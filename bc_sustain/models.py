@@ -14,7 +14,7 @@ class Profile(models.Model):
         ('CSON', 'CSON'),
         ('LAW', 'LAW'),
     ])
-    graduation_year = models.PositiveIntegerField()
+    graduation_year = models.PositiveIntegerField(null=True, blank=True)
     major = models.CharField(max_length=100)
     minor = models.CharField(max_length=100, blank=True, null=True)
     picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
