@@ -1,20 +1,20 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from .forms import ProfileForm
+from .models import Profile
 
-# Create your views here.
 def ProfileView(request):
-    # check if the profile is filled, redirect if not
+    profile, created = Profile.objects.get_or_create(username=request.user)
+
     if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES)
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             profile = form.save(commit=False)
-            profile.user = request.user
+            profile.username = request.user
             profile.save()
-        
-        return HttpResponseRedirect("/home")
-    
+            messages.success(request, 'Your profile was updated successfully!')
+            return redirect("profile")
     else:
-        form = ProfileForm() 
+        form = ProfileForm(instance=profile)
 
-    return render(request, "profile.html", {"form": form})
+    return render(request, "profile.html", {"form": form, "profile": profile})
