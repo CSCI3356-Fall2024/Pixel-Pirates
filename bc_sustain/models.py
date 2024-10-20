@@ -15,10 +15,8 @@ class Profile(models.Model):
         ('LAW', 'LAW'),
     ])
     graduation_year = models.PositiveIntegerField()
-    major1 = models.CharField(max_length=100)
-    major2 = models.CharField(max_length=100, blank=True, null=True)
-    minor1 = models.CharField(max_length=100, blank=True, null=True)
-    minor2 = models.CharField(max_length=100, blank=True, null=True)
+    major = models.CharField(max_length=100)
+    minor = models.CharField(max_length=100, blank=True, null=True)
     picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
 
