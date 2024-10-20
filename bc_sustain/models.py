@@ -8,11 +8,11 @@ class Profile(models.Model):
     name = models.CharField(max_length=100)
     bc_email = models.EmailField(unique=True, default='default@bc.edu')
     school = models.CharField(max_length=100, choices=[
-        ('CSOM', 'Carroll School of Management'),
-        ('MCAS', 'Morrissey College of Arts and Sciences'),
-        ('LSEHD', 'Lynch School of Education and Human Development'),
-        ('CSON', 'Connell School of Nursing'),
-        ('LAW', 'Boston College Law School'),
+        ('CSOM', 'CSOM'),
+        ('MCAS', 'MCAS'),
+        ('LSEHD', 'LSEHD'),
+        ('CSON', 'CSON'),
+        ('LAW', 'LAW'),
     ])
     graduation_year = models.PositiveIntegerField()
     major1 = models.CharField(max_length=100)

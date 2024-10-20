@@ -4,11 +4,11 @@ from .models import Profile
 
 class ProfileForm(forms.ModelForm):
     SCHOOL_CHOICES = [
-        ('CSOM', 'Carroll School of Management'),
-        ('MCAS', 'Morrissey College of Arts and Sciences'),
-        ('LSEHD', 'Lynch School of Education and Human Development'),
-        ('CSON', 'Connell School of Nursing'),
-        ('LAW', 'Boston College Law School'),
+        ('CSOM', 'CSOM'),
+        ('MCAS', 'MCAS'),
+        ('LSEHD', 'LSEHD'),
+        ('CSON', 'CSON'),
+        ('LAW', 'LAW'),
     ]
     school = forms.ChoiceField(choices=SCHOOL_CHOICES, widget=forms.Select(attrs={'class': 'form-select'}))
 

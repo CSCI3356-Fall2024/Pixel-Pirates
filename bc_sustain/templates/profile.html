@@ -21,19 +21,57 @@
 
     .pfp-container {
         height: 20%;
-        width: 30%;
+        width: 20%;
         padding: 10px;
     }
 
     .info-container {
-        height: 70%;
-        width: 70%;
+        height: 60%;
+        width: 75%;
         padding: 10px;
         display: grid;
         grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
         justify-items: start;
         align-content: stretch;
+        align-items: center;
+        background-color: #F5F5F5;
+        border-radius: 20px;
+        padding: 20px 40px;
+        box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
     }
+
+    .info-container h2 {
+        font-size: 30px;
+        margin: 0;
+    }
+
+    .mb-3 label {
+        font-size: 23px;
+        font-weight: bold;
+        display: block;
+        padding-bottom: 10px;
+        color: #204136
+    }
+
+    .mb-3 .form-control {
+        color: gray;
+        font-size: 20px;
+        border-radius: 5px;
+        border: 1px solid #D9D9D9;
+        box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
+        padding: 5px;
+    }
+
+    .mb-3 .form-select {
+        color: gray;
+        font-size: 20px;
+        border-radius: 5px;
+        border: 1px solid #D9D9D9;
+        box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
+        padding: 5px 10px;
+    }
+
 </style>
 
 <form method="POST" enctype="multipart/form-data">
@@ -50,13 +88,13 @@
         <div class="info-container">
             <h2 style="grid-column: 1/3; grid-row: 1;">Personal Information</h2>
             <div class="mb-3">
-                <label for="id_name">Full Name:</label>
-                {{ form.bc_email|add_class:"form-control" }}
+                <label for="id_name">Name:</label>
+                {% render_field form.name class="form-control" placeholder="First Last" %}
             </div>
     
             <div class="mb-3">
                 <label for="id_username">Username:</label>
-                {{ form.bc_email|add_class:"form-control" }}
+                {{ form.username|add_class:"form-control" }}
             </div>
     
             <div class="mb-3">
