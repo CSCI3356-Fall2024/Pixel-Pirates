@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "Pixel_Pirates",
-    "bc_sustain",
+    "bc_sustain.apps.BcSustainConfig",
 ]
 
 MIDDLEWARE = [

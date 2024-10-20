@@ -1,15 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Complete Profile</title>
-    </head>
-    <body>
-        <h2>Complete Your Profile</h2>
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Save Profile</button>
-        </form>
-    </body>
-</html>
+{% extends 'base.html' %}
+{% block title %} Profile Page {% endblock %}
+
+{% block content %}
+<h2>Complete Your Profile</h2>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit", name="save">Save Profile</button>
+</form>
+{% endblock %}
