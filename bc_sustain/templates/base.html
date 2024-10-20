@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <style type="text/css">
+            .sidenav {
+                height: 100%;
+                width: 100px;
+                position: fixed;
+                z-index: 1;
+                top: 0;
+                left: 0;
+                background-color: #B8D8BE;
+                overflow-x: hidden;
+                padding-top: 20px;
+            }
+
+            .sidenav a {
+                /* padding: 6px 8px 6px 16px; */
+                text-decoration: none;
+                color: #49454F;
+                font-size: 15px;
+                display: flex;
+                /* align-content: center; */
+                align-items: center;
+                flex-direction: column;
+                padding: 20px;
+            }
+
+            .sidenav a:hover {
+                color:#8E8E93;
+            }
+
+            .sidenav i {
+                font-size: 25px;
+                padding-bottom: 10px;
+            }
+
+            .main {
+            margin-left: 100px;
+            padding: 0px 10px;
+            height: 100vh;
+            width: 100%;
+            }
+        </style>
+
+        <script src="https://kit.fontawesome.com/d4b5ddbcae.js" crossorigin="anonymous"></script>
+
+    </head>
+    <body>
+       <div class="sidenav">
+        <a href = "/home">
+            <i class="fa-solid fa-house"></i>
+            Home
+        </a>
+        <a href = "/profile">
+            <i class="fa fa-user"></i>
+            Profile
+        </a>
+        <a href = "/home">
+            <i class="fas fa-award"></i>
+            Rewards
+        </a>
+        <a href = "/home">
+            <i class="fa-solid fa-person-walking"></i>
+            Actions
+        </a>
+        <a href = "/home">
+            <i class="fa-solid fa-image"></i>
+            Explore
+        </a>
+       </div>
+
+       <div id="content", class="main">
+        {% block content %}
+        {% endblock %}
+       </div>
+    </body>
+</html>
