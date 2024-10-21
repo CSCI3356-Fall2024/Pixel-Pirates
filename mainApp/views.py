@@ -30,7 +30,7 @@ def profile_view(request):
     return render(request, "profile.html", {"form": form, "profile": profile})
 
 def confirmation_view(request):  
-    profile = Profile.objects.get(id=1) #the database must be empty in order for this work 
+    profile = Profile.objects.order_by('-id').first() #the most recently created profile  
     user = request.user
 
     context = { 
