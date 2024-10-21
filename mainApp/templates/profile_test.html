@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Profile Page{% endblock %}
+
+{% block content %}
+
+<form action="{% url 'profile' %}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+    <div class="content-container"></div>
+        <div class="pfp-container">
+            <div class="pfp">
+                {% if profile.picture %}
+                    <img id="profileImage" src="{{ profile.picture.url }}" alt="Profile Picture">
+                {% else %}
+                    <img id="profileImage" src="https://via.placeholder.com/150" alt="Default Profile Picture">
+                {% endif %}
+                <button type="button" class="upload-btn" onclick="document.getElementById('id_picture').click();">
+                    Edit Photo
+                </button>
+            </div>
+
+            <div class="mb-3" style="display:none;">
+                {{ form.picture|add_class:"form-control-file" }}
+            </div>
+        </div>
+
+        {{ form.as_p }}
+    <input type='submit' value='Save Profile' class='btn btn-primary' />
+</form>
+
+
+
+{% endblock %}

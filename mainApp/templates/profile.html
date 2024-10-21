@@ -148,7 +148,8 @@
 </div>
 {% endif %}
 
-<form method="POST" enctype="multipart/form-data">
+<!--<form method="POST" enctype="multipart/form-data">-->
+<form action='.' method='POST' enctype="multipart/form-data"> 
     {% csrf_token %}
 
     <div class="content-container">
@@ -175,7 +176,8 @@
 
             <div class="mb-3">
                 <label for="id_name">Name</label>
-                {% render_field form.name class="form-control" placeholder="First Last" %}
+                <!--{% render_field form.name class="form-control" placeholder="First Last" %}-->
+                {{ form.name }}
             </div>
 
             <div class="mb-3">
@@ -185,27 +187,27 @@
 
             <div class="mb-3">
                 <label for="id_bc_email">BC Email</label>
-                {% render_field form.bc_email class="form-control" %}
+                {{ form.bc_email }}
             </div>
 
             <div class="mb-3">
                 <label for="id_school">School</label>
-                {% render_field form.school class="form-select" %}
+                {{ form.school }}
             </div>
 
             <div class="mb-3">
                 <label for="id_major">Major(s)</label>
-                {% render_field form.major class="form-control" placeholder="Enter major(s)" %}
+                {{ form.major }}
             </div>
 
             <div class="mb-3">
                 <label for="id_minor">Minor(s)</label>
-                {% render_field form.minor class="form-control" placeholder="(optional)" %}
+                {{ form.minor }}
             </div>
 
             <div class="mb-3">
                 <label for="id_graduation_year">Graduation Year</label>
-                {% render_field form.graduation_year class="form-select" %}
+                {{ form.graduation_year }}
             </div>
         </div>
 
@@ -215,11 +217,12 @@
 
         <div class="bio-container">
             <label for="id_bio"><h2>Bio</h2></label>
-            {% render_field form.bio class="form-control" placeholder="Let’s get sustainable!" %}
+            {{ form.bio }}
         </div>
 
         <div class="submit-container">
-            <button type="submit" class="btn btn-primary mt-3">Save Profile</button>
+            <input type="submit" value="Save Profile"/>
+            <!--class="btn btn-primary mt-3" -->
         </div>
     </div>
 </form>

@@ -19,12 +19,14 @@ def profile_view(request):
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
-            profile = form.save(commit=False)
-            profile.username = request.user
-            profile.save()
+            form.save()
+            print(form)
+            #profile = form.save()
+            #profile.username = request.user
+            #profile.save()
             messages.success(request, 'Your profile was updated successfully!')
             return redirect("profile")
     else:
         form = ProfileForm(instance=profile)
 
-    return render(request, "profile.html", {"form": form, "profile": profile})
+    return render(request, "profile_test.html", {"form": form, "profile": profile})

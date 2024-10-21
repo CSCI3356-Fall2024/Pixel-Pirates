@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "Pixel_Pirates",
+    #"Pixel_Pirates",
     "widget_tweaks",
     "mainApp",
     "django.contrib.sites",
