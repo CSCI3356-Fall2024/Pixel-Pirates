@@ -40,18 +40,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-<<<<<<< HEAD
     "Pixel_Pirates",
     "bc_sustain.apps.BcSustainConfig",
     "widget_tweaks",
-=======
     "mainApp",
     "django.contrib.sites",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google"
->>>>>>> b66c0271e3e11cd139c3db921ffb5997cf9bb529
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
