@@ -25,5 +25,4 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("", include("mainApp.urls")),
-    path("", include("bc_sustain.urls")),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "Pixel_Pirates",
-    "bc_sustain.apps.BcSustainConfig",
     "widget_tweaks",
     "mainApp",
     "django.contrib.sites",
