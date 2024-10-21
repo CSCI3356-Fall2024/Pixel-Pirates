@@ -12,7 +12,7 @@ def logout_view(request):
     logout(request)
     return redirect("/")
 
-# Create your views here.
+#Create your views here.
 def profile_view(request):
     profile, created = Profile.objects.get_or_create(username=request.user)
 
@@ -28,3 +28,13 @@ def profile_view(request):
         form = ProfileForm(instance=profile)
 
     return render(request, "profile.html", {"form": form, "profile": profile})
+
+def confirmation_view(request):  
+    profile = Profile.objects.get(id=1) #the database must be empty in order for this work 
+    user = request.user
+
+    context = { 
+        "profile": profile,
+        "user": user
+    }
+    return render(request, "confirmation.html", context)
