@@ -13,7 +13,7 @@ def logout_view(request):
     return redirect("/")
 
 # Create your views here.
-def ProfileView(request):
+def profile_view(request):
     profile, created = Profile.objects.get_or_create(username=request.user)
 
     if request.method == "POST":
