@@ -57,7 +57,14 @@ SOCIALACCOUNT_PROVIDERS = {
             "profile",
             "email"
         ],
-        "AUTH_PARAMS": {"access_type": "online"}
+        "AUTH_PARAMS": {
+            'access_type': 'online'
+        },
+        'App': {
+            'client_id': '208517930837-uc1hi71vrtvmntp5rs6h687hd9j5ga4h.apps.googleusercontent.com',  
+            'secret': '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', 
+            'key': ''
+        }
     },
 }
 
@@ -148,11 +155,12 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.2']
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend"
 )
 
-LOGIC_DIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/accounts/google/login/"
