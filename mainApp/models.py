@@ -1,19 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Create your models here.
-
 class Profile(models.Model):
-    username = models.OneToOneField(User, on_delete=models.CASCADE)
+    username = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     name = models.CharField(max_length=100)
     bc_email = models.EmailField(unique=True, default='default@bc.edu')
-    school = models.CharField(max_length=100, choices=[
-        ('CSOM', 'CSOM'),
-        ('MCAS', 'MCAS'),
-        ('LSEHD', 'LSEHD'),
-        ('CSON', 'CSON'),
-        ('LAW', 'LAW'),
-    ])
+    school = models.CharField(
+        max_length=100, 
+        choices=[
+            ('CSOM', 'CSOM'),
+            ('MCAS', 'MCAS'),
+            ('LSEHD', 'LSEHD'),
+            ('CSON', 'CSON'),
+            ('LAW', 'LAW'),
+        ]
+    )
     graduation_year = models.PositiveIntegerField(null=True, blank=True)
     major = models.CharField(max_length=100)
     minor = models.CharField(max_length=100, blank=True, null=True)

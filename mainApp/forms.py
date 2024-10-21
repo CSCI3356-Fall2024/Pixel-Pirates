@@ -23,7 +23,7 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ['username', 'name', 'bc_email', 'school', 'major',
+        fields = ['name', 'bc_email', 'school', 'major',
             'minor', 'graduation_year', 'picture', 'bio']
         
         def clean_bc_email(self):

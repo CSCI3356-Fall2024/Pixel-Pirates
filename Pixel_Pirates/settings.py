@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "Pixel_Pirates",
     "widget_tweaks",
-    "mainApp",
+    'mainApp.apps.MainappConfig',
     "django.contrib.sites",
     "allauth",
     "allauth.account",
@@ -160,6 +160,9 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend"
 )
+
+SOCIALACCOUNT_QUERY_EMAIL = True
+
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/accounts/google/login/"
