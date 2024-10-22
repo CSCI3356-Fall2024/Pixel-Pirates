@@ -205,10 +205,10 @@
                     type="text" 
                     class="form-control" 
                     name="name" 
-                    placeholder="{{ user.first_name }} {{ user.last_name }}" 
-                    value="{{ form.name.value|default_if_none:'' }}" 
+                    value="{{ form.name.value|default:user.get_full_name }}" 
                 >
             </div>
+            
 
             <div class="mb-3">
                 <label for="id_username">Username</label>
