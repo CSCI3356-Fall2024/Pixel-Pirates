@@ -4,11 +4,7 @@ from . import views
 urlpatterns = [
     path("", views.home, name="home"),
     path("profile/", views.profile_view, name="profile"),
-<<<<<<< HEAD
-    path("logout/", views.logout_view, name="logout")
-=======
     path("logout/", views.logout_view, name="logout"),
     path("confirmation/", views.confirmation_view, name="confirmation")
 
->>>>>>> origin
 ]

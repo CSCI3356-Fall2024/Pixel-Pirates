@@ -2,13 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Profile(models.Model):
-<<<<<<< HEAD
-    username = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    name = models.CharField(max_length=100)
-=======
     username = models.OneToOneField(User, on_delete=models.CASCADE) #this is just the user itself, not the actual username of the user
     name = models.CharField(max_length=100)                         
->>>>>>> origin
     bc_email = models.EmailField(unique=True, default='default@bc.edu')
     school = models.CharField(
         max_length=100, 
