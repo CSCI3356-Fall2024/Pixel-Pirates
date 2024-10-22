@@ -1,18 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmation{% endblock %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
+<style>
+    notification-container {
+        grid-column: 1;
+        grid-row: 3/5;
+        background-color: #F5F5F5;
+        border-radius: 20px;
+        box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
+        padding: 20px 40px;
+    }
+</style>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Confirmation</title>
 </head>
+<div class="notification-container">
 <body>
-    <h2>Name:</h2>
-    <h4>{{ profile.name }}</h4>
-    <h2>Role:<h2>
-    {% if profile.username.is_superuser %}
-    <h4>supervisor role</h4>
-    {% else %}
-    <h4>student role</h4>
+    <h2>Name: {{ profile.name }}</h2>
+    <h2>Role: {% if profile.username.is_superuser %} supervisor role {% else %} student role</h2>
     {% endif %}
 </body>
+</div>
 </html>
+
+{% endblock %}
