@@ -2,19 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Django Google Sign In</title>
+
+    <style>
+        body {
+            background-color: #B8D8BE;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            height: 30%;
+            width: 90%;
+            background: white;
+            align-items: center;
+            justify-content: center;
+            margin: 30% 5%;
+        }
+    </style>
 </head>
 <body>
-    <h2>Google Login</h2>
+    <div class="content">
+        <!-- Page Header -->
+        <h1>Sign In Via Google</h1>
 
-    {% load socialaccount %}
+        <p>You are about to sign in using a third-party account from Google.</p>
 
-    {% if user.is_authenticated %}
-        <p>You are signed in as {{ user.email|default:"No email available" }}</p>
-        <a href="{% url 'logout' %}">Logout</a>
-    {% else %}
-        <a href="{% provider_login_url 'google' %}?next=/profile">Login With Google</a>
-    {% endif %}
+        {% load socialaccount %}
+
+        {% if user.is_authenticated %}
+            <!-- Authenticated User Section -->
+            <p>You are signed in as {{ user.email|default:"No email available" }}</p>
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <!-- Google Login Button -->
+            <form method="post" action="{% provider_login_url 'google' %}?next=/profile">
+                {% csrf_token %}
+                <button type="submit">Continue with Google</button>
+            </form>
+        {% endif %}
+    </div>
+
 </body>
 </html>
