@@ -27,6 +27,12 @@ def profile_view(request):
 
         if created:
             messages.success(request, "Profile created successfully!")
+        
+        required_fields = False
+        if profile.name and profile.school and profile.major:
+            required_fields = True 
+        print(required_fields)
+
     except IntegrityError:
         messages.error(request, "There was an issue creating your profile.")
         return redirect('home')
@@ -35,6 +41,8 @@ def profile_view(request):
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             try:
+                if profile.name and profile.school and profile.major:
+                    required_fields = True 
                 form.save()
                 messages.success(request, "Profile updated successfully!")
                 return redirect('profile')
@@ -50,8 +58,8 @@ def profile_view(request):
         'form': form,
         'profile': profile,
         'user': request.user,  # Pass the user object
+        'required': required_fields,
     })
-    return render(request, "profile.html", {"form": form, "profile": profile})
 
 def confirmation_view(request):  
     user = request.user
