@@ -4,7 +4,5 @@ class MainappConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "mainApp"
 
-    def ready(self):
-        print("Signals loaded!")  
+    def ready(self): 
         import mainApp.signals 
-        # import mainApp.adapter
