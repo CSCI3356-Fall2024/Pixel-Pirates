@@ -123,6 +123,7 @@
 
     <body>
         <!-- Sidebar -->
+        {% if required %}
         <div class="sidenav">
             <a href="/home">
                 <i class="fa-solid fa-house"></i>
@@ -149,6 +150,10 @@
                 Logout
             </a>
         </div>
+        {% else %}
+                <!-- Do not render the sidebar or show a message like below -->
+            <p>Please complete your profile to unlock more features.</p>
+        {% endif %}
 
         <!-- Content area -->
         <div id="content" class="main">
