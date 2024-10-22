@@ -48,32 +48,37 @@
 
     </head>
     <body>
-       <div class="sidenav">
-        <a href = "/home">
-            <i class="fa-solid fa-house"></i>
-            Home
-        </a>
-        <a href = "/profile">
-            <i class="fa fa-user"></i>
-            Profile
-        </a>
-        <a href = "/home">
-            <i class="fas fa-award"></i>
-            Rewards
-        </a>
-        <a href = "/home">
-            <i class="fa-solid fa-person-walking"></i>
-            Actions
-        </a>
-        <a href = "/home">
-            <i class="fa-solid fa-image"></i>
-            Explore
-        </a>
-       </div>
-
-       <div id="content", class="main">
-        {% block content %}
-        {% endblock %}
-       </div>
+        {% if required %}
+            <div class="sidenav">
+                <a href = "/home">
+                    <i class="fa-solid fa-house"></i>
+                    Home
+                </a>
+                <a href = "/profile">
+                    <i class="fa fa-user"></i>
+                    Profile
+                </a>
+                <a href = "/home">
+                    <i class="fas fa-award"></i>
+                    Rewards
+                </a>
+                <a href = "/home">
+                    <i class="fa-solid fa-person-walking"></i>
+                    Actions
+                </a>
+                <a href = "/home">
+                    <i class="fa-solid fa-image"></i>
+                    Explore
+                </a>
+            </div>
+        {% else %}
+                <!-- Do not render the sidebar or show a message like below -->
+            <p>Please complete your profile to unlock more features.</p>
+        {% endif %}
+        
+        <div id="content", class="main">
+            {% block content %}
+            {% endblock %}
+        </div>
     </body>
 </html>
