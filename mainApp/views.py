@@ -35,7 +35,7 @@ def profile_view(request):
             try:
                 form.save()
                 messages.success(request, "Profile updated successfully!")
-                return redirect('profile')  # Redirect to avoid duplicate form submissions
+                return redirect('confirmation')  # Redirect to avoid duplicate form submissions
             except Exception as e:
                 messages.error(request, f"Error saving profile: {e}")
         else:

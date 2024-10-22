@@ -6,11 +6,13 @@
     <title>Confirmation</title>
 </head>
 <body>
-    <h2>{{ profile.name }}</h2>
+    <h2>Name:</h2>
+    <h4>{{ profile.name }}</h4>
+    <h2>Role:<h2>
     {% if profile.username.is_superuser %}
-    <h2>supervisor role</h2>
+    <h4>supervisor role</h4>
     {% else %}
-    <h2>student role</h2>
+    <h4>student role</h4>
     {% endif %}
 </body>
 </html>
