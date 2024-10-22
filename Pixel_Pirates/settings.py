@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "Pixel_Pirates",
     "widget_tweaks",
-    'mainApp.apps.MainappConfig',
+    'mainApp',
     "django.contrib.sites",
     "allauth",
     "allauth.account",
@@ -161,8 +161,17 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend"
 )
 
+# Enforce login redirect after Google login
+LOGIN_REDIRECT_URL = '/profile/'
+LOGOUT_REDIRECT_URL = '/accounts/google/login/'
+
+# Disable email verification to simplify login
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_SIGNUP_REDIRECT_URL = '/profile/'  
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_QUERY_EMAIL = True
 
-
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/accounts/google/login/"
+# Disable regular signup
+# ACCOUNT_ADAPTER = 'mainApp.adapter.NoSignupAccountAdapter'

@@ -4,6 +4,7 @@ from .models import Profile
 
 class ProfileForm(forms.ModelForm):
     SCHOOL_CHOICES = [
+        ('', 'School'),
         ('CSOM', 'CSOM'),
         ('MCAS', 'MCAS'),
         ('LSEHD', 'LSEHD'),

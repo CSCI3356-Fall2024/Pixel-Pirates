@@ -1,23 +1,54 @@
+from allauth.account.signals import user_signed_up
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Profile
 from django.contrib.auth.models import User
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        # Automatically create a profile for the user
-        Profile.objects.create(
-            username=instance,  # Assuming 'username' is a OneToOneField to User
-            bc_email=instance.email,
-            name=f"{instance.first_name} {instance.last_name}",
+@receiver(user_signed_up)
+def create_profile_on_google_signup(request, user, **kwargs):
+    """Create or update profile on Google OAuth sign-up."""
+    sociallogin = kwargs.get('sociallogin')
+
+    if sociallogin:
+        # Extract email and username from Google's OAuth response
+        email = sociallogin.account.extra_data.get('email', '')
+        username_part = email.split('@')[0]  # Extract everything before '@'
+
+        # Extract first and last names from Google's response
+        first_name = sociallogin.account.extra_data.get('given_name', '')
+        last_name = sociallogin.account.extra_data.get('family_name', '')
+
+        # Debugging: Print statements to confirm the extracted data
+        print(f"Username: {username_part}")
+        print(f"First Name: {first_name}")
+        print(f"Last Name: {last_name}")
+
+        # Update the User instance before creating the profile
+        user.username = username_part  # Set username to part before '@'
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()  # Save the updated user instance
+
+        # Now, create or update the user's profile
+        Profile.objects.update_or_create(
+            username=user,  # OneToOneField with User
+            defaults={
+                'bc_email': email,
+                'name': f"{first_name} {last_name}".strip(),
+            }
         )
 
 @receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    # Save the user's profile whenever the User instance is saved
-    try:
-        instance.profile.save()
-    except Profile.DoesNotExist:
-        # Handle the case where the profile does not yet exist
-        Profile.objects.create(username=instance, bc_email=instance.email)
+def save_user_profile(sender, instance, created, **kwargs):
+    """Ensure profile is created or saved whenever a User instance is saved."""
+    if created:
+        Profile.objects.get_or_create(
+            username=instance,
+            defaults={'bc_email': instance.email}
+        )
+    else:
+        try:
+            instance.profile.save()
+        except Profile.DoesNotExist:
+            # Create the profile if it doesn't exist
+            Profile.objects.create(username=instance, bc_email=instance.email)

@@ -5,4 +5,6 @@ class MainappConfig(AppConfig):
     name = "mainApp"
 
     def ready(self):
+        print("Signals loaded!")  
         import mainApp.signals 
+        # import mainApp.adapter

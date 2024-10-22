@@ -175,17 +175,17 @@
 
             <div class="mb-3">
                 <label for="id_name">Name</label>
-                {% render_field form.name class="form-control" placeholder="First Last" %}
+                <input type="text" class="form-control" value="{{ user.first_name }} {{ user.last_name }}" >
             </div>
 
             <div class="mb-3">
                 <label for="id_username">Username</label>
-                <input type="text" class="form-control" value="{{ request.user.username }}" readonly>
+                <input type="text" class="form-control" value="{{ profile.username }}" readonly>
             </div>
 
             <div class="mb-3">
                 <label for="id_bc_email">BC Email</label>
-                {% render_field form.bc_email class="form-control" %}
+                <input type="email" class="form-control" value="{{ profile.bc_email }}" readonly>
             </div>
 
             <div class="mb-3">
