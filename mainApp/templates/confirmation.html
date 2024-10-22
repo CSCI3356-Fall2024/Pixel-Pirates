@@ -8,11 +8,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Confirmation</title>
+
+<style>
+    .content {
+        display: flex;
+        flex-direction: column;
+        height: 30%;
+        width: 90%;
+        background-color: #d4edda;
+        align-items: center;
+        justify-content: center;
+        margin: 15% 5%;
+        border-radius: 20px;
+        box-shadow: 0px 7px rgba(46, 104, 78, 0.3);
+        }
+</style>
 </head>
+
 <body>
+<div class="content">
     <h2>Name: {{ profile.name }}</h2>
-    <h2>Role: {% if profile.username.is_superuser %} supervisor role {% else %} student role</h2>
+    <h2>Role: {% if profile.username.is_superuser %} supervisor {% else %} student </h2>
     {% endif %}
+</div>
 </body>
 </html>
 
