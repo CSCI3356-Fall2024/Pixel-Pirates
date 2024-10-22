@@ -13,7 +13,11 @@ def logout_view(request):
     logout(request)
     return redirect("/")
 
+<<<<<<< HEAD
 @login_required
+=======
+#Create your views here.
+>>>>>>> origin
 def profile_view(request):
     try:
         # Retrieve or create the profile for the logged-in user
@@ -45,9 +49,22 @@ def profile_view(request):
     else:
         form = ProfileForm(instance=profile)
 
+<<<<<<< HEAD
     # Pass the user and profile objects to the template
     return render(request, 'profile.html', {
         'form': form,
         'profile': profile,
         'user': request.user,  # Pass the user object
     })
+=======
+    return render(request, "profile.html", {"form": form, "profile": profile})
+
+def confirmation_view(request):  
+    user = request.user
+    profile = profile = Profile.objects.get(username=user)
+
+    context = { 
+        "profile": profile
+    }
+    return render(request, "confirmation.html", context)
+>>>>>>> origin

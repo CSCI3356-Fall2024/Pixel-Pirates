@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirmation</title>
+</head>
+<body>
+    <h2>{{ profile.name }}</h2>
+    {% if profile.username.is_superuser %}
+    <h2>supervisor role</h2>
+    {% else %}
+    <h2>student role</h2>
+    {% endif %}
+</body>
+</html>
