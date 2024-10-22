@@ -23,6 +23,11 @@ def profile_view(request):
         messages.error(request, "Profile not found. Creating a new profile.")
         profile = Profile(username=request.user)
         profile.save()
+    
+    required_fields = False
+    if profile.name and profile.school and profile.major:
+        required_fields = True 
+    print(required_fields)
 
     if request.method == 'POST':
         # Bind the form to the POST data and files
@@ -34,9 +39,11 @@ def profile_view(request):
 
         if form.is_valid():
             try:
+                if profile.name and profile.school and profile.major:
+                    required_fields = True 
                 form.save()
                 messages.success(request, "Profile updated successfully!")
-                return redirect('profile')  # Redirect to avoid duplicate form submissions
+                return redirect('confirmation')  # Redirect to avoid duplicate form submissions
             except Exception as e:
                 messages.error(request, f"Error saving profile: {e}")
         else:
@@ -44,7 +51,7 @@ def profile_view(request):
     else:
         form = ProfileForm(instance=profile)
 
-    return render(request, 'profile.html', {'form': form, 'profile': profile})
+    return render(request, 'profile.html', {'form': form, 'profile': profile, 'required': required_fields})
 
 def confirmation_view(request):  
     user = request.user
