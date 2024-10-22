@@ -30,11 +30,10 @@ def profile_view(request):
     return render(request, "profile.html", {"form": form, "profile": profile})
 
 def confirmation_view(request):  
-    profile = Profile.objects.order_by('-id').first() #the most recently created profile  
     user = request.user
+    profile = profile = Profile.objects.get(username=user)
 
     context = { 
-        "profile": profile,
-        "user": user
+        "profile": profile
     }
     return render(request, "confirmation.html", context)

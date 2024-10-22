@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Profile(models.Model):
-    username = models.OneToOneField(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    username = models.OneToOneField(User, on_delete=models.CASCADE) #this is just the user itself, not the actual username of the user
+    name = models.CharField(max_length=100)                         
     bc_email = models.EmailField(unique=True, default='default@bc.edu')
     school = models.CharField(max_length=100, choices=[
         ('CSOM', 'CSOM'),

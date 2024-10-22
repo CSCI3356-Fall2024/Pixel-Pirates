@@ -7,7 +7,7 @@
 </head>
 <body>
     <h2>{{ profile.name }}</h2>
-    {% if user.is_superuser %}
+    {% if profile.username.is_superuser %}
     <h2>supervisor role</h2>
     {% else %}
     <h2>student role</h2>
