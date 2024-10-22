@@ -172,6 +172,3 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_QUERY_EMAIL = True
-
-# Disable regular signup
-# ACCOUNT_ADAPTER = 'mainApp.adapter.NoSignupAccountAdapter'
