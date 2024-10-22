@@ -73,7 +73,7 @@
         gap: 10px;
         justify-items: start;
         align-content: stretch;
-        align-items: center;
+        align-items: start;
         background-color: #F5F5F5;
         border-radius: 20px;
         padding: 20px 40px;
@@ -85,12 +85,16 @@
         margin: 0;
     }
 
+    .mb-3 {
+        width: 90%;
+    }
+
     .mb-3 label {
         font-size: 20px;
         font-weight: bold;
         display: block;
         padding-bottom: 10px;
-        color: #204136
+        color: #204136;
     }
 
     .mb-3 .form-control {
@@ -100,6 +104,7 @@
         border: 1px solid #D9D9D9;
         box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
         padding: 5px 15px;
+        width: 60%;
     }
 
     .mb-3 .form-select {
@@ -108,7 +113,8 @@
         border-radius: 5px;
         border: 1px solid #D9D9D9;
         box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
-        padding: 5px 25px;
+        padding: 5px 15px;
+        width: 60%;
     }
 
     .notification-container {
@@ -136,6 +142,16 @@
     .submit-container {
         grid-column: 4;
         grid-row: 5;
+    }
+
+    .readonly-field {
+        color: gray;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #D9D9D9;
+        box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
+        padding: 5px 15px;
+        width: 60%;
     }
 
 </style>
@@ -175,17 +191,23 @@
 
             <div class="mb-3">
                 <label for="id_name">Name</label>
-                <input type="text" class="form-control" value="{{ user.first_name }} {{ user.last_name }}" >
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    name="name" 
+                    placeholder="{{ user.first_name }} {{ user.last_name }}" 
+                    value="{{ form.name.value|default_if_none:'' }}" 
+                >
             </div>
 
             <div class="mb-3">
                 <label for="id_username">Username</label>
-                <input type="text" class="form-control" value="{{ profile.username }}" readonly>
+                <div class="readonly-field">{{ profile.username }} </div>
             </div>
 
             <div class="mb-3">
-                <label for="id_bc_email">BC Email</label>
-                <input type="email" class="form-control" value="{{ profile.bc_email }}" readonly>
+                <label>BC Email</label>
+                <div class="readonly-field">{{ profile.bc_email }}</div>
             </div>
 
             <div class="mb-3">

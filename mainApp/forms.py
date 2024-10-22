@@ -24,16 +24,16 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ['name', 'bc_email', 'school', 'major',
+        fields = ['name', 'school', 'major',
             'minor', 'graduation_year', 'picture', 'bio']
         
-        def clean_bc_email(self):
-            bc_email = self.cleaned_data.get('bc_email')
+        # def clean_bc_email(self):
+        #     bc_email = self.cleaned_data.get('bc_email')
 
-            if not bc_email.endswith('@bc.edu'):
-                raise forms.ValidationError("Please enter a valid BC email address.")
+        #     if not bc_email.endswith('@bc.edu'):
+        #         raise forms.ValidationError("Please enter a valid BC email address.")
 
-            if Profile.objects.filter(bc_email=bc_email).exists():
-                raise forms.ValidationError("This email is already associated with another account.")
+        #     if Profile.objects.filter(bc_email=bc_email).exists():
+        #         raise forms.ValidationError("This email is already associated with another account.")
             
-            return bc_email
+        #     return bc_email

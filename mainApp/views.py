@@ -16,42 +16,34 @@ def logout_view(request):
 @login_required
 def profile_view(request):
     try:
-        # Retrieve or create the profile for the logged-in user
-        profile, created = Profile.objects.get_or_create(
-            username=request.user,
-            defaults={
-                'bc_email': request.user.email,
-                'name': f"{request.user.first_name} {request.user.last_name}".strip()
-            }
-        )
-
-        if created:
-            messages.success(request, "Profile created successfully!")
-    except IntegrityError:
-        messages.error(request, "There was an issue creating your profile.")
-        return redirect('home')
+        # Get the profile linked to the user
+        profile = Profile.objects.get(username=request.user)
+    except Profile.DoesNotExist:
+        messages.error(request, "Profile not found. Creating a new profile.")
+        profile = Profile(username=request.user)
+        profile.save()
 
     if request.method == 'POST':
+        # Bind the form to the POST data and files
         form = ProfileForm(request.POST, request.FILES, instance=profile)
+
+        # Print the POST data and form errors for debugging
+        print("POST Data:", request.POST)  # Debugging: Check what data is submitted
+        print("Form Errors:", form.errors)  # Debugging: Check for form validation errors
+
         if form.is_valid():
             try:
                 form.save()
                 messages.success(request, "Profile updated successfully!")
-                return redirect('profile')
-            except IntegrityError:
-                messages.error(request, "This email is already in use. Please try another one.")
+                return redirect('profile')  # Redirect to avoid duplicate form submissions
+            except Exception as e:
+                messages.error(request, f"Error saving profile: {e}")
         else:
             messages.error(request, "Please correct the errors below.")
     else:
         form = ProfileForm(instance=profile)
 
-    # Pass the user and profile objects to the template
-    return render(request, 'profile.html', {
-        'form': form,
-        'profile': profile,
-        'user': request.user,  # Pass the user object
-    })
-    return render(request, "profile.html", {"form": form, "profile": profile})
+    return render(request, 'profile.html', {'form': form, 'profile': profile})
 
 def confirmation_view(request):  
     user = request.user
