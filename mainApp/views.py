@@ -56,8 +56,9 @@ def profile_view(request):
 def confirmation_view(request):  
     user = request.user
     profile = profile = Profile.objects.get(username=user)
-
+    
     context = { 
-        "profile": profile
+        "profile": profile,
+        "required" : True
     }
     return render(request, "confirmation.html", context)
