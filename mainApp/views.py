@@ -6,8 +6,8 @@ from .forms import ProfileForm
 from .models import Profile
 from django.db import IntegrityError
 
-def home(request):
-    return render(request, "home.html")
+def login(request):
+    return render(request, "login.html")
 
 def logout_view(request):
     logout(request)
