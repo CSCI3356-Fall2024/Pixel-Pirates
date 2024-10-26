@@ -62,3 +62,8 @@ def confirmation_view(request):
         "required" : True
     }
     return render(request, "confirmation.html", context)
+
+
+def campaign_view(request):
+    required = request.user.is_authenticated  
+    return render(request, "campaign.html", {"required": required})
