@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
-from .forms import ProfileForm
+from .forms import ProfileForm, CampaignForm
 from .models import Profile
 from django.db import IntegrityError
 
@@ -66,4 +66,12 @@ def confirmation_view(request):
 
 def campaign_view(request):
     required = request.user.is_authenticated  
-    return render(request, "campaign.html", {"required": required})
+    if request.method == 'POST':
+        form = CampaignForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the form data to the database
+            return redirect('home')  # Redirect to the home page after successful save
+    else:
+        form = CampaignForm()  # Display an empty form on GET request
+
+    return render(request, 'campaign.html', {'form': form, 'required': required})

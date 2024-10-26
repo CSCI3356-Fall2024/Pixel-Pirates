@@ -1,6 +1,6 @@
 from django import forms
 from datetime import datetime
-from .models import Profile
+from .models import Profile, Campaign
 
 class ProfileForm(forms.ModelForm):
     SCHOOL_CHOICES = [
@@ -26,14 +26,16 @@ class ProfileForm(forms.ModelForm):
         model = Profile
         fields = ['name', 'school', 'major',
             'minor', 'graduation_year', 'picture', 'bio']
-        
-        # def clean_bc_email(self):
-        #     bc_email = self.cleaned_data.get('bc_email')
 
-        #     if not bc_email.endswith('@bc.edu'):
-        #         raise forms.ValidationError("Please enter a valid BC email address.")
+class CampaignForm(forms.ModelForm): 
 
-        #     if Profile.objects.filter(bc_email=bc_email).exists():
-        #         raise forms.ValidationError("This email is already associated with another account.")
-            
-        #     return bc_email
+    class Meta: 
+        model = Campaign
+        fields = ['title', 'description', 'date_begin', 'date_end', 'time_begin', 'time_end']
+        widgets = {
+            'date_begin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'date_end': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'time_begin': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'time_end': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+        }

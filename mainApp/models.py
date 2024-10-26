@@ -25,4 +25,13 @@ class Profile(models.Model):
         return f"{self.username.username}'s Profile"
  
 
- 
+class Campaign(models.Model):
+    title = models.CharField(max_length=200)  # Changed to CharField for better practice
+    description = models.TextField(max_length=500)  # Increased max length
+    date_begin = models.DateField()
+    date_end = models.DateField()
+    time_begin = models.TimeField()
+    time_end = models.TimeField()
+
+    def __str__(self):
+        return self.title

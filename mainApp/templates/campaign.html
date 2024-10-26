@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 
 {% block title %}Campaign{% endblock %}
+
 {% block content %}
-<div>
-    <h1>Campaign Page</h1>
-    <p>Welcome to the campaign page!</p>
-</div>
+<h1>Campaign Page</h1>
+<form method="post" action="/create/" class="form-group">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+
 {% endblock %}
