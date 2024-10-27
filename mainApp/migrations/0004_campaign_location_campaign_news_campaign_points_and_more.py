@@ -42,3 +42,5 @@ class Migration(migrations.Migration):
             field=models.CharField(max_length=200),
         ),
     ]
+    #whoops accidentally didn't push this 
+    
