@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "allauth.socialaccount.providers.google"
+    "allauth.socialaccount.providers.google",
+    'multiselectfield',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -57,7 +58,8 @@ SOCIALACCOUNT_PROVIDERS = {
             "email"
         ],
         "AUTH_PARAMS": {
-            'access_type': 'online'
+            'access_type': 'online',
+            'hd': 'bc.edu' 
         },
         'APP': {
             'client_id': '208517930837-uc1hi71vrtvmntp5rs6h687hd9j5ga4h.apps.googleusercontent.com',  
@@ -66,6 +68,8 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     },
 }
+
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

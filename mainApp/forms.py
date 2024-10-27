@@ -27,8 +27,11 @@ class ProfileForm(forms.ModelForm):
         fields = ['name', 'school', 'major',
             'minor', 'graduation_year', 'picture', 'bio']
 
-class CampaignForm(forms.ModelForm): 
-
+class CampaignForm(forms.ModelForm):     
     class Meta: 
         model = Campaign
-        fields = ['title', 'description', 'date_begin', 'date_end', 'time_begin', 'time_end']
+        fields = ['title', 'description', 'date_begin', 'date_end', 'time_begin', 'time_end', 'points', 'news', 'validation', 'location']
+        widgets = {
+            'location': forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'validation': forms.Select(attrs={'class': 'form-select'}),
+        }

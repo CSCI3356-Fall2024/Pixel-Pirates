@@ -145,10 +145,13 @@
                 <i class="fa-solid fa-image"></i>
                 Explore
             </a>
+            {% if user.is_superuser %}
             <a href="/campaign">
                 <i class="fa-solid fa-square-plus"></i>
                 Create
             </a>
+            {% endif %}
+           
             <a href="#" onclick="showLogoutModal(event)">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 Logout

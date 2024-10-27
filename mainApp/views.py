@@ -70,7 +70,7 @@ def campaign_view(request):
         form = CampaignForm(request.POST)
         if form.is_valid():
             form.save()  # Save the form data to the database
-            return redirect('home')  # Redirect to the home page after successful save
+            return redirect('profile')  # Redirect to the profile page after successful save
     else:
         form = CampaignForm()  # Display an empty form on GET request
 

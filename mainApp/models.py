@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from multiselectfield import MultiSelectField
 
 class Profile(models.Model):
     username = models.OneToOneField(User, on_delete=models.CASCADE) #this is just the user itself, not the actual username of the user
@@ -32,6 +33,27 @@ class Campaign(models.Model):
     date_end = models.DateField()
     time_begin = models.TimeField()
     time_end = models.TimeField()
+    points = models.IntegerField(default=0)
+    news = models.BooleanField(default=False)
+    validation = models.CharField(
+        max_length=100, 
+        choices=[
+            ('photo validation', 'photo validation'),
+            ('QR', 'QR'),
+        ],
+        default='photo validation'
+    )
+    location = MultiSelectField(
+        choices=[
+            ('Lower', 'Lower'),
+            ('McElroy', 'McElroy'),
+            ('Stuart', 'Stuart'),
+            ("Addie's", "Addie's"),
+            ("Eagle's Nest", "Eagle's Nest"),
+        ],
+        default=list,
+        blank=True
+    )
 
     def __str__(self):
         return self.title
