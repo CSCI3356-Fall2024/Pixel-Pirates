@@ -3,8 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from .forms import ProfileForm, CampaignForm
-from .models import Profile
+from .models import Profile, News
 from django.db import IntegrityError
+
+def google_login(request):
+    return redirect('/auth/login/google-oauth2/')
 
 def login(request):
     return render(request, "login.html")
@@ -12,7 +15,7 @@ def login(request):
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out successfully.")
-    return redirect("/")
+    return redirect("login")
 
 @login_required
 def profile_view(request):
@@ -75,3 +78,20 @@ def campaign_view(request):
         form = CampaignForm()  # Display an empty form on GET request
 
     return render(request, 'campaign.html', {'form': form, 'required': required})
+
+def home(request):
+    if request.user.is_authenticated:
+        try:
+            profile = request.user.profile
+            if not (profile.name and profile.school and profile.major):
+                return redirect('profile')
+        except Profile.DoesNotExist:
+            return redirect('profile')
+    else:
+        return redirect('login')
+
+    context = {
+        "required": True,
+    }
+    return render(request, 'home.html', context)
+

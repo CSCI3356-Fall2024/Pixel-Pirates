@@ -21,6 +21,7 @@ class Profile(models.Model):
     minor = models.CharField(max_length=100, blank=True, null=True)
     picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
+    points = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.username.username}'s Profile"
@@ -54,6 +55,15 @@ class Campaign(models.Model):
         default=list,
         blank=True
     )
+
+    def __str__(self):
+        return self.title
+    
+class News(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    image = models.ImageField(upload_to='news/', blank=True, null=True)
+    date_posted = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
