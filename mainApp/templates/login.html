@@ -53,7 +53,12 @@
         <!-- Page Header -->
         <h1>Sign In Via Google</h1>
 
-        <p>You are about to sign in using a third-party account from Google.</p>
+        {% if messages %}
+        <p>Please sign up with an email that ends with @bc.edu</p>
+        {% else %}
+        <p>You are about to sign in using a third-party account from Google</p>
+        {% endif %}
+
 
         {% load socialaccount %}
 
