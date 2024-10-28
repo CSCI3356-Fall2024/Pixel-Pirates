@@ -28,9 +28,8 @@ def profile_view(request):
         profile.save()
     
     required_fields = False
-    if profile.name and profile.school and profile.major:
+    if profile.name and profile.school and profile.major and profile.graduation_year:
         required_fields = True 
-    print(required_fields)
 
     if request.method == 'POST':
         # Bind the form to the POST data and files
@@ -42,8 +41,6 @@ def profile_view(request):
 
         if form.is_valid():
             try:
-                if profile.name and profile.school and profile.major:
-                    required_fields = True 
                 form.save()
                 messages.success(request, "Profile updated successfully!")
                 return redirect('confirmation')  # Redirect to avoid duplicate form submissions
