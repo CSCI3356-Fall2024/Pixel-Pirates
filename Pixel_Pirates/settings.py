@@ -175,5 +175,5 @@ ACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_QUERY_EMAIL = True
 
 # Enforce login redirect after Google login
-LOGIN_REDIRECT_URL = '/'  # Redirect existing users
+LOGIN_REDIRECT_URL = '/home/'  # Redirect existing users
 LOGOUT_REDIRECT_URL = '/accounts/google/login/'
