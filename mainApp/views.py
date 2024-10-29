@@ -5,22 +5,33 @@ from django.contrib import messages
 from .forms import ProfileForm, CampaignForm
 from .models import Profile, News
 from django.db import IntegrityError
+from django.dispatch import receiver
+from allauth.account.signals import user_logged_in
 import json
 
-def google_login(request):
-    return redirect('/auth/login/google-oauth2/')
+@receiver(user_logged_in)
+def handle_login(sender, request, user, **kwargs):
+    """Redirect new users to profile page and existing users to home."""
+    try:
+        # Check if the user has a profile
+        Profile.objects.get(username=user)
+        # If profile exists, redirect to home
+        request.session['login_redirect'] = '/home/'
+    except Profile.DoesNotExist:
+        # Redirect new users to profile creation page
+        request.session['login_redirect'] = '/profile/'
 
 def login_view(request):
-    # If user is already authenticated, redirect to profile or home
+    """Handle post-login redirection."""
     if request.user.is_authenticated:
-        return redirect('/home/')
-    
+        # Redirect based on session value set during login
+        return redirect(request.session.pop('login_redirect', '/home/'))
     return render(request, 'login.html')
 
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out successfully.")
-    return redirect("login")
+    return redirect('login')
 
 @login_required
 def profile_view(request):
@@ -48,7 +59,7 @@ def profile_view(request):
             try:
                 form.save()
                 messages.success(request, "Profile updated successfully!")
-                return redirect('confirmation')  # Redirect to avoid duplicate form submissions
+                return redirect('home')  # Redirect to avoid duplicate form submissions
             except Exception as e:
                 messages.error(request, f"Error saving profile: {e}")
         else:
@@ -81,21 +92,21 @@ def campaign_view(request):
 
     return render(request, 'campaign.html', {'form': form, 'required': required})
 
-def home(request):
-    if request.user.is_authenticated:
-        try:
-            profile = request.user.profile
-            if not (profile.name and profile.school and profile.major):
-                return redirect('profile')
-        except Profile.DoesNotExist:
-            return redirect('profile')
-    else:
-        return redirect('login')
+# def home(request):
+#     if request.user.is_authenticated:
+#         try:
+#             profile = request.user.profile
+#             if not (profile.name and profile.school and profile.major):
+#                 return redirect('profile')
+#         except Profile.DoesNotExist:
+#             return redirect('profile')
+#     else:
+#         return redirect('login')
 
-    context = {
-        "required": True,
-    }
-    return render(request, 'home.html', context)
+#     context = {
+#         "required": True,
+#     }
+#     return render(request, 'home.html', context)
 
 def home(request):
     if request.user.is_authenticated: #logic for determining if user is signed in properly

@@ -166,10 +166,6 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend"
 )
 
-# Enforce login redirect after Google login
-LOGIN_REDIRECT_URL = '/profile/'
-LOGOUT_REDIRECT_URL = '/accounts/google/login/'
-
 # Disable email verification to simplify login
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_SIGNUP_REDIRECT_URL = '/profile/'  
@@ -177,3 +173,7 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_QUERY_EMAIL = True
+
+# Enforce login redirect after Google login
+LOGIN_REDIRECT_URL = '/'  # Redirect existing users
+LOGOUT_REDIRECT_URL = '/accounts/google/login/'
