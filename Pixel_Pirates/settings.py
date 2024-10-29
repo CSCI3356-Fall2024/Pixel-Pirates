@@ -59,6 +59,7 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         "AUTH_PARAMS": {
             'access_type': 'online',
+            'prompt': 'select_account',
             'hd': 'bc.edu' 
         },
         'APP': {
@@ -170,7 +171,7 @@ LOGIN_REDIRECT_URL = '/profile/'
 LOGOUT_REDIRECT_URL = '/accounts/google/login/'
 
 # Disable email verification to simplify login
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_SIGNUP_REDIRECT_URL = '/profile/'  
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_USERNAME_REQUIRED = False
