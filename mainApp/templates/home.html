@@ -3,46 +3,92 @@
 
 {% block content %}
 <link rel= "stylesheet" type= "text/css" href= "../static/styles/home.css">
-
-<div class="container">
-    <div class="main-content">
-        <div class="leaderboard">
-            <h2>Leaderboard</h2>
-            <div class="leaderboard-item">
-                <h3>Jane Doe</h3>
-                <p>40 Points</p>
-            </div>
-            <div class="leaderboard-item">
-                <h3>George Lopez</h3>
-                <p>50 Points</p>
-            </div>
-            <div class="leaderboard-item">
-                <h3>John Smith</h3>
-                <p>33 Points</p>
-            </div>
+<div class="landing-page-container">
+    <div class="leaderboard-container">
+        <h2 class="section-title">Leaderboard</h2>
+        <div class="chart-container">
+            <canvas id="leaderboardChart"></canvas>
         </div>
-
-        <div class="top-50">
-            <h3>Top 50 Users</h3>
-            <ul>
-                <li>Jane Doe - 40</li>
-                <li>George Lopez - 50</li>
-                <li>John Smith - 33</li>
-            </ul>
+        <div class="user-rank">
+            <p class="motivation-container">You are ranked {{ user_rank }} out of {{ total_users }}. {{ motivation_message }}</p>
+        </div>
+        <div class="leaderboard-table-container">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Place</th>
+                        <th>Name</th>
+                        <th class="points-column">Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in leaderboard_data %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ user.name }}</td>
+                        <td class="points-column">{{ user.points }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+    <div class="latest-news">
+        <h2 class="section-title">Latest News</h2>
+        <hr style="width:100%">
+        <p class="paragraph-font">
+            Be sustainable today! Check out what’s happening in the community and take part in sustainable events,
+            activities, and promotions.
+        </p>
+        {% for news in news_items %}
+        <div class="news-item">
 
-    <div class="newsfeed">
-        <h2>Latest News</h2>
-        <div class="news-item">
-            <h4>Score extra points today using Green2Go</h4>
+            <p>{{ news.title }}</p>
         </div>
-        <div class="news-item">
-            <h4>Attend EcoPledge weekly meeting</h4>
-        </div>
-        <div class="news-item">
-            <h4>Swing by the farmer’s market this Friday at Lower Campus</h4>
-        </div>
+        {% endfor %}
     </div>
 </div>
+<!-- barchart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const top3Names = JSON.parse('{{ top_3_names|escapejs }}');
+        const top3Points = JSON.parse('{{ top_3_points|escapejs }}');
+        const ctx = document.getElementById('leaderboardChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: top3Names,
+                datasets: [{
+                    label: 'Points',
+                    data: top3Points,
+                    backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
+                    borderColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                plugins: {
+                    datalabels: {
+                        display: true,
+                        color: '#000',
+                        font: {
+                            weight: 'bold'
+                        },
+                        formatter: function (value) {
+                            return value;
+                        }
+                    }
+                },
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
