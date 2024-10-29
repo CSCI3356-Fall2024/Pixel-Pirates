@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import logout
 from django.contrib import messages
 from .forms import ProfileForm, CampaignForm
 from .models import Profile, News
 from django.db import IntegrityError
+
 import json
 
 def google_login(request):
@@ -54,6 +55,7 @@ def profile_view(request):
 
     return render(request, 'profile.html', {'form': form, 'profile': profile, 'required': required_fields})
 
+@login_required
 def confirmation_view(request):  
     user = request.user
     profile = profile = Profile.objects.get(username=user)
@@ -64,7 +66,8 @@ def confirmation_view(request):
     }
     return render(request, "confirmation.html", context)
 
-
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def campaign_view(request):
     required = request.user.is_authenticated  
     if request.method == 'POST':
@@ -77,6 +80,7 @@ def campaign_view(request):
 
     return render(request, 'campaign.html', {'form': form, 'required': required})
 
+@login_required
 def home(request):
     if request.user.is_authenticated:
         try:
@@ -93,6 +97,7 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
+@login_required
 def home(request):
     if request.user.is_authenticated: #logic for determining if user is signed in properly
         try:
