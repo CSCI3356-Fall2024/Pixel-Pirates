@@ -4,7 +4,7 @@ from .models import Profile, Campaign
 
 class ProfileForm(forms.ModelForm):
     SCHOOL_CHOICES = [
-        ('', 'School'),
+        ('', 'Select School'),
         ('CSOM', 'CSOM'),
         ('MCAS', 'MCAS'),
         ('LSEHD', 'LSEHD'),
@@ -15,7 +15,7 @@ class ProfileForm(forms.ModelForm):
 
     # Graduation year dropdown with the default year set to the next year
     current_year = datetime.now().year
-    YEAR_CHOICES = [(year, year) for year in range(current_year, current_year + 10)]
+    YEAR_CHOICES = [('', 'Select Year')] + [(year, year) for year in range(current_year, current_year + 10)]
     graduation_year = forms.ChoiceField(
         choices=YEAR_CHOICES,
         initial=current_year + 1,  # Default to the next year

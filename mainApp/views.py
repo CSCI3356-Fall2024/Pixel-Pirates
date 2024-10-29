@@ -5,6 +5,7 @@ from django.contrib import messages
 from .forms import ProfileForm, CampaignForm
 from .models import Profile, News
 from django.db import IntegrityError
+import json
 
 def google_login(request):
     return redirect('/auth/login/google-oauth2/')
@@ -28,9 +29,8 @@ def profile_view(request):
         profile.save()
     
     required_fields = False
-    if profile.name and profile.school and profile.major:
+    if profile.name and profile.school and profile.major and profile.graduation_year:
         required_fields = True 
-    print(required_fields)
 
     if request.method == 'POST':
         # Bind the form to the POST data and files
@@ -42,8 +42,6 @@ def profile_view(request):
 
         if form.is_valid():
             try:
-                if profile.name and profile.school and profile.major:
-                    required_fields = True 
                 form.save()
                 messages.success(request, "Profile updated successfully!")
                 return redirect('confirmation')  # Redirect to avoid duplicate form submissions
@@ -94,4 +92,54 @@ def home(request):
         "required": True,
     }
     return render(request, 'home.html', context)
+
+def home(request):
+    if request.user.is_authenticated: #logic for determining if user is signed in properly
+        try:
+            profile = request.user.profile
+            if not (profile.name and profile.school and profile.major):
+                return redirect('profile')
+            required = True
+        except Profile.DoesNotExist:
+            return redirect('profile')
+    else:
+        return redirect('login')
+
+    # fetch top 50 users
+    leaderboard_data = Profile.objects.order_by('-points')[:50]
+    # fetch news items (doesn't work)
+    news_items = News.objects.all()
+    # data for barchart
+    top_3_users = leaderboard_data[:3]
+    top_3_names = [user.name for user in top_3_users]
+    top_3_points = [user.points for user in top_3_users]
+    #rank and motivational message
+    total_users = Profile.objects.count()
+    user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
+    if user_rank <= 10:
+        motivation_message = "Amazing job! You're in the Top 10. Keep up the good work!"
+    elif user_rank <= 20:
+        motivation_message = "Great work! You’re in the Top 20. Aim higher and reach the next milestone!"
+    elif user_rank <= 50:
+        motivation_message = "You’re in the Top 50! Keep going to break into the top ranks."
+    elif user_rank <= 75:
+        motivation_message = "You're doing well! Continue exploring and earning more points."
+    else:
+        motivation_message = "Check out the latest news and actions to boost your points and rise up the ranks!"
+    
+    context = {
+        "required": True,
+        "leaderboard_data": leaderboard_data,
+        "news_items": news_items,
+        "leaderboard_names": json.dumps(profile.name), 
+        "leaderboard_points": json.dumps(profile.points),  
+        "user_rank": user_rank,
+        "motivation_message": motivation_message,
+        "total_users": total_users,
+        "top_3_names": json.dumps(top_3_names),  
+        "top_3_points": json.dumps(top_3_points),
+        "required": required,  
+    }
+    return render(request, 'home.html', context)
+
 

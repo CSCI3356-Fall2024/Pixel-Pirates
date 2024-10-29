@@ -1,9 +1,7 @@
 # Pixel-Pirates
 
-## To do
-1. update requirements.txt
-2. create list of admin users in database
-3. verify bc email
-4. link with google authentication
-5. make sure info is saved to database
-6. landing page with printed info
+## To do for delivery 4
+
+### grace
+1. If the user is existing make it so the default link takes them to landing page not sign in page
+2. Add personal info to the landing page (like how many points the user has and their own rank)
