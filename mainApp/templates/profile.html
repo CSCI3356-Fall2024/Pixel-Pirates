@@ -5,6 +5,7 @@
 {% block title %}Profile Page{% endblock %}
 
 {% block content %}
+<link rel= "stylesheet" type= "text/css" href= "../static/styles/style.css">
 <link rel= "stylesheet" type= "text/css" href= "../static/styles/profile.css">
 
 {% if messages %}
@@ -21,18 +22,30 @@
     <div class="content-container">
         <div class="pfp-container">
             <div class="pfp">
-                {% if profile.picture %}
-                    <img id="profileImage" src="{{ profile.picture.url }}" alt="Profile Picture">
-                {% else %}
-                    <img id="profileImage" src="https://via.placeholder.com/150" alt="Default Profile Picture">
-                {% endif %}
-                <button type="button" class="upload-btn" onclick="document.getElementById('id_picture').click();">
+                <img 
+                    id="profileImage" 
+                    src="{% if profile.picture %}{{ profile.picture.url }}{% else %}https://via.placeholder.com/150{% endif %}" 
+                    alt="Profile Picture"
+                    style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid #D9D9D9;"
+                >
+                <button 
+                    type="button" 
+                    class="upload-btn" 
+                    onclick="document.getElementById('id_picture').click();"
+                >
                     Edit Photo
                 </button>
             </div>
-
+        
             <div class="mb-3" style="display:none;">
-                {{ form.picture|add_class:"form-control-file" }}
+                <input 
+                    type="file" 
+                    id="id_picture" 
+                    name="picture" 
+                    accept="image/*" 
+                    class="form-control-file"
+                    onchange="previewImage(event)"
+                >
             </div>
         </div>
 
@@ -101,5 +114,20 @@
         </div>
     </div>
 </form>
+
+<script>
+    function previewImage(event) {
+        const reader = new FileReader();  // Create a new FileReader instance
+        const imageField = document.getElementById('profileImage');  // Get the image element
+
+        reader.onload = function () {
+            if (reader.readyState === 2) {  // File is fully read
+                imageField.src = reader.result;  // Set the src to the selected image
+            }
+        };
+
+        reader.readAsDataURL(event.target.files[0]);  // Read the selected file
+    }
+</script>
 
 {% endblock %}
