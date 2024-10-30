@@ -99,14 +99,20 @@
             <h2>Notifications</h2>
         </div>
 
-        <div class="bio-container">
-            <label for="id_bio"><h2>Bio</h2></label>
-            {% render_field form.bio class="form-control" placeholder="Let’s get sustainable!" %}
+        <div class="bottom-containers">
+            <div class="bio-container">
+                <label for="id_bio"><h2>Bio</h2></label>
+                {% render_field form.bio class="form-control" placeholder="Let’s get sustainable!" %}
+            </div>
+    
+            <div class="submit-container">
+                <button type="submit" class="btn btn-primary mt-3">Save</button>
+            </div>
         </div>
 
-        <div class="submit-container">
-            <button type="submit" class="btn btn-primary mt-3">Save Profile</button>
-        </div>
+
+
+
     </div>
 </form>
 

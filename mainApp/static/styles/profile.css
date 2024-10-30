@@ -32,9 +32,15 @@ form {
     background-color: #E8F4EA;
     border-radius: 20px;
     box-shadow: 0px 3px rgba(0, 0, 0, 0.2);
-    padding: 20px;
+    padding: 10px;
+}
+
+.pfp-container .pfp {
+    height: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: space-between;
 }
 
 .pfp-container .pfp img {
@@ -118,13 +124,20 @@ h2 {
     padding: 20px 40px;
 }
 
-.bio-container {
-    grid-column: 1/4;
+.bottom-containers {
+    grid-column: 1/5;
     grid-row: 5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bio-container {
     background-color: #F5F5F5;
     border-radius: 20px;
     box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
     padding: 20px 40px;
+    width: calc(100% - 100px);
 }
 
 .bio-container textarea {
@@ -132,8 +145,6 @@ h2 {
 }
 
 .submit-container {
-    grid-column: 4;
-    grid-row: 5;
     align-content: end;
 }
 
@@ -143,7 +154,8 @@ h2 {
     color: #73A497;
     border: 1px solid #73A497;
     font-size: 20px;
-    padding: 10px;
+    padding: 20px;
+    box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
 }
 
 .readonly-field {
