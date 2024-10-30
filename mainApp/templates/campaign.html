@@ -1,92 +1,27 @@
 {% extends 'base.html' %}
-{% load widget_tweaks %}
+{% load static widget_tweaks %}  
 
 {% block title %}Campaign{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" type="text/css" href="../static/styles/style.css">
+<link rel="stylesheet" type="text/css" href="../static/styles/campaign.css">
 
-<style>
-    .content-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        padding: 30px;
-        gap: 10px 30px;
-        width: 90%;
-        margin: 0 auto; 
-    }
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
 
-    p {
-        font-size: 18px;
-        margin: 0;
-    }
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const startDate = moment(document.getElementById('id_date_begin').value);
+            const endDate = moment(document.getElementById('id_date_end').value);
 
-    .mb-3 {
-        width: 100%;
-    }
+            if (endDate.isBefore(startDate)) {
+                e.preventDefault();
+                alert('End date must be after the start date.');
+            }
+        });
+    });
+</script>
 
-    .mb-3 label {
-        font-size: 18px;
-        display: block;
-        padding-bottom: 10px;
-        color: #204136;
-    }
-
-    .mb-3 .form-control {
-        color: gray;
-        font-size: 14px;
-        border-radius: 5px;
-        border: 1px solid #D9D9D9;
-        padding: 10px 15px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    button {
-        font-size: 18px;
-        padding: 10px 20px;
-    }
-
-    @media (max-width: 768px) {
-        .content-container {
-            grid-template-columns: 1fr; 
-            gap: 20px; /* Adjust gap */
-        }
-
-        .mb-3 label {
-            font-size: 18px; 
-        }
-
-        .mb-3 .form-control {
-            font-size: 14px; 
-            padding: 8px 12px;
-        }
-
-        button {
-            font-size: 16px; 
-            padding: 8px 16px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .content-container {
-            padding: 15px; 
-            width: 100%; 
-        }
-
-        .mb-3 label {
-            font-size: 16px; 
-        }
-
-        .mb-3 .form-control {
-            font-size: 12px; 
-        }
-
-        button {
-            font-size: 14px; 
-            padding: 6px 12px;
-        }
-    }
-</style>
 
 <form method="post" action="" class="form-group">
     {% csrf_token %}
@@ -99,11 +34,9 @@
                         <li><strong>{{ field.label }}:</strong> {{ field.errors|join:", " }}</li>
                     {% endif %}
                 {% endfor %}
-                {% if form.non_field_errors %}
-                    {% for error in form.non_field_errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                {% endif %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
             </ul>
         </div>
     {% endif %}
@@ -111,73 +44,68 @@
     <div class="content-container"> 
         <div class="mb-3" style="grid-column: 1/3;">
             <label for="id_title">Title</label>
-            <!-- <input type="text" name="title" id="id_title" class="form-control" placeholder="Enter campaign title" required> -->
             {% render_field form.title class="form-control" %}
         </div>
 
         <div class="mb-3" style="grid-column: 1/3;">
             <label for="id_description">Description</label>
-            <!-- <textarea name="description" id="id_description" rows="4" class="form-control" placeholder="Enter campaign description" required></textarea> -->
             {% render_field form.description class="form-control" style="height: 90px;" %}
         </div>
 
-        <div class="mb-3" style="grid-column: 1/3;">
-            <p> Availiable From </p>
+        <div class="mb-3" style="grid-column: 1/3; padding-bottom: 0px;">
+            <p>Available From</p>
         </div>
 
         <div class="mb-3">
             <label for="id_date_begin">Date</label>
-            <!-- <input type="date" name="date_begin" id="id_date_begin" class="form-control" required> -->
-            {% render_field form.date_begin class="form-control" placeholder='mm/dd/yyyy' %}
+            {% render_field form.date_begin class="form-control" %}
         </div>
 
         <div class="mb-3">
             <label for="id_time_begin">Time</label>
-            <!-- <input type="time" name="time_begin" id="id_time_begin" class="form-control" required> -->
             {% render_field form.time_begin class="form-control" %}
         </div>
 
-        <div class="mb-3" style="grid-column: 1/3;">
-            <p> Until </p>
+        <div class="mb-3" style="grid-column: 1/3; padding-bottom: 0px;">
+            <p>Until</p>
         </div>
 
         <div class="mb-3">
             <label for="id_date_end">Date</label>
-            <!-- <input type="date" name="date_end" id="id_date_end" class="form-control" required> -->
             {% render_field form.date_end class="form-control" %}
         </div>
 
         <div class="mb-3">
             <label for="id_time_end">Time</label>
-            <!-- <input type="time" name="time_end" id="id_time_end" class="form-control" required> -->
             {% render_field form.time_end class="form-control" %}
         </div>
 
         <div class="mb-3">
             <label for="id_points">Points Awarded</label>
             {% render_field form.points class="form-control" %}
-        </div>    
+        </div>
 
         <div class="mb-3">
             <div class="checkbox-container">
-                <!-- Align checkbox with label -->
                 <label for="id_news">Add to News?</label>
                 {% render_field form.news class="form-check-input" %}
             </div>
         </div>
-         
 
         <div class="mb-3">
-            <label for="id_validation">Validation Method </label>
+            <label for="id_validation">Validation Method</label>
             {% render_field form.validation class="form-control" %}
-        </div>  
+        </div>
 
         <div class="mb-3">
             <label for="id_location">Location(s)</label> <!-- you have to drag to select multiple -->
             {% render_field form.location class="form-control" %}
-        </div>  
+        </div>
+        
+        
 
         <button type="submit" class="btn btn-success">Create Campaign</button>
-    </div>  
+    </div>
 </form>
+
 {% endblock %}
