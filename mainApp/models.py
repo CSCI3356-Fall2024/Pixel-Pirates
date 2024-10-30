@@ -36,6 +36,15 @@ class Campaign(models.Model):
     time_end = models.TimeField()
     points = models.IntegerField(default=0)
     news = models.BooleanField(default=False)
+    LOCATION_CHOICES = [
+        ('Lower', 'Lower'),
+        ('McElroy', 'McElroy'),
+        ('Stuart', 'Stuart'),
+        ("Addie's", "Addie's"),
+        ("Eagle's Nest", "Eagle's Nest"),
+    ]
+    location = MultiSelectField(choices=LOCATION_CHOICES, blank=True)
+
     validation = models.CharField(
         max_length=100, 
         choices=[
@@ -43,17 +52,6 @@ class Campaign(models.Model):
             ('QR', 'QR'),
         ],
         default='photo validation'
-    )
-    location = MultiSelectField(
-        choices=[
-            ('Lower', 'Lower'),
-            ('McElroy', 'McElroy'),
-            ('Stuart', 'Stuart'),
-            ("Addie's", "Addie's"),
-            ("Eagle's Nest", "Eagle's Nest"),
-        ],
-        default=list,
-        blank=True
     )
 
     def __str__(self):

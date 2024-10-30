@@ -151,6 +151,24 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'default-local-memory',
+    },
+    'select2': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/2',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+
+# Tell select2 which cache configuration to use:
+SELECT2_CACHE_BACKEND = "select2"
+
 # image uploads
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
