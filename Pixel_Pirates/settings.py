@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-SITE_ID = 2
+SITE_ID = 1
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -62,9 +62,10 @@ SOCIALACCOUNT_PROVIDERS = {
             'prompt': 'select_account',
             'hd': 'bc.edu' 
         },
+        'OAUTH_PKCE_ENABLED': True,
         'APP': {
-            'client_id': '208517930837-uc1hi71vrtvmntp5rs6h687hd9j5ga4h.apps.googleusercontent.com',  
-            'secret': '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', 
+            'client_id': '625766461849-4c4dpq7903mvsf7100m6fqel2maf6cdm.apps.googleusercontent.com',  
+            'secret': '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', 
             'key': ''
         }
     },
