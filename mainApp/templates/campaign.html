@@ -4,12 +4,18 @@
 {% block title %}Campaign{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" type="text/css" href="../static/styles/style.css">
-<link rel="stylesheet" type="text/css" href="../static/styles/campaign.css">
 
-<script>
+<!-- External CSS Stylesheets -->
+<link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/campaign.css' %}">
+
+<!-- JavaScript for Multiselect Dropdown -->
+<script type="text/javascript" src="{% static 'js/multiselect-dropdown.js' %}"></script>
+
+<!-- Form Validation Script -->
+<script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
-
+        // Validation for date fields to ensure the end date is after the start date
         document.querySelector('form').addEventListener('submit', function (e) {
             const startDate = moment(document.getElementById('id_date_begin').value);
             const endDate = moment(document.getElementById('id_date_end').value);
@@ -22,10 +28,11 @@
     });
 </script>
 
-
+<!-- Form Content -->
 <form method="post" action="" class="form-group">
     {% csrf_token %}
 
+    <!-- Display form errors -->
     {% if form.errors %}
         <div class="alert alert-danger">
             <ul>
@@ -41,50 +48,53 @@
         </div>
     {% endif %}
 
+    <!-- Form Fields -->
     <div class="content-container"> 
+        <!-- Title Field -->
         <div class="mb-3" style="grid-column: 1/3;">
             <label for="id_title">Title</label>
             {% render_field form.title class="form-control" %}
         </div>
 
+        <!-- Description Field -->
         <div class="mb-3" style="grid-column: 1/3;">
             <label for="id_description">Description</label>
             {% render_field form.description class="form-control" style="height: 90px;" %}
         </div>
 
+        <!-- Available From Date and Time -->
         <div class="mb-3" style="grid-column: 1/3; padding-bottom: 0px;">
             <p>Available From</p>
         </div>
-
         <div class="mb-3">
             <label for="id_date_begin">Date</label>
             {% render_field form.date_begin class="form-control" %}
         </div>
-
         <div class="mb-3">
             <label for="id_time_begin">Time</label>
             {% render_field form.time_begin class="form-control" %}
         </div>
 
+        <!-- Until Date and Time -->
         <div class="mb-3" style="grid-column: 1/3; padding-bottom: 0px;">
             <p>Until</p>
         </div>
-
         <div class="mb-3">
             <label for="id_date_end">Date</label>
             {% render_field form.date_end class="form-control" %}
         </div>
-
         <div class="mb-3">
             <label for="id_time_end">Time</label>
             {% render_field form.time_end class="form-control" %}
         </div>
 
+        <!-- Points Awarded Field -->
         <div class="mb-3">
             <label for="id_points">Points Awarded</label>
             {% render_field form.points class="form-control" %}
         </div>
 
+        <!-- News Checkbox Field -->
         <div class="mb-3">
             <div class="checkbox-container">
                 <label for="id_news">Add to News?</label>
@@ -92,18 +102,19 @@
             </div>
         </div>
 
+        <!-- Validation Method Field -->
         <div class="mb-3">
             <label for="id_validation">Validation Method</label>
             {% render_field form.validation class="form-control" %}
         </div>
 
+        <!-- Location(s) Field with Multiselect Dropdown -->
         <div class="mb-3">
-            <label for="id_location">Location(s)</label> <!-- you have to drag to select multiple -->
-            {% render_field form.location class="form-control" %}
+            <label for="id_location">Location(s)</label>
+            {% render_field form.location class="form-control multiselect-target" %}
         </div>
-        
-        
 
+        <!-- Submit Button -->
         <button type="submit" class="btn btn-success">Create Campaign</button>
     </div>
 </form>

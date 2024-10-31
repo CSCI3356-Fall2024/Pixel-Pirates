@@ -37,7 +37,9 @@ class CampaignForm(forms.ModelForm):
             'validation', 'location'
         ]
         widgets = {
-            'location': forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'location': forms.SelectMultiple(attrs={
+                'class': 'form-control multiselect-target'  # Added unique class
+            }),
             'date_begin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_end': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'time_begin': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),

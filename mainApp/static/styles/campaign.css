@@ -38,12 +38,6 @@ button {
     padding: 10px 20px;
 }
 
-.form-select[multiple] {
-    display: block;
-    min-height: 40px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-}
 
 @media (max-width: 768px) {
     .content-container {
