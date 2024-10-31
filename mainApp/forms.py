@@ -2,18 +2,11 @@ from django import forms
 from django.core.exceptions import ValidationError
 from datetime import datetime
 from .models import Profile, Campaign
+from .choices import SCHOOL_CHOICES, MAJOR_CHOICES, MINOR_CHOICES
 
 class ProfileForm(forms.ModelForm):
-    SCHOOL_CHOICES = [
-        ('', 'Select School'),
-        ('CSOM', 'CSOM'),
-        ('MCAS', 'MCAS'),
-        ('LSEHD', 'LSEHD'),
-        ('CSON', 'CSON'),
-        ('LAW', 'LAW'),
-    ]
     school = forms.ChoiceField(choices=SCHOOL_CHOICES, widget=forms.Select(attrs={'class': 'form-select'}))
-
+    
     # Graduation year dropdown with the default year set to the next year
     current_year = datetime.now().year
     YEAR_CHOICES = [('', 'Select Year')] + [(year, year) for year in range(current_year, current_year + 10)]
@@ -28,6 +21,15 @@ class ProfileForm(forms.ModelForm):
         fields = ['name', 'school', 'major',
             'minor', 'graduation_year', 'picture', 'bio']
 
+        widgets = {
+            'major': forms.SelectMultiple(attrs={
+                'class': 'form-control multiselect-target'
+            }),
+            'minor': forms.SelectMultiple(attrs={
+                'class': 'form-control multiselect-target'
+            }),
+        }
+
 class CampaignForm(forms.ModelForm):
     class Meta:
         model = Campaign
@@ -38,7 +40,7 @@ class CampaignForm(forms.ModelForm):
         ]
         widgets = {
             'location': forms.SelectMultiple(attrs={
-                'class': 'form-control multiselect-target'  # Added unique class
+                'class': 'form-control multiselect-target' 
             }),
             'date_begin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_end': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),

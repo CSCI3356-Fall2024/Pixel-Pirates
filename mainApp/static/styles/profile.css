@@ -88,11 +88,14 @@ h2 {
 }
 
 .mb-3 label {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 14px;
     display: block;
     padding-bottom: 10px;
     color: #204136;
+}
+
+.mb-3 option {
+    font-size: 14px;
 }
 
 .mb-3 .form-control {
@@ -102,18 +105,31 @@ h2 {
     border: 1px solid #D9D9D9;
     box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
     padding: 5px 15px;
-    width: 60%;
+    width: 100%;
 }
 
-.mb-3 .form-select {
-    color: gray;
-    font-size: 16px;
-    border-radius: 5px;
+.form-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: white;
     border: 1px solid #D9D9D9;
-    box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
-    padding: 5px 15px;
-    width: 60%;
+    border-radius: 5px;
+    font-size: 14px;
+    padding: 7px 15px;
+    color: gray;
+    width: 100%;
+    box-shadow: 0px 3px rgba(0, 0, 0, 0.2);
+    
+    /* Custom arrow */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    padding-right: 2.5rem; /* Space for custom arrow */
 }
+
+
 
 .notification-container {
     grid-column: 1;
@@ -165,5 +181,27 @@ h2 {
     border: 1px solid #D9D9D9;
     box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
     padding: 5px 15px;
-    width: 60%;
+    width: 100%;
+}
+
+.multiselect-dropdown {
+    color: gray;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #D9D9D9;
+    box-shadow: 0px 3px rgb(0, 0, 0, 0.2);
+    background-color: white;
+    padding: 5px 15px;
+    width: 100%;
+}
+
+/* Adjust multiselect input fields to match the form control look */
+.multiselect-dropdown .multiselect-dropdown-search {
+    color: gray;
+    font-size: 14px;
+}
+
+.multiselect-dropdown-list-wrapper {
+    max-height: 200px; /* Ensure dropdown doesn't exceed form size */
+    overflow-y: auto;
 }

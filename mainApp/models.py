@@ -1,24 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 from multiselectfield import MultiSelectField
+from .choices import MAJOR_CHOICES, MINOR_CHOICES, SCHOOL_CHOICES
 
 class Profile(models.Model):
     username = models.OneToOneField(User, on_delete=models.CASCADE) #this is just the user itself, not the actual username of the user
     name = models.CharField(max_length=100)                         
     bc_email = models.EmailField(unique=True, default='default@bc.edu')
-    school = models.CharField(
-        max_length=100, 
-        choices=[
-            ('CSOM', 'CSOM'),
-            ('MCAS', 'MCAS'),
-            ('LSEHD', 'LSEHD'),
-            ('CSON', 'CSON'),
-            ('LAW', 'LAW'),
-        ]
-    )
+    school = models.CharField(max_length=100, choices=SCHOOL_CHOICES)
     graduation_year = models.PositiveIntegerField(null=True, blank=True)
-    major = models.CharField(max_length=100)
-    minor = models.CharField(max_length=100, blank=True, null=True)
+    major = MultiSelectField(choices=MAJOR_CHOICES, blank=True)
+    minor = MultiSelectField(choices=MINOR_CHOICES, blank=True, null=True)
     picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     points = models.IntegerField(default=0)
