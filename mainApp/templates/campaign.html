@@ -59,7 +59,7 @@
         <!-- Description Field -->
         <div class="mb-3" style="grid-column: 1/3;">
             <label for="id_description">Description</label>
-            {% render_field form.description class="form-control" style="height: 90px;" %}
+            {% render_field form.description class="form-control" style="height: 80px;" %}
         </div>
 
         <!-- Available From Date and Time -->
@@ -111,11 +111,16 @@
         <!-- Location(s) Field with Multiselect Dropdown -->
         <div class="mb-3">
             <label for="id_location">Location(s)</label>
-            {% render_field form.location class="form-control multiselect-target" %}
+            {% render_field form.location class="form-control multiselect-target" multiselect-select-all="true" %}
         </div>
 
+        <hr style="grid-column: 1/3;">
+
         <!-- Submit Button -->
-        <button type="submit" class="btn btn-success">Create Campaign</button>
+        <div class="submit-container">
+            <button type="submit" class="btn btn-success">Create Campaign</button>
+        </div>
+       
     </div>
 </form>
 

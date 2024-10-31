@@ -33,9 +33,30 @@ p {
     box-sizing: border-box;
 }
 
+.submit-container {
+    display: flex;
+    justify-content: flex-end;
+    grid-column: 2;
+}
+
 button {
-    font-size: 18px;
+    width: 180px;
+    font-size: 16px;
+    background-color: black;
+    color: white;
+    border-radius: 10px;
     padding: 10px 20px;
+}
+
+button:hover {
+    background-color: darkslategray;
+}
+
+hr {
+    width: 100%;
+    margin: 20px 0;
+    border-top: 2px solid black;
+    border-radius: 5px;
 }
 
 

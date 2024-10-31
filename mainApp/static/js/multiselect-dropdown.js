@@ -2,16 +2,19 @@ var style = document.createElement('style');
 style.setAttribute("id","multiselect_dropdown_styles");
 style.innerHTML = `
 .multiselect-dropdown{
-  display: inline-block;
-  padding: 2px 5px 0px 5px;
-  border-radius: 4px;
-  border: solid 1px #ced4da;
-  background-color: white;
-  position: relative;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right .75rem center;
-  background-size: 16px 12px;
+width: 100%;
+    display: inline-block;
+    position: relative;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    background-size: 16px 12px;
+    color: gray;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #D9D9D9;
+    padding: 7px 15px;
+    box-sizing: border-box;
 }
 .multiselect-dropdown span.optext, .multiselect-dropdown span.placeholder{
   margin-right:0.5em; 
@@ -29,7 +32,7 @@ style.innerHTML = `
 .multiselect-dropdown span.optext .optdel {
   float: right;
   margin: 0 -6px 1px 5px;
-  font-size: 0.7em;
+  font-size: 14px;
   margin-top: 2px;
   cursor: pointer;
   color: white;
@@ -70,6 +73,7 @@ style.innerHTML = `
 
 .multiselect-dropdown-list div{
   padding: 5px;
+  display: flex;
 }
 .multiselect-dropdown-list input{
   height: 1.15em;
