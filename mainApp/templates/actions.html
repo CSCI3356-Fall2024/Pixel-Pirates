@@ -1,0 +1,63 @@
+{% extends 'base.html' %}  
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
+<link rel="stylesheet" href="{% static 'styles/actions.css' %}"> 
+<style>
+    /* Override the overflow-y for this page */
+    html, body {
+        overflow-y: auto !important;
+    }
+</style>
+
+<div class="actions-page-container">
+    <div class="profile-summary">
+        <img src="{% if user.profile.picture %}{{ user.profile.picture.url }}{% else %}{% static 'images/default_profile_image.jpg' %}{% endif %}" alt="Profile Picture" class="profile-image">
+        <h2>{{ user.get_full_name }}</h2>
+        <p>{{ user.profile.points }} Points Earned This Week</p>
+        <p>Streak Status: {{ user.profile.streak_status }} Days</p>
+        <p>Streak Bonus: {{ user.profile.streak_bonus }}x</p>
+    </div>
+
+    <!-- Daily Progress Section -->
+    <div class="daily-progress">
+        <h3>Daily Progress</h3>
+        <div class="progress-bar">
+            <!-- <div class="progress-bar-fill" style="width: {{ daily_progress_percentage }}%;"></div> --> 
+        </div>
+
+        <!-- Daily Tasks List -->
+        <div class="tasks-list">
+            <h4>Daily Tasks</h4>
+            {% for task in daily_tasks %}
+                <div class="task-item {{ task.status }}">
+                    <p>{{ task.name }}</p>
+                    <span>{{ task.points }} points - {{ task.status }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Calendar and Streaks Section -->
+    <div class="calendar-container">
+        <h3>Streaks</h3>
+    </div>
+
+    <!-- Weekly and Referral Tasks Section -->
+    <div class="extra-tasks">
+        <h4>Weekly Task</h4>
+        <div class="task-item {{ weekly_task.status }}">
+            <p>{{ weekly_task.name }}</p>
+            <span>{{ weekly_task.points }} points - {{ weekly_task.status }}</span>
+        </div>
+
+        <h4>Referral</h4>
+        <div class="task-item {{ referral_task.status }}">
+            <p>{{ referral_task.name }}</p>
+            <span>{{ referral_task.points }} points - {{ referral_task.status }}</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

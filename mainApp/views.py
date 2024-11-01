@@ -91,7 +91,8 @@ def campaign_view(request):
 
     return render(request, 'campaign.html', {'form': form, 'required': required})
 
-def home(request):
+@login_required
+def home_view(request):
     if request.user.is_authenticated:
         try:
             profile = request.user.profile
@@ -142,3 +143,34 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
+@login_required
+def actions_view(request):
+    profile = request.user.profile
+
+    if not (profile.name and profile.school and profile.major and profile.graduation_year):
+        return redirect('profile')  
+
+    daily_tasks = [
+        {'name': 'Word of the Day', 'points': 20, 'status': 'completed'},
+        {'name': 'Picture in Action', 'points': 20, 'status': 'open'},
+        {'name': 'Composting', 'points': 5, 'status': 'completed'},
+        {'name': 'Recycling', 'points': 5, 'status': 'open'},
+        {'name': 'Green2Go Container', 'points': 15, 'status': 'open'},
+    ]
+    weekly_task = {'name': 'Article Quiz', 'points': 15, 'status': 'in progress'}
+    referral_task = {'name': 'Refer a Friend', 'points': 10, 'status': 'open'}
+    daily_progress_percentage = 60 
+
+    calendar_weeks = [
+        [{'day': 1, 'is_today': False, 'is_streak': False}, ...],  
+    ]
+
+    context = {
+        'daily_tasks': daily_tasks,
+        'weekly_task': weekly_task,
+        'referral_task': referral_task,
+        'daily_progress_percentage': daily_progress_percentage,
+        'calendar_weeks': calendar_weeks,
+        'required': True
+    }
+    return render(request, 'actions.html', context)
