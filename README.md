@@ -1,6 +1,13 @@
 # Pixel-Pirates
 
 ## To do for delivery 4
+1. News section: if campaign is checked as news, make sure it is added to the landing page news section (user could hover over item to see campaign details)
+
+## leah
+### DONE
+1. Landing page: Dynamic leaderboard with test users (used chart.js)
+2. Ranking 
+3. html for landing page
 
 ## grace
 1. If the user is existing make it so the default link takes them to landing page not sign in page
