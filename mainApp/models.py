@@ -14,6 +14,7 @@ class Profile(models.Model):
     picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     points = models.IntegerField(default=0)
+    previous_rank = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.username.username}'s Profile"
