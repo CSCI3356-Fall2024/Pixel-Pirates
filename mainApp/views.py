@@ -5,6 +5,7 @@ from django.contrib import messages
 from .forms import ProfileForm, CampaignForm
 from .models import Profile, News
 from django.db import IntegrityError
+from django.db.models import F
 from django.dispatch import receiver
 from allauth.account.signals import user_logged_in
 import json
@@ -30,7 +31,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    messages.success(request, "You have been logged out successfully.")
+    #messages.success(request, "You have been logged out successfully.")
     return redirect('login')
 
 @login_required
@@ -78,7 +79,6 @@ def confirmation_view(request):
     }
     return render(request, "confirmation.html", context)
 
-
 def campaign_view(request):
     required = request.user.is_authenticated  
     if request.method == 'POST':
@@ -91,24 +91,8 @@ def campaign_view(request):
 
     return render(request, 'campaign.html', {'form': form, 'required': required})
 
-# def home(request):
-#     if request.user.is_authenticated:
-#         try:
-#             profile = request.user.profile
-#             if not (profile.name and profile.school and profile.major):
-#                 return redirect('profile')
-#         except Profile.DoesNotExist:
-#             return redirect('profile')
-#     else:
-#         return redirect('login')
-
-#     context = {
-#         "required": True,
-#     }
-#     return render(request, 'home.html', context)
-
 def home(request):
-    if request.user.is_authenticated: #logic for determining if user is signed in properly
+    if request.user.is_authenticated:
         try:
             profile = request.user.profile
             if not (profile.name and profile.school and profile.major):
@@ -119,17 +103,19 @@ def home(request):
     else:
         return redirect('login')
 
-    # fetch top 50 users
-    leaderboard_data = Profile.objects.order_by('-points')[:50]
-    # fetch news items (doesn't work)
-    news_items = News.objects.all()
-    # data for barchart
+    leaderboard_data = Profile.objects.order_by('-points').annotate(
+        rank=F('points')
+    )[:50]
+
     top_3_users = leaderboard_data[:3]
     top_3_names = [user.name for user in top_3_users]
     top_3_points = [user.points for user in top_3_users]
-    #rank and motivational message
+
+    news_items = News.objects.all()
+
     total_users = Profile.objects.count()
     user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
+
     if user_rank <= 10:
         motivation_message = "Amazing job! You're in the Top 10. Keep up the good work!"
     elif user_rank <= 20:
@@ -140,20 +126,19 @@ def home(request):
         motivation_message = "You're doing well! Continue exploring and earning more points."
     else:
         motivation_message = "Check out the latest news and actions to boost your points and rise up the ranks!"
-    
+
     context = {
         "required": True,
         "leaderboard_data": leaderboard_data,
-        "news_items": news_items,
-        "leaderboard_names": json.dumps(profile.name), 
-        "leaderboard_points": json.dumps(profile.points),  
         "user_rank": user_rank,
         "motivation_message": motivation_message,
         "total_users": total_users,
-        "top_3_names": json.dumps(top_3_names),  
+        "top_3_names": json.dumps(top_3_names),
         "top_3_points": json.dumps(top_3_points),
+        "news_items": news_items,
+        "leaderboard_names": json.dumps(profile.name), 
+        "leaderboard_points": json.dumps(profile.points),
         "required": required,  
     }
     return render(request, 'home.html', context)
-
 
