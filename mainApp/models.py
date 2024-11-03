@@ -60,6 +60,7 @@ class News(models.Model):
     date_end = models.DateField()
     time_begin = models.TimeField()
     time_end = models.TimeField()
+    image = models.ImageField(upload_to='news_pics/', blank=True, null=True)
                                  
     def __str__(self):
         return self.display_title

@@ -66,9 +66,6 @@ class NewsForm(forms.ModelForm):
         fields = ['display_title', 'external_url', 'image', 
                   'date_begin', 'date_end', 'time_begin', 'time_end']
         widgets = {
-            'location': forms.SelectMultiple(attrs={
-                'class': 'form-control multiselect-target' 
-            }),
             'date_begin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_end': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'time_begin': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
