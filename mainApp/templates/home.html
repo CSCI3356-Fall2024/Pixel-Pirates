@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" type="text/css" href="../static/styles/style.css">
-<link rel="stylesheet" type="text/css" href="../static/styles/home.css">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/home.css' %}">
 <div class="landing-page-container">
     <div class="leaderboard-container">
         <h2 class="section-title">Leaderboard</h2>
@@ -48,21 +48,24 @@
                 </tbody>
             </table>
         </div>
-
     </div>
     <div class="latest-news">
         <h2 class="section-title">Latest News</h2>
-        <hr style="width:100%">
         <p class="paragraph-font">
             Be sustainable today! Check out what’s happening in the community and take part in sustainable events,
             activities, and promotions.
         </p>
-        {% for news in news_items %}
-        <div class="news-item">
-
-            <p>{{ news.title }}</p>
-        </div>
-        {% endfor %}
+        <ul class="no-bullets">
+            {% for news in news_items %}
+                {% if news.external_url %}
+                    <li class="news-item">
+                        <div class="news-box">
+                            <a href="{{ news.external_url }}" target="_blank">{{ news.display_title }}</a>
+                        </div>    
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
     </div>
 </div>
 <!-- barchart -->

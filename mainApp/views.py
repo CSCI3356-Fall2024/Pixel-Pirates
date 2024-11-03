@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
-from .forms import ProfileForm, CampaignForm
+from .forms import ProfileForm, CampaignForm, NewsForm
 from .models import Profile, News
 from django.db import IntegrityError
 from django.db.models import F
@@ -79,6 +79,11 @@ def confirmation_view(request):
     }
     return render(request, "confirmation.html", context)
 
+@login_required
+def choose_action_view(request):
+    required = request.user.is_authenticated
+    return render(request, 'choose_action.html', {'required': required})
+
 def campaign_view(request):
     required = request.user.is_authenticated  
     if request.method == 'POST':
@@ -90,6 +95,17 @@ def campaign_view(request):
         form = CampaignForm()  # Display an empty form on GET request
 
     return render(request, 'campaign.html', {'form': form, 'required': required})
+
+def news_view(request):
+    required = request.user.is_authenticated
+    if request.method == 'POST':
+        form = NewsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  # Redirect to the list of news items after saving
+    else:
+        form = NewsForm()
+    return render(request, 'news.html', {'form': form, 'required': required})
 
 @login_required
 def home_view(request):
