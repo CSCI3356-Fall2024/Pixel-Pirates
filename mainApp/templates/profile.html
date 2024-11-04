@@ -8,6 +8,10 @@
 <link rel= "stylesheet" type= "text/css" href= "../static/styles/style.css">
 <link rel= "stylesheet" type= "text/css" href= "../static/styles/profile.css">
 
+<!-- JavaScript for Multiselect Dropdown -->
+<script type="text/javascript" src="{% static 'js/multiselect-dropdown.js' %}"></script>
+
+
 {% if messages %}
 <div class="alert alert-success">
     {% for message in messages %}
@@ -82,12 +86,13 @@
 
             <div class="mb-3">
                 <label for="id_major">Major(s)<span style="color:red">*</span></label>
-                {% render_field form.major class="form-control" placeholder="Enter major(s)" %}
+                {% render_field form.major class="form-control multiselect-target" multiselect-search="true" multiselect-max-items="2" %}
             </div>
+            
 
             <div class="mb-3">
                 <label for="id_minor">Minor(s)</label>
-                {% render_field form.minor class="form-control" placeholder="(optional)" %}
+                {% render_field form.minor class="form-control multiselect-target" multiselect-search='true' %}
             </div>
 
             <div class="mb-3">
@@ -114,10 +119,6 @@
                 <button type="submit" class="btn btn-primary mt-3">Save</button>
             </div>
         </div>
-
-
-
-
     </div>
 </form>
 
@@ -125,6 +126,16 @@
     function previewImage(event) {
         const reader = new FileReader();  // Create a new FileReader instance
         const imageField = document.getElementById('profileImage');  // Get the image element
+        const majorField = document.querySelector('[name="major"]');
+        const minorField = document.querySelector('[name="minor"]');
+
+        // Set custom attributes for multiselect functionality
+        majorField.setAttribute('multiselect-search', 'true');
+        majorField.setAttribute('multiselect-max-items', '2');
+        minorField.setAttribute('multiselect-search', 'true');
+
+        // Initialize multiselect dropdown
+        MultiselectDropdown(window.MultiselectDropdownOptions);
 
         reader.onload = function () {
             if (reader.readyState === 2) {  // File is fully read

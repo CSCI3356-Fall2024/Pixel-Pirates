@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
-from .forms import ProfileForm, CampaignForm
-from .models import Profile, News
+from .forms import ProfileForm, CampaignForm, NewsForm
+from .models import Profile, News, Campaign
 from django.db import IntegrityError
+from django.db.models import F
 from django.dispatch import receiver
 from allauth.account.signals import user_logged_in
 import json
@@ -30,7 +31,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    messages.success(request, "You have been logged out successfully.")
+    #messages.success(request, "You have been logged out successfully.")
     return redirect('login')
 
 @login_required
@@ -78,37 +79,37 @@ def confirmation_view(request):
     }
     return render(request, "confirmation.html", context)
 
+@login_required
+def choose_action_view(request):
+    required = request.user.is_authenticated
+    return render(request, 'choose_action.html', {'required': required})
 
 def campaign_view(request):
     required = request.user.is_authenticated  
     if request.method == 'POST':
-        form = CampaignForm(request.POST)
+        form = CampaignForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()  # Save the form data to the database
-            return redirect('profile')  # Redirect to the profile page after successful save
+            return redirect('home')  # Redirect to the home page after successful save
     else:
         form = CampaignForm()  # Display an empty form on GET request
 
     return render(request, 'campaign.html', {'form': form, 'required': required})
 
-# def home(request):
-#     if request.user.is_authenticated:
-#         try:
-#             profile = request.user.profile
-#             if not (profile.name and profile.school and profile.major):
-#                 return redirect('profile')
-#         except Profile.DoesNotExist:
-#             return redirect('profile')
-#     else:
-#         return redirect('login')
+def news_view(request):
+    required = request.user.is_authenticated
+    if request.method == 'POST':
+        form = NewsForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  # Redirect to the landing page to see current news items after saving
+    else:
+        form = NewsForm()
+    return render(request, 'news.html', {'form': form, 'required': required})
 
-#     context = {
-#         "required": True,
-#     }
-#     return render(request, 'home.html', context)
-
-def home(request):
-    if request.user.is_authenticated: #logic for determining if user is signed in properly
+@login_required
+def home_view(request):
+    if request.user.is_authenticated:
         try:
             profile = request.user.profile
             if not (profile.name and profile.school and profile.major):
@@ -119,17 +120,20 @@ def home(request):
     else:
         return redirect('login')
 
-    # fetch top 50 users
-    leaderboard_data = Profile.objects.order_by('-points')[:50]
-    # fetch news items (doesn't work)
-    news_items = News.objects.all()
-    # data for barchart
+    leaderboard_data = Profile.objects.order_by('-points').annotate(
+        rank=F('points')
+    )[:50]
+
     top_3_users = leaderboard_data[:3]
     top_3_names = [user.name for user in top_3_users]
     top_3_points = [user.points for user in top_3_users]
-    #rank and motivational message
+
+    news_items = News.objects.all()
+    campaign_items = Campaign.objects.all()
+
     total_users = Profile.objects.count()
     user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
+
     if user_rank <= 10:
         motivation_message = "Amazing job! You're in the Top 10. Keep up the good work!"
     elif user_rank <= 20:
@@ -140,20 +144,51 @@ def home(request):
         motivation_message = "You're doing well! Continue exploring and earning more points."
     else:
         motivation_message = "Check out the latest news and actions to boost your points and rise up the ranks!"
-    
+
     context = {
         "required": True,
         "leaderboard_data": leaderboard_data,
-        "news_items": news_items,
-        "leaderboard_names": json.dumps(profile.name), 
-        "leaderboard_points": json.dumps(profile.points),  
         "user_rank": user_rank,
         "motivation_message": motivation_message,
         "total_users": total_users,
-        "top_3_names": json.dumps(top_3_names),  
+        "top_3_names": json.dumps(top_3_names),
         "top_3_points": json.dumps(top_3_points),
+        "news_items": news_items,
+        "campaign_items": campaign_items,
+        "leaderboard_names": json.dumps(profile.name), 
+        "leaderboard_points": json.dumps(profile.points),
         "required": required,  
     }
     return render(request, 'home.html', context)
 
+@login_required
+def actions_view(request):
+    profile = request.user.profile
 
+    if not (profile.name and profile.school and profile.major and profile.graduation_year):
+        return redirect('profile')  
+
+    daily_tasks = [
+        {'name': 'Word of the Day', 'points': 20, 'status': 'completed'},
+        {'name': 'Picture in Action', 'points': 20, 'status': 'open'},
+        {'name': 'Composting', 'points': 5, 'status': 'completed'},
+        {'name': 'Recycling', 'points': 5, 'status': 'open'},
+        {'name': 'Green2Go Container', 'points': 15, 'status': 'open'},
+    ]
+    weekly_task = {'name': 'Article Quiz', 'points': 15, 'status': 'in progress'}
+    referral_task = {'name': 'Refer a Friend', 'points': 10, 'status': 'open'}
+    daily_progress_percentage = 60 
+
+    calendar_weeks = [
+        [{'day': 1, 'is_today': False, 'is_streak': False}, ...],  
+    ]
+
+    context = {
+        'daily_tasks': daily_tasks,
+        'weekly_task': weekly_task,
+        'referral_task': referral_task,
+        'daily_progress_percentage': daily_progress_percentage,
+        'calendar_weeks': calendar_weeks,
+        'required': True
+    }
+    return render(request, 'actions.html', context)

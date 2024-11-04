@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block content %}
-<link rel= "stylesheet" type= "text/css" href= "../static/styles/style.css">
-<link rel= "stylesheet" type= "text/css" href= "../static/styles/home.css">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/home.css' %}">
 <div class="landing-page-container">
     <div class="leaderboard-container">
         <h2 class="section-title">Leaderboard</h2>
@@ -25,8 +25,23 @@
                 <tbody>
                     {% for user in leaderboard_data %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ user.name }}</td>
+                        <td>
+                            <span class="rank-icon">
+                                {% if user.rank_change > 0 %}
+                                <span class="rank-up">▲</span> <!-- Green up arrow for rank increase -->
+                                {% elif user.rank_change < 0 %} <span class="rank-down">▼</span>
+                            <!-- Red down arrow for rank decrease -->
+                            {% else %}
+                            <span class="rank-neutral">●</span> <!-- Neutral icon for no change -->
+                            {% endif %}
+                            </span>
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            <img src="{% if user.picture %}{{ user.picture.url }}{% else %}{% static 'images/default_profile_image.jpg' %}{% endif %}"
+                                alt="Profile image" class="profile-image">
+                            {{ user.name }}
+                        </td>
                         <td class="points-column">{{ user.points }}</td>
                     </tr>
                     {% endfor %}
@@ -36,20 +51,41 @@
     </div>
     <div class="latest-news">
         <h2 class="section-title">Latest News</h2>
-        <hr style="width:100%">
         <p class="paragraph-font">
             Be sustainable today! Check out what’s happening in the community and take part in sustainable events,
             activities, and promotions.
         </p>
-        {% for news in news_items %}
-        <div class="news-item">
-
-            <p>{{ news.title }}</p>
-        </div>
-        {% endfor %}
+        <ul class="no-bullets">
+            <!-- First check if there are any campaigns to display -->
+            {% for campaign in campaign_items %}
+                {% if campaign.news%}
+                <li class="news-item">
+                    <div class="news-box">
+                        <a href="{% url 'actions' %}" target="_blank">{{ campaign.title }}</a>
+                    </div>    
+                </li>
+                {% endif%}
+            {% endfor%}
+            <!-- Then display news items -->
+            {% for news in news_items %}
+                {% if news.external_url %}
+                    <li class="news-item">
+                        <div class="news-box">
+                            {% if news.news_image %}
+                                <img src="{{ news.news_image.url }}">
+                            {% endif %}
+                            <a href="{{ news.external_url }}" target="_blank">{{ news.display_title }}</a>
+                        </div>    
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
     </div>
 </div>
 <!-- barchart -->
+<div class="chart-container">
+    <canvas id="leaderboardChart"></canvas>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 <script>
@@ -70,6 +106,7 @@
                 }]
             },
             options: {
+                maintainAspectRatio: false, 
                 plugins: {
                     datalabels: {
                         display: true,
