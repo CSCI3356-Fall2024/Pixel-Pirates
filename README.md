@@ -10,8 +10,10 @@
 3. html for landing page
 
 ## grace
-1. If the user is existing make it so the default link takes them to landing page not sign in page
-2. Add personal info to the landing page (like how many points the user has and their own rank)
+### DONE
+1. created new page with html and css to allow admin to choose what action item to create
+2. created new page with html and css to create news item  
+3. added campaign items with news attribute to news section of home page
 
 
 ## anora
