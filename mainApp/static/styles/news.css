@@ -59,6 +59,17 @@ hr {
     border-radius: 5px;
 }
 
+.upload-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.upload-btn:hover {
+    background-color: #45a049;
+}
 
 @media (max-width: 768px) {
     .content-container {

@@ -29,7 +29,7 @@
 </script>
 
 <!-- Form Content -->
-<form method="post" action="" class="form-group">
+<form method="post" action="" class="form-group" enctype="multipart/form-data">
     {% csrf_token %}
 
     <!-- Display form errors -->
@@ -88,7 +88,14 @@
             {% render_field form.time_end class="form-control" %}
         </div>       
 
-        <!-- Submit Button -->
+        <!-- Upload Image -->
+        <div class="mb-3">
+            <label for="id_news_image">Choose Image to Display</label>
+            <!-- input type="submit" value="Submit" class="btn btn-secondary" -->
+            {% render_field form.news_image class="form-control" %}
+        </div>
+
+            <!-- Submit Button -->
         <div class="submit-container">
             <button type="submit" class="btn btn-success">Create News Item</button>
         </div>

@@ -63,7 +63,7 @@ class CampaignForm(forms.ModelForm):
 class NewsForm(forms.ModelForm):
     class Meta:
         model = News
-        fields = ['display_title', 'external_url', 'image', 
+        fields = ['display_title', 'external_url', 'news_image', 
                   'date_begin', 'date_end', 'time_begin', 'time_end']
         widgets = {
             'date_begin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -71,7 +71,9 @@ class NewsForm(forms.ModelForm):
             'time_begin': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
             'time_end': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
         }
-
+        display_title = forms.CharField(required=True)
+        external_url = forms.CharField(required=True)
+        
     def clean(self):
         cleaned_data = super().clean()
         date_begin = cleaned_data.get('date_begin')

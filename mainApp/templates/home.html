@@ -56,10 +56,24 @@
             activities, and promotions.
         </p>
         <ul class="no-bullets">
+            <!-- First check if there are any campaigns to display -->
+            {% for campaign in campaign_items %}
+                {% if campaign.news%}
+                <li class="news-item">
+                    <div class="news-box">
+                        <a href="{% url 'actions' %}" target="_blank">{{ campaign.title }}</a>
+                    </div>    
+                </li>
+                {% endif%}
+            {% endfor%}
+            <!-- Then display news items -->
             {% for news in news_items %}
                 {% if news.external_url %}
                     <li class="news-item">
                         <div class="news-box">
+                            {% if news.news_image %}
+                                <img src="{{ news.news_image.url }}">
+                            {% endif %}
                             <a href="{{ news.external_url }}" target="_blank">{{ news.display_title }}</a>
                         </div>    
                     </li>

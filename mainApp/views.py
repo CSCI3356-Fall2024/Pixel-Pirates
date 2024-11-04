@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from .forms import ProfileForm, CampaignForm, NewsForm
-from .models import Profile, News
+from .models import Profile, News, Campaign
 from django.db import IntegrityError
 from django.db.models import F
 from django.dispatch import receiver
@@ -87,10 +87,10 @@ def choose_action_view(request):
 def campaign_view(request):
     required = request.user.is_authenticated  
     if request.method == 'POST':
-        form = CampaignForm(request.POST)
+        form = CampaignForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()  # Save the form data to the database
-            return redirect('profile')  # Redirect to the profile page after successful save
+            return redirect('home')  # Redirect to the home page after successful save
     else:
         form = CampaignForm()  # Display an empty form on GET request
 
@@ -99,10 +99,10 @@ def campaign_view(request):
 def news_view(request):
     required = request.user.is_authenticated
     if request.method == 'POST':
-        form = NewsForm(request.POST)
+        form = NewsForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('home')  # Redirect to the list of news items after saving
+            return redirect('home')  # Redirect to the landing page to see current news items after saving
     else:
         form = NewsForm()
     return render(request, 'news.html', {'form': form, 'required': required})
@@ -129,6 +129,7 @@ def home_view(request):
     top_3_points = [user.points for user in top_3_users]
 
     news_items = News.objects.all()
+    campaign_items = Campaign.objects.all()
 
     total_users = Profile.objects.count()
     user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
@@ -153,6 +154,7 @@ def home_view(request):
         "top_3_names": json.dumps(top_3_names),
         "top_3_points": json.dumps(top_3_points),
         "news_items": news_items,
+        "campaign_items": campaign_items,
         "leaderboard_names": json.dumps(profile.name), 
         "leaderboard_points": json.dumps(profile.points),
         "required": required,  
