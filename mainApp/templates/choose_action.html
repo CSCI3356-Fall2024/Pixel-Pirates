@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}  
+
+{% block title %}Choose Action Page{% endblock %}
+
+{% block content %}
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- External CSS Stylesheets -->
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/choose_action.css' %}">
+    <title>Choose Item</title>
+</head>    
+
+<body>
+    <div class='content'>
+        <h1>Please select the item you would like to create:</h1>
+
+        <!-- Option 1 - Create news item -->
+        <form action="{% url 'news' %}" method="get">
+            {% csrf_token %}
+            <button type="submit">News item</button>
+        </form>
+        <!-- Option 2 - Create campaign item -->
+        <form action="{% url 'campaign' %}" method="get">
+            {% csrf_token %}
+            <button type="submit">Campaign item</button>
+        </form>
+    </div>
+</body>
+</html>
+{% endblock %}

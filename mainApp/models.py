@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import User
 from multiselectfield import MultiSelectField
 from .choices import MAJOR_CHOICES, MINOR_CHOICES, SCHOOL_CHOICES
@@ -28,7 +29,7 @@ class Campaign(models.Model):
     time_begin = models.TimeField()
     time_end = models.TimeField()
     points = models.IntegerField(default=0)
-    news = models.BooleanField(default=False)
+    news = models.BooleanField(default=True)
     LOCATION_CHOICES = [
         ('Lower', 'Lower'),
         ('McElroy', 'McElroy'),
@@ -51,10 +52,14 @@ class Campaign(models.Model):
         return self.title
     
 class News(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    image = models.ImageField(upload_to='news/', blank=True, null=True)
+    display_title = models.CharField(max_length=500)
+    external_url = models.URLField(max_length=500, blank=True, null=True)  # field for external URL to display on landing page
     date_posted = models.DateTimeField(auto_now_add=True)
-
+    date_begin = models.DateField()
+    date_end = models.DateField()
+    time_begin = models.TimeField()
+    time_end = models.TimeField()
+    news_image = models.ImageField(upload_to='news_images/', blank=True, null=True)
+                                 
     def __str__(self):
-        return self.title
+        return self.display_title
