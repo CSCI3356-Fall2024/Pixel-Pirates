@@ -192,3 +192,19 @@ def actions_view(request):
         'required': True
     }
     return render(request, 'actions.html', context)
+
+@login_required 
+def rewards_view(request):
+
+    profile = request.user.profile 
+    campaign_items = Campaign.objects.all()
+
+    context = {
+        'profile': profile,
+        'campaign_items': campaign_items,
+        'required': True
+    }
+
+    return render(request, 'rewards.html', context)
+
+    

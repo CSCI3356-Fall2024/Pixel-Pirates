@@ -1,0 +1,70 @@
+
+.content-container {
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    padding: 10px;
+    gap: 20px 20px;
+}
+
+.points-display {
+    grid-column: 1;
+    grid-row: 1;
+    background-color: #E8F4EA;
+    width: 80%; /* Adjust width to control the oval's width */
+    height: 90%; /* Adjust height for desired oval shape */
+    border-radius: 50%; /* Creates an oval shape */
+    box-shadow: 0px 3px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    display: flex;
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Centers content vertically */
+    flex-direction: column; /* Stacks h2 elements vertically */
+    text-align: center; /* Centers text inside the container */
+    justify-self: center;
+    align-self: center;
+
+    border: 1px solid black;
+}
+
+.completed-tasks {
+    grid-column: 2;
+    grid-row: 1;
+    background-color: #E8F4EA;
+    border-radius: 20px;
+    box-shadow: 0px 3px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+}
+
+.redeem {
+    grid-column: 1;
+    grid-row: 2;
+    background-color: #E8F4EA;
+    border-radius: 20px;
+    box-shadow: 0px 3px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+}
+
+.history {
+    grid-column: 2;
+    grid-row: 2;
+    background-color: #E8F4EA;
+    border-radius: 20px;
+    box-shadow: 0px 3px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+}
+
+.red {
+    color: #ff0000;
+    font-size: 75px;
+    margin: 0;
+    -webkit-text-stroke: 1px black;
+}
+
+.gray {
+    color: #808080;
+    font-size: 50px;
+    margin: 0;
+}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rewards{% endblock %}
+
+{% block content %}
+<link rel= "stylesheet" type= "text/css" href= "../static/styles/style.css">
+<link rel= "stylesheet" type= "text/css" href= "../static/styles/rewards.css">
+
+<div class="content-container">
+    <div class="points-display">
+        <h2 class="gray">YOUR POINTS:</h2>
+        <h2 class="red">{{ profile.points }} </h2>
+
+    </div>
+
+    <div class="completed-tasks">
+        
+    </div>
+
+    <div class="redeem">
+        
+    </div>
+
+    <div class="history">
+        
+    </div>
+
+</div>
+
+
+
+{% endblock %}
