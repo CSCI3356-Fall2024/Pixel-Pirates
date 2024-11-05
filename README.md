@@ -1,7 +1,13 @@
 # Pixel-Pirates
 
-## To do for delivery 4
-1. News section: if campaign is checked as news, make sure it is added to the landing page news section (user could hover over item to see campaign details)
+## To do 
+1. Start thinking about allowing mobile interface (flex) --> ie no nav bar 
+2. Actions page html and css
+3. Word search (try to integrate API) - Leah
+4. Make campaigns once listed on landing page editable
+5. Picture in Action
+6. User can see where they are on chart even if not on the top 50
+7. Logic for if users have the same number of points
 
 ## leah
 ### DONE
