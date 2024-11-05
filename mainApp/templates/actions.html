@@ -14,7 +14,7 @@
 <div class="actions-page-container">
     <div class="profile-summary">
         <img src="{% if user.profile.picture %}{{ user.profile.picture.url }}{% else %}{% static 'images/default_profile_image.jpg' %}{% endif %}" alt="Profile Picture" class="profile-image">
-        <h2>{{ user.get_full_name }}</h2>
+        <h2>{{ user.profile.name }}</h2>
         <p>{{ user.profile.points }} Points Earned This Week</p>
         <p>Streak Status: {{ user.profile.streak_status }} Days</p>
         <p>Streak Bonus: {{ user.profile.streak_bonus }}x</p>

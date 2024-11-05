@@ -84,6 +84,7 @@ def choose_action_view(request):
     required = request.user.is_authenticated
     return render(request, 'choose_action.html', {'required': required})
 
+@login_required
 def campaign_view(request):
     required = request.user.is_authenticated  
     if request.method == 'POST':
