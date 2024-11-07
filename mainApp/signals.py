@@ -6,11 +6,11 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import logout 
 from allauth.exceptions import ImmediateHttpResponse
 from django.http import HttpResponseRedirect
-from django.urls import reverse 
+from django.urls import reverse
 from django.db.models.signals import post_save
-
-from .models import Profile
+from .models import Profile, DailyTask
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 @receiver(user_signed_up)
 def create_profile_on_google_signup(request, user, **kwargs):
@@ -66,3 +66,38 @@ def save_user_profile(sender, instance, created, **kwargs):
         except Profile.DoesNotExist:
             # Create the profile if it doesn't exist
             Profile.objects.create(username=instance, bc_email=instance.email)
+
+@receiver(post_save, sender=User)
+def create_default_daily_tasks(sender, instance, created, **kwargs):
+    if created:
+        # Create static tasks 
+        static_tasks = [
+            {"title": "COMPOSTING", "points": 5},
+            {"title": "RECYCLING", "points": 5},
+            {"title": "GREEN2GO CONTAINER", "points": 15},
+        ]
+
+        for task_data in static_tasks:
+            DailyTask.objects.create(
+                user = instance,
+                title = task_data["title"],
+                points = task_data["points"],
+                completed = False,
+                is_static = True,
+                completion_criteria = {'action_date': ''},
+            )
+
+        today = timezone.now().date()
+        dynamic_tasks = [
+            {"title": "WORD OF THE DAY", "points": 20, "is_static": False, "completion_criteria": {'action_date': str(today)}},
+            {"title": "PICTURE IN ACTION", "points": 20, "is_static": False, "completion_criteria": {'action_date': str(today)}},
+        ]
+        for task_data in dynamic_tasks:
+            DailyTask.objects.create(
+                user=instance,
+                title=task_data["title"],
+                points=task_data["points"],
+                completed=False,
+                is_static=task_data["is_static"],
+                completion_criteria=task_data["completion_criteria"],
+            )

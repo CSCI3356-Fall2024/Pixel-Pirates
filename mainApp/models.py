@@ -63,3 +63,66 @@ class News(models.Model):
                                  
     def __str__(self):
         return self.display_title
+    
+class DailyTask(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='daily_tasks')
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    points = models.IntegerField(default=0)
+    completed = models.BooleanField(default=False)
+    is_static = models.BooleanField(default=True)
+    completion_criteria = models.JSONField(default=dict)
+
+    def check_completion(self):
+        today = timezone.now().date()
+        action_date = self.completion_criteria.get('aciton_date')
+
+        if action_date == str(today):
+            self.completed = True
+            self.user.profile.points += self.points  
+            self.user.profile.save()
+            self.save()
+
+    def __str__(self):
+        return f"{self.title} - {'Completed' if self.completed else 'Open'}"
+
+
+class WeeklyTask(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="weekly_tasks")
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    points = models.IntegerField(default=0)
+    completed = models.BooleanField(default=False)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    completion_criteria = models.JSONField(default=dict)
+
+    def check_completion(self):
+        today = timezone.now().date()
+
+        if self.start_date <= today <= self.end_date and self.completion_criteria.get('criteria_met'):
+            self.completed = True
+            self.user.profile.points += self.points  
+            self.user.profile.save()
+            self.save()
+    
+    def __str__(self):
+        return f"{self.title} - {'Completed' if self.completed else 'Open'}"
+    
+class ReferralTask(models.Model):
+    referrer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='referrals')
+    referee_email = models.EmailField()
+    points_awarded = models.IntegerField(default=10)
+    completed = models.BooleanField(default=False)
+
+    def complete_referral(self):
+        """Marks the referral as completed, awards points, and sets completion date."""
+        if not self.completed:
+            self.completed = True
+            self.completion_date = timezone.now().date()
+            self.referrer.profile.points += self.points_awarded
+            self.referrer.profile.save()
+            self.save()
+
+    def __str__(self):
+        return f"Referral from {self.referrer.username} to {self.referee_email} - {'Completed' if self.completed else 'Pending'}"
