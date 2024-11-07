@@ -9,16 +9,15 @@
 4. assign points to users when task are completed
 5. currently when the user first sign up, when they fill in the required information on the profile page, they have to save twice to access the sidebar, will fix this
 
+## leah
+### In Progress
+1. Word search (once actions is in a workable state)
+2. Make campaigns once listed on landing page editable
+3. User can see where they are on ranking even if not on top 50
+4. Logic for if users have the same number of points
+5. Start mobile interface
 
 ## Delivery 4
-## To do 
-1. Start thinking about allowing mobile interface (flex) --> ie no nav bar 
-2. Actions page html and css
-3. Word search (try to integrate API) - Leah
-4. Make campaigns once listed on landing page editable
-5. Picture in Action
-6. User can see where they are on chart even if not on the top 50
-7. Logic for if users have the same number of points
 
 ## leah
 ### DONE
