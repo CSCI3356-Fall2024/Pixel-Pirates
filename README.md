@@ -8,6 +8,8 @@
 3. opening each task
 4. assign points to users when task are completed
 
+
+## Delivery 4
 ## To do 
 1. Start thinking about allowing mobile interface (flex) --> ie no nav bar 
 2. Actions page html and css
