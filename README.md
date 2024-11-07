@@ -7,6 +7,7 @@
 2. when using celery, run the command: celery -A Pixel_Pirates.celery worker --beat --loglevel=info, with runserver (not sure if this works yet still figuring it out)
 3. opening each task
 4. assign points to users when task are completed
+5. currently when the user first sign up, when they fill in the required information on the profile page, they have to save twice to access the sidebar, will fix this
 
 
 ## Delivery 4
