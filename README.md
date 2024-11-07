@@ -30,6 +30,9 @@
 
 Delivery 5
 1. working on creating tasks on action page using celery beats to create a schedule so that the task refreshes every day (starting with daily tasks first)
+2. when using celery, run the command: celery -A MainApp worker --beat --loglevel=info, with runserver (not sure if this works yet still figuring it out)
+3. opening each task
+4. assign points to users when task are completed
 
 ## meg
 ### DONE
