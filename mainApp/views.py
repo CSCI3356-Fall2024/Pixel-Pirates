@@ -3,11 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from .forms import ProfileForm, CampaignForm, NewsForm
-from .models import Profile, News, Campaign
+from .models import Profile, News, Campaign, DailyTask, WeeklyTask, ReferralTask
 from django.db import IntegrityError
 from django.db.models import F
 from django.dispatch import receiver
 from allauth.account.signals import user_logged_in
+from django.utils import timezone
+from .tasks import reset_daily_tasks
 import json
 
 @receiver(user_logged_in)
@@ -164,35 +166,68 @@ def home_view(request):
 
 @login_required
 def actions_view(request):
-    profile = request.user.profile
+    user = request.user
+    
+   # Check for mandatory profile fields
+    try:
+        profile = user.profile
+        if not (profile.name and profile.school and profile.major and profile.graduation_year):
+            return redirect('profile')
+    except Profile.DoesNotExist:
+        return redirect('profile')
 
-    if not (profile.name and profile.school and profile.major and profile.graduation_year):
-        return redirect('profile')  
-
-    daily_tasks_different = [
-        {'name': 'WORD OF THE DAY', 'points': 20, 'status': 'completed'},
-        {'name': 'PICTURE IN ACTION', 'points': 20, 'status': 'open'},
-    ]
-    daily_tasks_same = [
-        {'name': 'COMPOSTING', 'points': 5, 'status': 'completed'},
-        {'name': 'RECYCLING', 'points': 5, 'status': 'open'},
-        {'name': 'GREEN2GO CONTAINER', 'points': 15, 'status': 'open'},
-    ]
-    weekly_task = {'name': 'ARTICLE QUIZ', 'points': 15, 'status': 'in progress'}
-    referral_task = {'name': 'REFER A FRIEND', 'points': 10, 'status': 'open'}
-    daily_progress_percentage = 60 
-
-    calendar_weeks = [
-        [{'day': 1, 'is_today': False, 'is_streak': False}, ...],  
-    ]
+    # Retrieve static tasks (e.g., recurring daily tasks)
+    static_tasks = DailyTask.objects.filter(user=user, is_static=True)
+    
+    # Retrieve dynamic tasks for today (e.g., changing daily tasks)
+    today = timezone.now().date()
+    dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
 
     context = {
-        'daily_tasks_different': daily_tasks_different,
-        'daily_tasks_same': daily_tasks_same,
-        'weekly_task': weekly_task,
-        'referral_task': referral_task,
-        'daily_progress_percentage': daily_progress_percentage,
-        'calendar_weeks': calendar_weeks,
+        'profile': profile,
+        'static_tasks': static_tasks,
+        'dynamic_tasks': dynamic_tasks,
         'required': True
     }
     return render(request, 'actions.html', context)
+
+# def actions_view(request):
+#     # Ensure the user has a complete profile
+#     profile = request.user.profile
+#     if not (profile.name and profile.school and profile.major and profile.graduation_year):
+#         return redirect('profile')
+
+#     # Get today's date for filtering daily tasks
+#     today = timezone.now().date()
+
+#     # Retrieve daily tasks associated with the user
+#     daily_tasks_different = DailyTask.objects.filter(user=request.user, title__in=["WORD OF THE DAY", "PICTURE IN ACTION"])
+#     daily_tasks_same = DailyTask.objects.filter(user=request.user, title__in=["COMPOSTING", "RECYCLING", "GREEN2GO CONTAINER"])
+
+#     # Retrieve the weekly task for the user (assuming one weekly task per user)
+#     weekly_task = WeeklyTask.objects.filter(user=request.user).first()
+
+#     # Retrieve an active referral task if available
+#     referral_task = ReferralTask.objects.filter(referrer=request.user, completed=False).first()
+
+#     # Calculate daily progress as a percentage based on completed tasks
+#     total_daily_tasks = daily_tasks_different.count() + daily_tasks_same.count()
+#     completed_daily_tasks = daily_tasks_different.filter(completed=True).count() + daily_tasks_same.filter(completed=True).count()
+#     daily_progress_percentage = (completed_daily_tasks / total_daily_tasks * 100) if total_daily_tasks > 0 else 0
+
+#     # Example static data for calendar weeks; ideally, this would be dynamically generated
+#     calendar_weeks = [
+#         [{'day': 1, 'is_today': False, 'is_streak': False}, {'day': 2, 'is_today': True, 'is_streak': True}, ...],
+#     ]
+
+#     # Pass all data to the template
+#     context = {
+#         'profile': profile,
+#         'daily_tasks_different': daily_tasks_different,
+#         'daily_tasks_same': daily_tasks_same,
+#         'weekly_task': weekly_task,
+#         'referral_task': referral_task,
+#         'daily_progress_percentage': daily_progress_percentage,
+#         'calendar_weeks': calendar_weeks,
+#     }
+#     return render(request, 'actions.html', context)

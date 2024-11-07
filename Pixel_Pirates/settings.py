@@ -174,6 +174,18 @@ SELECT2_CACHE_BACKEND = "select2"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
+# CELERY Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'reset-daily-tasks-every-midnight': {
+        'task': 'mainApp.tasks.reset_daily_tasks',
+        'schedule': crontab(minute=0, hour=0),  # Runs every day at midnight
+    },
+}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
