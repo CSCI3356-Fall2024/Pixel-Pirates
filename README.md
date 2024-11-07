@@ -1,5 +1,13 @@
 # Pixel-Pirates
 
+## Delivery 5
+## anora
+### In Progress
+1. working on creating tasks on action page using celery beats to create a schedule so that the task refreshes every day (starting with daily tasks first)
+2. when using celery, run the command: celery -A Pixel_Pirates.celery worker --beat --loglevel=info, with runserver (not sure if this works yet still figuring it out)
+3. opening each task
+4. assign points to users when task are completed
+
 ## To do 
 1. Start thinking about allowing mobile interface (flex) --> ie no nav bar 
 2. Actions page html and css
@@ -23,16 +31,12 @@
 
 
 ## anora
+### DONE
 1. created the basic layout for the campaign page 
 2. restricted the campaign page to superusers only
 3. found a problem for creating new users (it took them to a signup page instead of directly log in) - working on allowing the users create a profile directly based on google authentication
 4. finish the html for campaign page
 
-Delivery 5
-1. working on creating tasks on action page using celery beats to create a schedule so that the task refreshes every day (starting with daily tasks first)
-2. when using celery, run the command: celery -A MainApp worker --beat --loglevel=info, with runserver (not sure if this works yet still figuring it out)
-3. opening each task
-4. assign points to users when task are completed
 
 ## meg
 ### DONE
