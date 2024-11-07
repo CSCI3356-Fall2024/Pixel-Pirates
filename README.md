@@ -28,6 +28,9 @@
 3. found a problem for creating new users (it took them to a signup page instead of directly log in) - working on allowing the users create a profile directly based on google authentication
 4. finish the html for campaign page
 
+Delivery 5
+1. working on creating tasks on action page using celery beats to create a schedule so that the task refreshes every day (starting with daily tasks first)
+
 ## meg
 ### DONE
 1. separated html and css
