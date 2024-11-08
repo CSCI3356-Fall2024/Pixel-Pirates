@@ -12,7 +12,7 @@
 ## leah
 ### In Progress
 1. Word search (once actions is in a workable state)
-2. Make campaigns once listed on landing page editable
+2. Make campaigns once listed on landing page editable *works but might change to pop-up for more efficiency* fix CSS for it because wonky
 3. User can see where they are on ranking even if not on top 50
 4. Logic for if users have the same number of points
 5. Start mobile interface
