@@ -8,9 +8,9 @@ from allauth.exceptions import ImmediateHttpResponse
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models.signals import post_save
-from .models import Profile, DailyTask
+from .models import Profile, ReferralTask
 from django.contrib.auth.models import User
-from django.utils import timezone
+from .task_helpers import *
 
 @receiver(user_signed_up)
 def create_profile_on_google_signup(request, user, **kwargs):
@@ -68,36 +68,39 @@ def save_user_profile(sender, instance, created, **kwargs):
             Profile.objects.create(username=instance, bc_email=instance.email)
 
 @receiver(post_save, sender=User)
-def create_default_daily_tasks(sender, instance, created, **kwargs):
+def create_default_tasks_for_new_user(sender, instance, created, **kwargs):
+    """Create default tasks for a new user."""
     if created:
-        # Create static tasks 
+        # Static tasks (e.g., composting, recycling)
         static_tasks = [
             {"title": "COMPOSTING", "points": 5},
             {"title": "RECYCLING", "points": 5},
             {"title": "GREEN2GO CONTAINER", "points": 15},
         ]
+        create_daily_tasks(instance, static_tasks, is_static=True)
 
-        for task_data in static_tasks:
-            DailyTask.objects.create(
-                user = instance,
-                title = task_data["title"],
-                points = task_data["points"],
-                completed = False,
-                is_static = True,
-                completion_criteria = {'action_date': ''},
-            )
-
+        # Dynamic daily tasks (change daily)
         today = timezone.now().date()
         dynamic_tasks = [
-            {"title": "WORD OF THE DAY", "points": 20, "is_static": False, "completion_criteria": {'action_date': str(today)}},
-            {"title": "PICTURE IN ACTION", "points": 20, "is_static": False, "completion_criteria": {'action_date': str(today)}},
+            {"title": "WORD OF THE DAY", "points": 20, "completion_criteria": {"action_date": str(today)}},
+            {"title": "PICTURE IN ACTION", "points": 20, "completion_criteria": {"action_date": str(today)}},
         ]
-        for task_data in dynamic_tasks:
-            DailyTask.objects.create(
-                user=instance,
-                title=task_data["title"],
-                points=task_data["points"],
-                completed=False,
-                is_static=task_data["is_static"],
-                completion_criteria=task_data["completion_criteria"],
-            )
+        create_daily_tasks(instance, dynamic_tasks, is_static=False)
+
+        # Weekly task setup using the current week's range
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+        weekly_tasks = [
+            {"title": "ARTICLE QUIZ", "points": 20, "description": "Complete the weekly quiz"},
+        ]
+        
+        # Create weekly tasks with the current week's start and end dates
+        create_weekly_tasks(instance, weekly_tasks, start_of_week, end_of_week)
+    
+@receiver(post_save, sender=User)
+def check_referral_completion(sender, instance, created, **kwarg):
+    if created:
+        # Check if a ReferralTask with this user's email exists
+        referral = ReferralTask.objects.filter(referee_email=instance.email, completed=False).first()
+        if referral:
+            referral.complete_referral()

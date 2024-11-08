@@ -114,6 +114,7 @@ class ReferralTask(models.Model):
     referee_email = models.EmailField()
     points_awarded = models.IntegerField(default=10)
     completed = models.BooleanField(default=False)
+    completion_date = models.DateField(null=True, blank=True)
 
     def complete_referral(self):
         """Marks the referral as completed, awards points, and sets completion date."""

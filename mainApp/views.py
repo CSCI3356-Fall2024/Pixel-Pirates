@@ -9,6 +9,7 @@ from django.db.models import F
 from django.dispatch import receiver
 from allauth.account.signals import user_logged_in
 from django.utils import timezone
+from datetime import timedelta
 from .tasks import reset_daily_tasks
 import json
 
@@ -167,6 +168,9 @@ def home_view(request):
 @login_required
 def actions_view(request):
     user = request.user
+    today = timezone.now().date()
+    start_of_week = today - timedelta(days=today.weekday())
+    end_of_week = start_of_week + timedelta(days=6)
     
    # Check for mandatory profile fields
     try:
@@ -180,13 +184,20 @@ def actions_view(request):
     static_tasks = DailyTask.objects.filter(user=user, is_static=True)
     
     # Retrieve dynamic tasks for today (e.g., changing daily tasks)
-    today = timezone.now().date()
     dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
+
+    #weekly tasks 
+    weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
+
+     # Fetch or create an open referral task for the current user
+    referral_task, created = ReferralTask.objects.get_or_create(referrer=request.user, completed=False)
 
     context = {
         'profile': profile,
         'static_tasks': static_tasks,
         'dynamic_tasks': dynamic_tasks,
+        'weekly_tasks': weekly_tasks,
+        'referral_task': referral_task,
         'required': True
     }
     return render(request, 'actions.html', context)

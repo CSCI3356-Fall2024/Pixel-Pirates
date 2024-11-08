@@ -26,34 +26,36 @@
     <div class="daily-progress">
         <h3>Daily Progress</h3>
         <div class="progress-bar">
-            <div class="progress-bar-fill" style="width: {{ daily_progress_percentage|default:'0' }}%;"></div>
+            <!-- <div class="progress-bar-fill" style="width: {{ daily_progress_percentage|default:'0' }}%;"></div> -->
         </div>
         <p>Progress: {{ daily_progress_percentage }}%</p>
 
+        <!-- Daily Tasks Section -->
+        <div class="tasks-list">
+            <h3>Daily Tasks</h3>
+            {% for task in dynamic_tasks %}
+                <div class="task-item {{ task.status }}">
+                    <div class="task-title"> <p>{{ task.title }}</p> </div>
+                    <div class="task-details"> 
+                        <div class="points">{{ task.points }} points</div>
+                        <button class="status">{% if task.completed %}Completed{% else %}Open{% endif %}</button>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% for task in static_tasks %}
+                <div class="task-item {{ task.status }}">
+                    <div class="task-title"> <p>{{ task.title }}</p> </div>
+                    <div class="task-details"> 
+                        <div class="points">{{ task.points }} points</div>
+                        <button class="status">{% if task.completed %}Completed{% else %}Open{% endif %}</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
-    <!-- Daily Tasks Section -->
-    <div class="tasks-list">
-        {% for task in dynamic_tasks %}
-            <div class="task-item {{ task.status }}">
-                <div class="task-title"> <p>{{ task.title }}</p> </div>
-                <div class="task-details"> 
-                    <div class="points">{{ task.points }} points</div>
-                    <div class="status">{% if task.completed %}Completed{% else %}Open{% endif %}</div>
-                </div>
-            </div>
-        {% endfor %}
-
-        {% for task in static_tasks %}
-            <div class="task-item {{ task.status }}">
-                <div class="task-title"> <p>{{ task.title }}</p> </div>
-                <div class="task-details"> 
-                    <div class="points">{{ task.points }} points</div>
-                    <div class="status">{% if task.completed %}Completed{% else %}Open{% endif %}</div>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
+    
 
     <!-- Streak Calendar Section -->
     <!-- <div class="calendar-container">
@@ -72,43 +74,31 @@
     </div> -->
 
     <!-- Weekly Task Section -->
-    <!-- <div class="weekly-task">
-        <h4>Weekly Task <span class="info-icon">ℹ️</span></h4>
-        {% if weekly_task %}
-            <div class="task-item {% if weekly_task.completed %}completed{% else %}in-progress{% endif %}">
-                <div class="task-title">{{ weekly_task.title }}</div>
-                <div class="task-details">
-                    <span>{{ weekly_task.points }} points</span>
-                    {% if weekly_task.completed %}
-                        <span>Completed</span>
-                    {% else %}
-                        <span>In Progress</span>
-                    {% endif %}
+    <div class="weekly-task">
+        <h3>Weekly Tasks</h3>
+        {% for task in weekly_tasks %}
+            <div class="task-item {{ task.status }}">
+                <div class="task-title"> <p>{{ task.title }}</p> </div>
+                <div class="task-details"> 
+                    <div class="points">{{ task.points }} points</div>
+                    <button class="status">{% if task.completed %}Completed{% else %}Open{% endif %}</button>
                 </div>
             </div>
-        {% else %}
-            <p>No weekly task assigned.</p>
-        {% endif %}
-    </div> -->
+        {% endfor %}
+    </div>
 
     <!-- Referral Section -->
-    <!-- <div class="referral-task">
-        <h4>Referral <span class="info-icon">ℹ️</span></h4>
+    <div class="referral-task">
+        <h3>Referral</h3>
         {% if referral_task %}
-            <div class="task-item {% if referral_task.completed %}completed{% else %}pending{% endif %}">
-                <div class="task-title">{{ referral_task.referee_email }}</div>
-                <div class="task-details">
-                    <span>{{ referral_task.points_awarded }} points</span> 
-                    {% if referral_task.completed %}
-                        <span>Completed</span>
-                    {% else %}
-                        <span>Open</span>
-                    {% endif %}
+            <div class="task-item {% if referral_task.completed %}completed{% else %}open{% endif %}">
+                <div class="task-title"><p>Referral</p></div>
+                <div class="task-details"> 
+                    <div class="points">{{ task.points }} points</div>
+                    <button class="status">{% if task.completed %}Completed{% else %}Open{% endif %}</button>
                 </div>
             </div>
-        {% else %}
-            <p>No referral task available.</p>
         {% endif %}
-    </div> -->
+    </div>
 </div>
 {% endblock %}

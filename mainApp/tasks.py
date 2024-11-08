@@ -1,34 +1,24 @@
 from celery import shared_task
 from django.utils import timezone
 from django.contrib.auth.models import User
-from .models import DailyTask
+from .models import DailyTask, WeeklyTask
+from datetime import timedelta
+from .task_helpers import *
 
 @shared_task
 def reset_daily_tasks():
-    today = timezone.now().date()
-    
     # Reset static tasks for all users to incomplete
     DailyTask.objects.filter(is_static=True).update(completed=False)
 
     # Create new dynamic tasks for each user
     dynamic_tasks = [
-        {"title": "WORD OF THE DAY", "points": 20, "completion_criteria": {'action_date': str(today)}},
-        {"title": "PICTURE IN ACTION", "points": 20, "completion_criteria": {'action_date': str(today)}},
+        {"title": "WORD OF THE DAY", "points": 20},
+        {"title": "PICTURE IN ACTION", "points": 20},
     ]
 
-    users = User.objects.all()
-    for user in users:
-        for task_data in dynamic_tasks:
-            # Check if a dynamic task for today already exists
-            if not DailyTask.objects.filter(user=user, title=task_data["title"], completion_criteria__action_date=str(today)).exists():
-                DailyTask.objects.create(
-                    user=user,
-                    title=task_data["title"],
-                    points=task_data["points"],
-                    completed=False,
-                    is_static=False,
-                    completion_criteria=task_data["completion_criteria"]
-                )
+    for user in User.objects.all():
+        create_daily_tasks(user, dynamic_tasks, is_static=False)
+
 
 @shared_task
 def update_daily_tasks():
@@ -69,3 +59,16 @@ def update_daily_tasks():
                     "completed": False,
                 }
             )
+
+@shared_task
+def generate_weekly_tasks():
+    today = timezone.now().date()
+    start_of_week = today - timedelta(days=today.weekday())
+    end_of_week = start_of_week + timedelta(days=6)
+
+    weekly_tasks = [
+        {"title": "ARTICLE QUIZ", "points": 20, "description": "Complete the weeky quiz"}
+    ]
+
+    for user in User.objects.all():
+        create_weekly_tasks(user, weekly_tasks)

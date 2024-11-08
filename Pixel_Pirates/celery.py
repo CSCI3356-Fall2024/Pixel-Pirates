@@ -16,4 +16,8 @@ app.conf.beat_schedule = {
         'task': 'mainApp.tasks.update_daily_tasks',
         'schedule': crontab(hour=0, minute=0),  # Runs daily at midnight
     },
+    'generate-weekly-tasks': {
+        'task': 'mainApp.tasks.generate_weekly_tasks',
+        'schedule': crontab(minute=0, hour=0, day_of_week=1)
+    }
 }
