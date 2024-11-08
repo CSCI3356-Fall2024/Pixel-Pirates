@@ -56,77 +56,86 @@
             activities, and promotions.
         </p>
         <ul class="no-bullets">
-            <!-- First check if there are any campaigns to display -->
+            <!-- Display campaigns if any -->
             {% for campaign in campaign_items %}
-                {% if campaign.news%}
-                <li class="news-item">
-                    <div class="news-box">
-                        <a href="{% url 'actions' %}" target="_blank">{{ campaign.title }}</a>
-                    </div>    
-                </li>
-                {% endif%}
-            {% endfor%}
-            <!-- Then display news items -->
+            {% if campaign.news %}
+            <li class="news-item">
+                <div class="news-box">
+                    <a href="{% url 'actions' %}" target="_blank">{{ campaign.title }}</a>
+
+                    {% if user.is_superuser %} <!-- Only show edit button to admins -->
+                    <a href="{% url 'edit_campaign' campaign.id %}" class="edit-icon">
+                        <i class="fas fa-pen"></i> <!-- Edit icon (pen) for each campaign -->
+                    </a>
+                    {% endif %}
+                </div>
+            </li>
+            {% endif %}
+            {% endfor %}
+            <!-- Display news items -->
             {% for news in news_items %}
-                {% if news.external_url %}
-                    <li class="news-item">
-                        <div class="news-box">
-                            {% if news.news_image %}
-                                <img src="{{ news.news_image.url }}">
-                            {% endif %}
-                            <a href="{{ news.external_url }}" target="_blank">{{ news.display_title }}</a>
-                        </div>    
-                    </li>
-                {% endif %}
+            <li class="news-item">
+                <div class="news-box">
+                    {% if news.news_image %}
+                    <img src="{{ news.news_image.url }}" alt="News Image">
+                    {% endif %}
+                    <a href="{{ news.external_url }}" target="_blank">{{ news.display_title }}</a>
+
+                    {% if user.is_superuser %} <!-- Only show edit button to admins -->
+                    <a href="{% url 'edit_news' news.id %}" class="edit-icon">
+                        <i class="fas fa-pen"></i> <!-- Edit icon (pen) for each news item -->
+                    </a>
+                    {% endif %}
+                </div>
+            </li>
             {% endfor %}
         </ul>
     </div>
-</div>
-<!-- barchart -->
-<div class="chart-container">
-    <canvas id="leaderboardChart"></canvas>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const top3Names = JSON.parse('{{ top_3_names|escapejs }}');
-        const top3Points = JSON.parse('{{ top_3_points|escapejs }}');
-        const ctx = document.getElementById('leaderboardChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: top3Names,
-                datasets: [{
-                    label: 'Points',
-                    data: top3Points,
-                    backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
-                    borderColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
-                    borderWidth: 1,
-                }]
-            },
-            options: {
-                maintainAspectRatio: false, 
-                plugins: {
-                    datalabels: {
-                        display: true,
-                        color: '#000',
-                        font: {
-                            weight: 'bold'
-                        },
-                        formatter: function (value) {
-                            return value;
+    <!-- barchart -->
+    <div class="chart-container">
+        <canvas id="leaderboardChart"></canvas>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const top3Names = JSON.parse('{{ top_3_names|escapejs }}');
+            const top3Points = JSON.parse('{{ top_3_points|escapejs }}');
+            const ctx = document.getElementById('leaderboardChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: top3Names,
+                    datasets: [{
+                        label: 'Points',
+                        data: top3Points,
+                        backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
+                        borderColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        datalabels: {
+                            display: true,
+                            color: '#000',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: function (value) {
+                                return value;
+                            }
+                        }
+                    },
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
                         }
                     }
-                },
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
                 }
-            }
+            });
         });
-    });
-</script>
-{% endblock %}
+    </script>
+    {% endblock %}

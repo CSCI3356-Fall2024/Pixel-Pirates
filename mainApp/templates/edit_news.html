@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/base.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/edit_news.css' %}">
+
+<div class="edit-news-container">
+    <h2>Edit News Item</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Display Title Field -->
+        <div class="form-group">
+            <label for="display_title">Title</label>
+            {{ form.display_title }}
+        </div>
+        
+        <!-- External URL Field -->
+        <div class="form-group">
+            <label for="external_url">External URL</label>
+            {{ form.external_url }}
+        </div>
+        
+        <!-- News Image Field -->
+        <div class="form-group">
+            <label for="news_image">News Image</label>
+            {% if news_item.news_image %}
+                <div>
+                    <img src="{{ news_item.news_image.url }}" alt="News Image" class="current-image">
+                </div>
+            {% endif %}
+            {{ form.news_image }}
+        </div>
+        
+        <!-- Date Begin Field -->
+        <div class="form-group">
+            <label for="date_begin">Start Date</label>
+            {{ form.date_begin }}
+        </div>
+        
+        <!-- Date End Field -->
+        <div class="form-group">
+            <label for="date_end">End Date</label>
+            {{ form.date_end }}
+        </div>
+        
+        <!-- Time Begin Field -->
+        <div class="form-group">
+            <label for="time_begin">Start Time</label>
+            {{ form.time_begin }}
+        </div>
+        
+        <!-- Time End Field -->
+        <div class="form-group">
+            <label for="time_end">End Time</label>
+            {{ form.time_end }}
+        </div>
+        
+        <!-- Save and Cancel Buttons -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

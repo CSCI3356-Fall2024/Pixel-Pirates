@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
@@ -102,10 +102,36 @@ def news_view(request):
         form = NewsForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('home')  # Redirect to the landing page to see current news items after saving
+            return redirect('home')  
     else:
         form = NewsForm()
     return render(request, 'news.html', {'form': form, 'required': required})
+
+@login_required
+def edit_news(request, id):
+    news_item = get_object_or_404(News, id=id)
+    if request.method == 'POST':
+        form = NewsForm(request.POST, request.FILES, instance=news_item)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  
+    else:
+        form = NewsForm(instance=news_item)
+    return render(request, 'edit_news.html', {'form': form, 'news_item': news_item, 'required': True})
+
+@login_required
+def edit_campaign(request, id):
+    campaign_item = get_object_or_404(Campaign, id=id)
+    if request.method == 'POST':
+        form = CampaignForm(request.POST, request.FILES, instance=campaign_item)
+        if form.is_valid():
+            form.save()
+            next_url = request.GET.get('next')
+            return redirect(next_url) if next_url else redirect('home')
+    else:
+        form = CampaignForm(instance=campaign_item)
+    
+    return render(request, 'edit_campaign.html', {'form': form, 'campaign_item': campaign_item, 'required': True})
 
 @login_required
 def home_view(request):
