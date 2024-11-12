@@ -2,6 +2,7 @@
 
 # School Choices
 SCHOOL_CHOICES = [
+    ('', 'Select School'),
     ('CSOM', 'CSOM'),
     ('MCAS', 'MCAS'),
     ('LSEHD', 'LSEHD'),
@@ -96,8 +97,10 @@ MINOR_CHOICES = [
     ("Environmental_Studies", "Environmental Studies"),
     ("Faith_Peace_Justice", "Faith, Peace & Justice"),
     ("Film_Studies", "Film Studies"),
+    ("Finance", "Finance"),
     ("Foundation_in_Education", "Foundation in Education"),
     ("French", "French"),
+    ("General_Business", "General Business"),
     ("Geological_Sciences", "Geological Sciences"),
     ("German", "German"),
     ("German_Studies", "German Studies"),
@@ -115,7 +118,9 @@ MINOR_CHOICES = [
     ("Latin_American_Studies", "Latin American Studies"),
     ("Leadership_Higher_Education_Community", "Leadership in Higher Education and Community Settings"),
     ("Linguistics", "Linguistics"),
+    ("Management_Leadership", "Management & Leadership"),
     ("Managing_Social_Impact_Public_Good", "Managing for Social Impact and the Public Good"),
+    ("Marketing", "Marketing"),
     ("Mathematics", "Mathematics"),
     ("Medical_Humanities_Health_Culture", "Medical Humanities, Health, and Culture"),
     ("Middle_School_Mathematics_Teaching", "Middle School Mathematics Teaching"),
