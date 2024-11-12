@@ -17,6 +17,10 @@
 4. Logic for if users have the same number of points
 5. Start mobile interface
 
+## meg
+### in progress
+1. Work on new view for results page
+
 ## Delivery 4
 
 ## leah
