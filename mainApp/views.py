@@ -160,6 +160,18 @@ def home_view(request):
     total_users = Profile.objects.count()
     user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
 
+    user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
+    user_info = {
+        'rank': user_rank,
+        'name': profile.name,
+        'points': profile.points,
+        'picture': profile.picture.url if profile.picture else None,
+    }
+
+    leaderboard_data = Profile.objects.order_by('-points')[:50]
+    user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
+    user_in_top_50 = user_rank <= 50  # Check if the user is in the top 50
+
     if user_rank <= 10:
         motivation_message = "Amazing job! You're in the Top 10. Keep up the good work!"
     elif user_rank <= 20:
@@ -183,6 +195,8 @@ def home_view(request):
         "campaign_items": campaign_items,
         "leaderboard_names": json.dumps(profile.name), 
         "leaderboard_points": json.dumps(profile.points),
+        "user_in_top_50": user_in_top_50,
+        "user_info": user_info,
         "required": required,  
     }
     return render(request, 'home.html', context)
