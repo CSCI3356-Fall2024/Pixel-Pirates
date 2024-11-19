@@ -9,8 +9,8 @@
 4. assign points to users when task are completed
 5. currently when the user first sign up, when they fill in the required information on the profile page, they have to save twice to access the sidebar, will fix this
 6. for the actions, some of them dont show up when signing in: 
-   python manage.py update_tasks
-   - manally adds the actions
+   - python manage.py update_tasks
+      - manally adds the actions
 
 ## leah
 ### In Progress
