@@ -105,11 +105,20 @@ html, body {
 }
 
 .progress-bar-fill {
-    background-color: #4caf50; /* Adjust color as needed */
+    background-color: #B8D8BE; 
     height: 100%;
     width: 0;
     transition: width 0.5s ease;
     text-align: center;
     color: white;
     line-height: 20px;
+}
+
+.status {
+    background-color: white;
+    border: none
+}
+
+.status:hover {
+    color: #B8D8BE;
 }
