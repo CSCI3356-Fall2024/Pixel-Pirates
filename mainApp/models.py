@@ -63,3 +63,15 @@ class News(models.Model):
                                  
     def __str__(self):
         return self.display_title
+    
+#create a new rewards
+class Rewards(models.Model):
+    reward_title = models.CharField(max_length=500)
+    date_begin = models.DateField()
+    date_end = models.DateField()
+    time_begin = models.TimeField()
+    time_end = models.TimeField()
+    points = models.IntegerField(default=0)
+                                 
+    def __str__(self):
+        return self.reward_title

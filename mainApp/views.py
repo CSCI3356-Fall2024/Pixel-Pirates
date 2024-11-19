@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
-from .forms import ProfileForm, CampaignForm, NewsForm
-from .models import Profile, News, Campaign
+from .forms import ProfileForm, CampaignForm, NewsForm, RewardsForm
+from .models import Profile, News, Campaign, Rewards
 from django.db import IntegrityError
 from django.db.models import F
 from django.dispatch import receiver
@@ -94,7 +94,7 @@ def campaign_view(request):
     else:
         form = CampaignForm()  # Display an empty form on GET request
 
-    return render(request, 'campaign.html', {'form': form, 'required': required})
+    return render(request, 'create_campaign.html', {'form': form, 'required': required})
 
 def news_view(request):
     required = request.user.is_authenticated
@@ -105,7 +105,30 @@ def news_view(request):
             return redirect('home')  
     else:
         form = NewsForm()
-    return render(request, 'news.html', {'form': form, 'required': required})
+    return render(request, 'create_news.html', {'form': form, 'required': required})
+
+def create_reward(request):
+    required = request.user.is_authenticated
+    if request.method == 'POST':
+        form = RewardsForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  
+    else:
+        form = RewardsForm()
+    return render(request, 'create_reward.html', {'form': form, 'required': required})
+
+def rewards_view(request):
+    profile = request.user.profile 
+    campaign_items = Campaign.objects.all()
+
+    context = {
+        'profile': profile,
+        'campaign_items': campaign_items,
+        'required': True
+    }
+    return render(request, 'rewards.html', context)
+
 
 @login_required
 def edit_news(request, id):
@@ -132,6 +155,19 @@ def edit_campaign(request, id):
         form = CampaignForm(instance=campaign_item)
     
     return render(request, 'edit_campaign.html', {'form': form, 'campaign_item': campaign_item, 'required': True})
+
+# edit_rewards here
+@login_required
+def edit_rewards(request, id):
+    rewards_item = get_object_or_404(Rewards, id=id)
+    if request.method == 'POST':
+        form = RewardsForm(request.POST, request.FILES, instance=rewards_item)
+        if form.is_valid():
+            form.save()
+    else:
+        form = RewardsForm(instance=rewards_item)
+    
+    return render(request, 'edit_rewards.html', {'form': form, 'rewards_item': rewards_item, 'required': True})
 
 @login_required
 def home_view(request):
@@ -232,19 +268,3 @@ def actions_view(request):
         'required': True
     }
     return render(request, 'actions.html', context)
-
-@login_required 
-def rewards_view(request):
-
-    profile = request.user.profile 
-    campaign_items = Campaign.objects.all()
-
-    context = {
-        'profile': profile,
-        'campaign_items': campaign_items,
-        'required': True
-    }
-
-    return render(request, 'rewards.html', context)
-
-    
