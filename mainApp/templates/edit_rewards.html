@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/base.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/edit_campaign.css' %}">
+
+<div class="edit-campaign-container">
+    <h2>Edit Rewards</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}  
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Save Changes</button>
+            <a href="{% url 'home' %}" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
