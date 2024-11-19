@@ -38,7 +38,16 @@
                     <div class="task-title"> <p>{{ task.title }}</p> </div>
                     <div class="task-details"> 
                         <div class="points">{{ task.points }} points</div>
-                        <button class="status">{% if task.completed %}Completed{% else %}Open{% endif %}</button>
+                        <button class="status" type="button" onclick="showPopup()">{% if task.completed %}Completed{% else %}Open{% endif %}</button>
+                        <div id="overlay" onclick="hidePopup()"></div>
+                        <div id="popup">
+                            <div class="popup-title">
+                                <h2>{{ task.title }}</h2>
+                                <button class="close-button" onclick="hidePopup()"> <i class="fa-solid fa-x"></i> </button>
+                            </div>
+                            <p>Hello</p>
+    
+                        </div>
                     </div>
                 </div>
             {% endfor %}
@@ -48,7 +57,7 @@
                     <div class="task-title"> <p>{{ task.title }}</p> </div>
                     <div class="task-details"> 
                         <div class="points">{{ task.points }} points</div>
-                        <button class="status">{% if task.completed %}Completed{% else %}Open{% endif %}</button>
+                        <button class="status" type="button" onclick="showPopup()">{% if task.completed %}Completed{% else %}Open{% endif %}</button>
                     </div>
                 </div>
             {% endfor %}
@@ -101,4 +110,16 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+    function showPopup() {
+        document.getElementById("popup").style.display = "block";
+        document.getElementById("overlay").style.display = "block";
+    }
+
+    function hidePopup() {
+        document.getElementById("popup").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+    }
+</script>
 {% endblock %}
