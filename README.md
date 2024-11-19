@@ -19,7 +19,10 @@
 
 ## meg
 ### in progress
-1. Work on new view for results page
+1. Work with Jason to get the new rewards item to show up in rewards page
+
+### done
+1. create new form to create rewards item
 
 ## Delivery 4
 
