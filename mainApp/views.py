@@ -340,17 +340,18 @@ def actions_view(request):
 #     return render(request, 'actions.html', context)
 
 @csrf_exempt
+@login_required
 def complete_task(request, task_id):
     if request.method == "POST":
         try:
             # Try finding the task in DailyTask, WeeklyTask, or ReferralTask
-            task = DailyTask.objects.get(id=task_id)
+            task = DailyTask.objects.filter(user=request.user).get(id=task_id)
         except DailyTask.DoesNotExist:
             try:
-                task = WeeklyTask.objects.get(id=task_id)
+                task = WeeklyTask.objects.filter(user=request.user).get(id=task_id)
             except WeeklyTask.DoesNotExist:
                 try:
-                    task = ReferralTask.objects.get(id=task_id)
+                    task = ReferralTask.objects.filter(referrer=request.user).get(id=task_id)
                 except ReferralTask.DoesNotExist:
                     return JsonResponse({"error": "Task not found"}, status=404)
 
@@ -365,11 +366,11 @@ def complete_task(request, task_id):
         task.save()
 
         # Add points to the user's profile
-        points_to_add = task.points if hasattr(task, 'points') else task.points_awarded
-        user_profile = task.user.profile if hasattr(task, 'user') else task.referrer.profile
+        points_to_add = getattr(task, 'points', getattr(task, 'points_awarded', 0))
+        user_profile = getattr(task, 'user', getattr(task, 'referrer', None)).profile
         user_profile.points += points_to_add
         user_profile.save()
 
         return JsonResponse({"success": True, "points_added": points_to_add}, status=200)
 
-    return JsonResponse({"error": "Invalid request"}, status=400)
+    return JsonResponse({"error": "Invalid request method"}, status=405)
