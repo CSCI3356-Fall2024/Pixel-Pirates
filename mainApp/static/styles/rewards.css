@@ -117,22 +117,42 @@
     margin: 0;
 }
 
-.redeemed, .history {
+.history {
     display: grid;
     grid-template-columns: 70% 30%;
     align-content: center;
 }
 
-.reward, .ineligible-reward {
+.reward,.ineligible-reward {
     display: grid;
     grid-template-columns: 60% 40%;
     align-content: center;
 }
 
+.redeemed {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-.reward-item, .redeemed-item, .history-item {
+.redeemed-item {
+    align-content: center;
+}
+
+
+.reward-item, .history-item {
     font-size: 25px;
     align-content: center;
+}
+
+.redeemed-item {
+    font-size: 25px; 
+    text-align: center;
+    align-self: center;
+}
+
+.redeemed-item {
+    grid-row: 2;
 }
 
 .reward-points {
@@ -142,25 +162,32 @@
     font-size: 20px;
 }
 
+
+
 .redeemed-wrapper, .history-wrapper, .reward-wrapper {
     display: grid;
     grid-template-rows: 1fr 1fr 1fr;
 }
-.redeemed-wrapper, .history-wrapper, .reward-wrapper {
+
+.history-wrapper, .reward-wrapper {
     text-align: right;
 }
 
-.redeemed-points, .history-points, .reward-points {
+.history-points, .reward-points {
     grid-row: 2;
     color: gray;
     font-size: 20px;
 }
 
-.redeemed-date, .history-date, .history-location, .reward-date {
+.history-date, .history-location, .reward-date, .redeemed-date {
     grid-row: 3;
     color: gray;
+    text-align: right;
 }
 
+.redeemed-date {
+    text-align: center;
+}
 
 
 

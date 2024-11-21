@@ -65,7 +65,7 @@
             <div class="reward" data-reward-id="{{ reward.id }}" onclick="showConfirmModal(event)">
                 <span class="reward-item">{{reward.title}}</span>
                 <div class="reward-wrapper"> 
-                    <span class="reward-points">{{ reward.points }}</span>
+                    <span class="reward-points">{{ reward.points }} points</span>
                     <span class="reward-date">Available from: {{ reward.date_begin|date:"m/d"}}-{{reward.date_end|date:"m/d" }}</span>
                 </div>
             </div>
@@ -84,13 +84,14 @@
 
     <div class="scrollable-section user-rewards">
         <div class="title"><h3>Your Rewards</h3></div>
+        {% for redeemed in redeemed_items %}
         <div class="redeemed">
-            <span class="redeemed-item">Free Drink</span>
             <div class="redeemed-wrapper">
-                <span class="redeemed-points">15 points</span>
-                <span class="redeemed-date">10/20/2024</span>
+                <span class="redeemed-item">{{ redeemed.title }}</span>
+                <span class="redeemed-date">Available from: {{ redeemed.date_begin|date:"m/d"}}-{{redeemed.date_end|date:"m/d" }}</span>
             </div>
         </div>
+        {% endfor %}
     </div>
 </div>
 
