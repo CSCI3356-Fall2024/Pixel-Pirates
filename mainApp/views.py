@@ -9,6 +9,8 @@ from django.db.models import F
 from django.dispatch import receiver
 from allauth.account.signals import user_logged_in
 import json
+from django.utils import timezone
+from datetime import timedelta, time 
 
 @receiver(user_logged_in)
 def handle_login(sender, request, user, **kwargs):
@@ -136,6 +138,31 @@ def rewards_view(request):
         'required': True
     }
     return render(request, 'rewards.html', context)
+
+@login_required
+def redeem_reward(request):
+    if request.method == 'POST':
+        reward_id = request.POST.get('reward_id')
+        reward = get_object_or_404(Rewards, id=reward_id)
+
+        start_day = timezone.now().date()
+        end_day = start_day + timedelta(days=30)
+
+        profile = request.user.profile
+        profile.points -= reward.points
+        profile.save()
+
+        Redeemed.objects.create(
+            user=request.user,
+            title=reward.title,
+            date_begin=start_day,
+            date_end=end_day,
+            time_begin=time(0, 0),
+            time_end=time(23,59),
+            description=reward.description
+        )
+        return redirect('rewards')
+
 
 @login_required
 def edit_news(request, id):

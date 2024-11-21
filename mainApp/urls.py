@@ -12,6 +12,7 @@ urlpatterns = [
     path("create_news/", views.news_view, name = "create_news"),
     path('create_news/edit/<int:id>/', views.edit_news, name='edit_news'),
     path("rewards/", views.rewards_view, name='rewards'),
+    path("redeem_reward/", views.redeem_reward, name='redeem_reward'),
     path('rewards/edit/<int:id>/', views.edit_rewards, name='edit_rewards'),
     path('create_reward/', views.create_reward, name='create_reward'),
     path('create_reward/edit/<int:id>/', views.edit_rewards, name='edit_rewards'),

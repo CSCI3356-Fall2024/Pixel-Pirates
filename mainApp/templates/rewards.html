@@ -13,9 +13,18 @@
 
     // Show the logout modal when the logout link is clicked
     function showConfirmModal(event) {
-        event.preventDefault(); // Prevent link default behavior
-        document.getElementById("confirmModal").style.display = "flex";
+        // Get the reward element that was clicked
+        const rewardElement = event.currentTarget;
 
+        // Extract the reward ID from the data attribute
+        const rewardId = rewardElement.getAttribute('data-reward-id');
+
+        // Set the reward ID in the hidden input field in the modal
+        document.getElementById('rewardIdField').value = rewardId;
+
+        // Show the modal
+        event.preventDefault();
+        document.getElementById("confirmModal").style.display = "flex";
     }
     // Somehow create an object currently a work in progress 
     function confirmRedemption() {
@@ -53,7 +62,7 @@
         <div class="title"><h3>Redeem Rewards</h3></div>
         {% for reward in available_rewards %}
             {% if profile.points >= reward.points %}
-            <div class="reward" onclick="showConfirmModal(event)">
+            <div class="reward" data-reward-id="{{ reward.id }}" onclick="showConfirmModal(event)">
                 <span class="reward-item">{{reward.title}}</span>
                 <div class="reward-wrapper"> 
                     <span class="reward-points">{{ reward.points }}</span>
@@ -88,10 +97,14 @@
 <div id="confirmModal" class="modal">
     <div class="modal-content">
         <h3>Are you sure you want to redeem this reward?</h3>
-        <div class="modal-buttons">
-            <button class="confirm-button" onclick="confirmRedemption()">Yes</button>
-            <button class="cancel-button" onclick="hideConfirmModal()">Cancel</button>
-        </div>
+        <form id="redeemForm" method="POST" action="{% url 'redeem_reward' %}">
+            {% csrf_token %}
+            <input type="hidden" name="reward_id" id="rewardIdField" value="">
+            <div class="modal-buttons">
+                <button type="submit" class="confirm-button">Yes</button>
+                <button type="button" class="cancel-button" onclick="hideConfirmModal()">Cancel</button>
+            </div>
+        </form>
     </div>
 </div>
 
