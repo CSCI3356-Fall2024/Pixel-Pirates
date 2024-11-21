@@ -23,6 +23,9 @@
 ## meg
 ### in progress
 1. Work with Jason to get the new rewards item to show up in rewards page
+2. Points to show up on rewards and subtracting them when rewards redeemed
+3. Show completed tasks on rewards page and points gained 
+4. Show redeemed rewards and points subtracted
 
 ### done
 1. create new form to create rewards item
