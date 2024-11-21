@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.shortcuts import redirect 
 from django.core.exceptions import ValidationError
 from django.contrib.auth import logout 
-from allauth.exceptions import ImmediateHttpResponse
+from allauth.core.exceptions import ImmediateHttpResponse
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models.signals import post_save
