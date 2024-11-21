@@ -12,7 +12,14 @@
     <!-- Profile Summary Section -->
     <div class="profile-summary">
         <div class="profile-image">
-            <img src="{{ user.profile.picture.url }}">
+            {% if profile.picture %}
+                <img 
+                    src="{{ profile.picture.url }}" 
+                    alt="Profile Picture" 
+                    class="profile-img">
+            {% else %}
+                <i class="fa-solid fa-user profile-icon"></i>
+            {% endif %}
         </div>
         <div class="profile-info">
             <h2>{{ user.profile.name }}</h2>

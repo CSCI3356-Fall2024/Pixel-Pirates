@@ -51,6 +51,12 @@ form {
     border: 2px solid #D9D9D9;
 }
 
+.pfp-container .pfp .profile-icon {
+    font-size: 4rem; 
+    color: black;
+    padding: 20px;
+}
+
 .pfp-container button {
     color: gray;
     font-size: 20px;

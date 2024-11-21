@@ -26,12 +26,15 @@
     <div class="content-container">
         <div class="pfp-container">
             <div class="pfp">
-                <img 
-                    id="profileImage" 
-                    src="{% if profile.picture %}{{ profile.picture.url }}{% else %}https://via.placeholder.com/150{% endif %}" 
-                    alt="Profile Picture"
-                    style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid #D9D9D9;"
-                >
+                {% if profile.picture %}
+                    <img 
+                        src="{{ profile.picture.url }}" 
+                        alt="Profile Picture" 
+                        class="profile-img">
+    
+                {% else %}
+                    <i class="fa-solid fa-user profile-icon"></i>
+                {% endif %}
                 <button 
                     type="button" 
                     class="upload-btn" 
