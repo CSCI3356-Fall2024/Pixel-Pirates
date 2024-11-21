@@ -2,37 +2,20 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
-<<<<<<< HEAD
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from django.dispatch import receiver
-=======
-from .forms import ProfileForm, CampaignForm, NewsForm, RewardsForm
-from .models import Profile, News, Campaign, Rewards
->>>>>>> origin
 from django.db import IntegrityError
 from django.db.models import F
 from allauth.account.signals import user_logged_in
 from datetime import timedelta
 import json
 
-from .models import (
-    Profile,
-    News,
-    Campaign,
-    DailyTask,
-    WeeklyTask,
-    ReferralTask,
-)
-
-from .forms import (
-    ProfileForm,
-    CampaignForm,
-    NewsForm,
-)
+from .models import *
+from .forms import *
 
 @receiver(user_logged_in)
 def handle_login(sender, request, user, **kwargs):

@@ -64,7 +64,6 @@ class News(models.Model):
     def __str__(self):
         return self.display_title
     
-<<<<<<< HEAD
 class DailyTask(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='daily_tasks')
     title = models.CharField(max_length=255)
@@ -133,7 +132,6 @@ class ReferralTask(models.Model):
 
     def __str__(self):
         return f"Referral from {self.referrer.username} to {self.referee_email} - {'Completed' if self.completed else 'Pending'}"
-=======
 #create a new rewards
 class Rewards(models.Model):
     reward_title = models.CharField(max_length=500)
@@ -145,4 +143,3 @@ class Rewards(models.Model):
                                  
     def __str__(self):
         return self.reward_title
->>>>>>> origin
