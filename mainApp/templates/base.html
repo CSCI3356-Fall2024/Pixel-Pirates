@@ -3,84 +3,57 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <link rel= "stylesheet" type= "text/css" href= "../static/styles/base.css">
-        <title> {% block title %}Logout Confirmation {% endblock %}</title>
-        <script>
-            // Ensure the modal stays hidden initially
+        <link rel="stylesheet" type="text/css" href="{% static 'styles/base.css' %}">
+        <title>{% block title %}Logout Confirmation{% endblock %}</title>
+        <script defer>
             document.addEventListener("DOMContentLoaded", function () {
+                console.log("DOM fully loaded");
                 const modal = document.getElementById("logoutModal");
-                modal.style.display = "none";  // Ensure hidden on load
+                if (modal) modal.style.display = "none"; // Ensure hidden on load
             });
 
-            // Show the logout modal when the logout link is clicked
             function showLogoutModal(event) {
-                event.preventDefault(); // Prevent link default behavior
-                document.getElementById("logoutModal").style.display = "flex";
+                event.preventDefault();
+                const modal = document.getElementById("logoutModal");
+                if (modal) modal.style.display = "flex";
             }
 
-            // Hide the logout modal
             function hideLogoutModal() {
-                document.getElementById("logoutModal").style.display = "none";
+                const modal = document.getElementById("logoutModal");
+                if (modal) modal.style.display = "none";
             }
 
-            // Perform logout action
             function confirmLogout() {
                 window.location.href = "/logout/"; // Redirect to logout URL
             }
         </script>
-
         <script src="https://kit.fontawesome.com/d4b5ddbcae.js" crossorigin="anonymous"></script>
     </head>
 
     <body>
-        <!-- Sidebar -->
         {% if required %}
         <div class="sidenav">
-            <a href="/home">
-                <i class="fa-solid fa-house"></i>
-                Home
-            </a>
-            <a href="/profile">
-                <i class="fa fa-user"></i>
-                Profile
-            </a>
-            <a href="/home">
-                <i class="fas fa-award"></i>
-                Rewards
-            </a>
-            <a href="/actions">
-                <i class="fa-solid fa-person-walking"></i>
-                Actions
-            </a>
-            <a href="/confirmation">
-                <i class="fa-solid fa-image"></i>
-                Explore
-            </a>
+            <a href="/home"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/profile"><i class="fa fa-user"></i> Profile</a>
+            <a href="/home"><i class="fas fa-award"></i> Rewards</a>
+            <a href="/actions"><i class="fa-solid fa-person-walking"></i> Actions</a>
+            <a href="/confirmation"><i class="fa-solid fa-image"></i> Explore</a>
             {% if user.is_superuser %}
-            <a href="/choose_action">
-                <i class="fa-solid fa-square-plus"></i>
-                Create
-            </a>
+            <a href="/choose_action"><i class="fa-solid fa-square-plus"></i> Create</a>
             {% endif %}
-           
             <a href="#" onclick="showLogoutModal(event)">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                Logout
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </a>
         </div>
         {% else %}
-                <!-- Do not render the sidebar or show a message like below -->
-            <p>Please complete your profile to unlock more features.</p>
+        <p>Please complete your profile to unlock more features.</p>
         {% endif %}
 
-        <!-- Content area -->
         <div id="content" class="main">
-            {% block content %}
-            {% endblock %}
+            {% block content %}{% endblock %}
         </div>
 
-        <!-- Logout Confirmation Modal -->
-        <div id="logoutModal" class="modal">
+        <div id="logoutModal" class="modal" style="display: none;">
             <div class="modal-content">
                 <h3>Are you sure you want to logout?</h3>
                 <div class="modal-buttons">
