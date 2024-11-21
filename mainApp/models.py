@@ -12,7 +12,7 @@ class Profile(models.Model):
     graduation_year = models.PositiveIntegerField(null=True, blank=True)
     major = MultiSelectField(choices=MAJOR_CHOICES, blank=True)
     minor = MultiSelectField(choices=MINOR_CHOICES, blank=True, null=True)
-    picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    picture = models.ImageField(upload_to='profile_pics/', default='default.jpg', blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     points = models.IntegerField(default=0)
     previous_rank = models.IntegerField(null=True, blank=True)
@@ -112,7 +112,7 @@ class WeeklyTask(models.Model):
 class ReferralTask(models.Model):
     referrer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='referrals')
     referee_email = models.EmailField()
-    points_awarded = models.IntegerField(default=10)
+    points = models.IntegerField(default=10)
     completed = models.BooleanField(default=False)
     completion_date = models.DateField(null=True, blank=True)
 
@@ -121,7 +121,7 @@ class ReferralTask(models.Model):
         if not self.completed:
             self.completed = True
             self.completion_date = timezone.now().date()
-            self.referrer.profile.points += self.points_awarded
+            self.referrer.profile.points += self.points
             self.referrer.profile.save()
             self.save()
 

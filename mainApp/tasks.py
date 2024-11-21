@@ -6,22 +6,7 @@ from datetime import timedelta
 from .task_helpers import *
 
 @shared_task
-def reset_daily_tasks():
-    # Reset static tasks for all users to incomplete
-    DailyTask.objects.filter(is_static=True).update(completed=False)
-
-    # Create new dynamic tasks for each user
-    dynamic_tasks = [
-        {"title": "WORD OF THE DAY", "points": 20},
-        {"title": "PICTURE IN ACTION", "points": 20},
-    ]
-
-    for user in User.objects.all():
-        create_daily_tasks(user, dynamic_tasks, is_static=False)
-
-
-@shared_task
-def update_daily_tasks():
+def manage_daily_tasks():
     today = timezone.now().date()
 
     static_tasks = [
@@ -36,8 +21,9 @@ def update_daily_tasks():
     ]
 
     for user in User.objects.all():
+        # Reset static tasks or create them if they do not exist
         for task_data in static_tasks:
-            DailyTask.objects.get_or_create(
+            DailyTask.objects.update_or_create(
                 user=user,
                 title=task_data["title"],
                 defaults={
@@ -48,27 +34,43 @@ def update_daily_tasks():
                 }
             )
 
+        # Reset dynamic tasks or create them if they do not exist
         for task_data in dynamic_tasks:
-            DailyTask.objects.update_or_create(
+            task, created = DailyTask.objects.update_or_create(
                 user=user,
                 title=task_data["title"],
-                is_static=False,
-                completion_criteria={'action_date': str(today)},
                 defaults={
                     "points": task_data["points"],
-                    "completed": False,
+                    "is_static": False,
+                    "completion_criteria": {'action_date': str(today)},
                 }
             )
+            if not created:
+                # Reset completed status for existing dynamic tasks
+                task.completed = False
+                task.save()
 
 @shared_task
 def generate_weekly_tasks():
+    """Generate or update weekly tasks for all users."""
     today = timezone.now().date()
-    start_of_week = today - timedelta(days=today.weekday())
-    end_of_week = start_of_week + timedelta(days=6)
+    start_of_week = today - timedelta(days=today.weekday())  # Start of the current week
+    end_of_week = start_of_week + timedelta(days=6)         # End of the current week
 
     weekly_tasks = [
-        {"title": "ARTICLE QUIZ", "points": 20, "description": "Complete the weeky quiz"}
+        {"title": "ARTICLE QUIZ", "points": 20, "description": "Complete the weekly quiz"}
     ]
 
     for user in User.objects.all():
-        create_weekly_tasks(user, weekly_tasks)
+        for task in weekly_tasks:
+            WeeklyTask.objects.update_or_create(
+                user=user,
+                title=task["title"],
+                start_date=start_of_week,
+                defaults={
+                    "description": task["description"],
+                    "points": task["points"],
+                    "completed": False,
+                    "end_date": end_of_week,
+                }
+            )

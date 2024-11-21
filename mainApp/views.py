@@ -10,7 +10,6 @@ from django.dispatch import receiver
 from allauth.account.signals import user_logged_in
 from django.utils import timezone
 from datetime import timedelta
-from .tasks import reset_daily_tasks
 import json
 
 @receiver(user_logged_in)
@@ -190,7 +189,7 @@ def actions_view(request):
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
      # Fetch or create an open referral task for the current user
-    referral_task, created = ReferralTask.objects.get_or_create(referrer=request.user, completed=False)
+    referral_task, created = ReferralTask.objects.get_or_create(referrer=request.user, completed=False, defaults={'points': 10})
 
     context = {
         'profile': profile,
