@@ -116,6 +116,11 @@ class ReferralTask(models.Model):
     completed = models.BooleanField(default=False)
     completion_date = models.DateField(null=True, blank=True)
 
+    @property
+    def title(self):
+        """Returns a consistent title for referral tasks."""
+        return "REFERRAL TASK"
+
     def complete_referral(self):
         """Marks the referral as completed, awards points, and sets completion date."""
         if not self.completed:

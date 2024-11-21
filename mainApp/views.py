@@ -213,6 +213,7 @@ def actions_view(request):
 
      # Fetch or create an open referral task for the current user
     referral_task, created = ReferralTask.objects.get_or_create(referrer=request.user, completed=False, defaults={'points': 10})
+    
 
     context = {
         'profile': profile,
