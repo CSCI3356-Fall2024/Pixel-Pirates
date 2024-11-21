@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from .forms import ProfileForm, CampaignForm, NewsForm, RewardsForm
-from .models import Profile, News, Campaign, Rewards
+from .models import Profile, News, Campaign, Rewards, Redeemed
 from django.db import IntegrityError
 from django.db.models import F
 from django.dispatch import receiver
@@ -118,17 +118,24 @@ def create_reward(request):
         form = RewardsForm()
     return render(request, 'create_reward.html', {'form': form, 'required': required})
 
+@login_required
 def rewards_view(request):
     profile = request.user.profile 
-    campaign_items = Campaign.objects.all()
+    user = request.user
+    # Get titles of rewards redeemed by the user
+    redeemed_titles = Redeemed.objects.filter(user=user).values_list('title', flat=True)
+    # Filter rewards not redeemed by the user
+    available_rewards = Rewards.objects.exclude(title__in=redeemed_titles)
+
+    redeemed_items = Redeemed.objects.filter(user=user)
 
     context = {
         'profile': profile,
-        'campaign_items': campaign_items,
+        'redeemed_items': redeemed_items,
+        'available_rewards': available_rewards,
         'required': True
     }
     return render(request, 'rewards.html', context)
-
 
 @login_required
 def edit_news(request, id):

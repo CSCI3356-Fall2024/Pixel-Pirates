@@ -4,92 +4,95 @@
 {% block title %}Rewards{% endblock %}
 
 {% block content %}
+<script>
+    // Ensure the modal stays hidden initially
+    document.addEventListener("DOMContentLoaded", function () {
+        const confirmModal = document.getElementById("confirmModal");
+        confirmModal.style.display = "none";  // Ensure hidden on load
+    });
+
+    // Show the logout modal when the logout link is clicked
+    function showConfirmModal(event) {
+        event.preventDefault(); // Prevent link default behavior
+        document.getElementById("confirmModal").style.display = "flex";
+
+    }
+    // Somehow create an object currently a work in progress 
+    function confirmRedemption() {
+        window.location.href = '/profile/'
+    }
+
+    // Hide the logout modal
+    function hideConfirmModal() {
+        document.getElementById("confirmModal").style.display = "none";
+    }
+</script>
+
 <link rel= "stylesheet" type= "text/css" href= "../static/styles/style.css">
 <link rel= "stylesheet" type= "text/css" href= "../static/styles/rewards.css">
 
 <div class="content-container">
-    <div class="points-display">
+
+     <div class="points-display">
         <h2 class="points-title">YOUR POINTS:</h2>
         <h2 class="points">{{ profile.points }} </h2>
     </div>
 
-    <!-- probably need some sort of model/context , so we can loop through 
-     the completed tasks, used points, and rewards; javascript? 
-     consider adding a feature where it indicates that ur eligible for that reward like highlighting it -->
-
+    <div class="scrollable-section user-history">
+        <div class="title"><h3>History</h3></div>
+        <div class="history">
+            <span class="history-item">Bakery Item</span>
+            <div class="history-wrapper">
+                <span class="history-points">-50 points</span>
+                <span class="history-date">10/1/2024</span>
+            </div>
+        </div>
+    </div>
 
      <div class="scrollable-section redeem">
         <div class="title"><h3>Redeem Rewards</h3></div>
-        <div class="reward">
-            <span class="reward-item">$25 BOOKSTORE GIFTCARD</span>
-            <span class="reward-points">500 points</span>
-        </div>
-        <div class="reward">
-            <span class="reward-item">COOKIE</span>
-            <span class="reward-points">10+ day streak</span>
-        </div>
+        {% for reward in available_rewards %}
+            {% if profile.points >= reward.points %}
+            <div class="reward" onclick="showConfirmModal(event)">
+                <span class="reward-item">{{reward.title}}</span>
+                <div class="reward-wrapper"> 
+                    <span class="reward-points">{{ reward.points }}</span>
+                    <span class="reward-date">Available from: {{ reward.date_begin|date:"m/d"}}-{{reward.date_end|date:"m/d" }}</span>
+                </div>
+            </div>
+            {% else %}
+            <!-- no hover or onlcick -->
+            <div class="ineligible-reward">
+            <span class="reward-item">{{reward.title}}</span>
+                <div class="reward-wrapper"> 
+                    <span class="reward-points">{{ reward.points }}</span>
+                    <span class="reward-date">Available from: {{ reward.date_begin|date:"m/d"}}-{{reward.date_end|date:"m/d" }}</span>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
     </div>
 
-    <div class="scrollable-section completed-tasks">
-        <div class="title"><h3>Completed Tasks</h3></div>
-        <div class="task">
-            <span class="task-type">DAILY TASK</span>
-            <div class="task-wrapper">
-                <span class="task-points">15 points</span>
-                <span class="task-date">10/20/2024</span>
-            </div>
-        </div>
-        <div class="task">
-            <span class="task-type">WEEKLY TASK</span>
-            <div class="task-wrapper">
-                <span class="task-points">50 points</span>
-                <span class="task-date">10/13-10/19, 2024</span>
-            </div>
-        </div>
-        <div class="task">
-            <span class="task-type">WEEKLY TASK</span>
-            <div class="task-wrapper">
-                <span class="task-points">50 points</span>
-                <span class="task-date">10/13-10/19, 2024</span>
-            </div>
-        </div>
-        <div class="task">
-            <span class="task-type">WEEKLY TASK</span>
-            <div class="task-wrapper">
-                <span class="task-points">50 points</span>
-                <span class="task-date">10/13-10/19, 2024</span>
-            </div>
-        </div>
-        <div class="task">
-            <span class="task-type">WEEKLY TASK</span>
-            <div class="task-wrapper">
-                <span class="task-points">50 points</span>
-                <span class="task-date">10/13-10/19, 2024</span>
-            </div>
-        </div>
-        <div class="task">
-            <span class="task-type">WEEKLY TASK</span>
-            <div class="task-wrapper">
-                <span class="task-points">50 points</span>
-                <span class="task-date">10/13-10/19, 2024</span>
+    <div class="scrollable-section user-rewards">
+        <div class="title"><h3>Your Rewards</h3></div>
+        <div class="redeemed">
+            <span class="redeemed-item">Free Drink</span>
+            <div class="redeemed-wrapper">
+                <span class="redeemed-points">15 points</span>
+                <span class="redeemed-date">10/20/2024</span>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="scrollable-section history">
-        <div class="title"><h3>Used Points</h3></div>
-        <div class="used">
-            <div class="used-wrapper"> 
-                <span class="used-item">Bakery Item</span>
-                <span class="used-location">Lyons</span>
-            </div>
-            <div class="used-wrapper-2">
-                <span class="used-points">-50 points</span>
-                <span class="used-date">10/1/2024</span>
-            </div>
+<div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <h3>Are you sure you want to redeem this reward?</h3>
+        <div class="modal-buttons">
+            <button class="confirm-button" onclick="confirmRedemption()">Yes</button>
+            <button class="cancel-button" onclick="hideConfirmModal()">Cancel</button>
         </div>
     </div>
-
 </div>
 
 
