@@ -12,7 +12,7 @@ class Profile(models.Model):
     graduation_year = models.PositiveIntegerField(null=True, blank=True)
     major = MultiSelectField(choices=MAJOR_CHOICES, blank=True)
     minor = MultiSelectField(choices=MINOR_CHOICES, blank=True, null=True)
-    picture = models.ImageField(upload_to='profile_pics/', default='default.jpg', blank=True, null=True)
+    picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     points = models.IntegerField(default=0)
     previous_rank = models.IntegerField(null=True, blank=True)
