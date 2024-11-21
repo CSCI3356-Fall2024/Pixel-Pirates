@@ -12,9 +12,9 @@
     <!-- Profile Summary Section -->
     <div class="profile-summary">
         <div class="profile-image">
-            {% if profile.picture %}
+            {% if user.profile.picture %}
                 <img 
-                    src="{{ profile.picture.url }}" 
+                    src="{{ user.profile.picture.url }}" 
                     alt="Profile Picture" 
                     class="profile-img">
             {% else %}
