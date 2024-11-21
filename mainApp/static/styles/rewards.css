@@ -37,7 +37,7 @@
     overflow-y: scroll;
 }
 
-.title, .task, .reward, .used {
+.title, .redeemed, .reward, .history, .ineligible-reward {
     background-color: white;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -46,8 +46,13 @@
     flex: 0 0 auto;
     padding: 10px;
     overflow: hidden;
-
 }
+
+.redeemed:hover, .reward:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
   
 .scrollable-section::-webkit-scrollbar {
     width: 8px;
@@ -63,8 +68,8 @@
 }
 
 
-.completed-tasks {
-    grid-column: 1;
+.user-rewards {
+    grid-column: 2;
     grid-row: 2;
     background-color: #B8D8BE;
     border-radius: 20px;
@@ -81,8 +86,8 @@
     padding: 10px;
 }
 
-.history {
-    grid-column: 2;
+.user-history {
+    grid-column: 1;
     grid-row: 2;
     background-color: #B8D8BE;
     border-radius: 20px;
@@ -112,15 +117,42 @@
     margin: 0;
 }
 
-.reward, .task, .used {
+.history {
     display: grid;
     grid-template-columns: 70% 30%;
     align-content: center;
 }
 
-.reward-item, .task-type, .used-item {
+.reward,.ineligible-reward {
+    display: grid;
+    grid-template-columns: 60% 40%;
+    align-content: center;
+}
+
+.redeemed {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.redeemed-item {
+    align-content: center;
+}
+
+
+.reward-item, .history-item {
     font-size: 25px;
     align-content: center;
+}
+
+.redeemed-item {
+    font-size: 25px; 
+    text-align: center;
+    align-self: center;
+}
+
+.redeemed-item {
+    grid-row: 2;
 }
 
 .reward-points {
@@ -130,29 +162,32 @@
     font-size: 20px;
 }
 
-.task-wrapper, .used-wrapper, .used-wrapper-2 {
+
+
+.redeemed-wrapper, .history-wrapper, .reward-wrapper {
     display: grid;
     grid-template-rows: 1fr 1fr 1fr;
 }
-.task-wrapper, .used-wrapper-2 {
+
+.history-wrapper, .reward-wrapper {
     text-align: right;
 }
 
-.task-points, .used-points {
+.history-points, .reward-points {
     grid-row: 2;
     color: gray;
     font-size: 20px;
 }
 
-.task-date, .used-date, .used-location {
+.history-date, .history-location, .reward-date, .redeemed-date {
     grid-row: 3;
     color: gray;
+    text-align: right;
 }
 
-.used-item {
-    grid-row: 2;
+.redeemed-date {
+    text-align: center;
 }
-
 
 
 
