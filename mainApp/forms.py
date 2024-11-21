@@ -88,15 +88,15 @@ class NewsForm(forms.ModelForm):
 class RewardsForm(forms.ModelForm):
     class Meta:
         model = Rewards
-        fields = ['reward_title', 'date_begin', 
-                  'date_end', 'time_begin', 'time_end', 'points']
+        fields = ['title', 'date_begin', 
+                  'date_end', 'time_begin', 'time_end', 'description', 'points']
         widgets = {
             'date_begin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_end': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'time_begin': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
             'time_end': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
         }
-        reward_title = forms.CharField(required=True)
+        title = forms.CharField(required=True)
 
     def clean(self):
         cleaned_data = super().clean()

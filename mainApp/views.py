@@ -13,6 +13,8 @@ from django.db.models import F
 from allauth.account.signals import user_logged_in
 from datetime import timedelta
 import json
+from django.utils import timezone
+from datetime import timedelta, time 
 
 from .models import *
 from .forms import *
@@ -132,16 +134,48 @@ def create_reward(request):
         form = RewardsForm()
     return render(request, 'create_reward.html', {'form': form, 'required': required})
 
+@login_required
 def rewards_view(request):
     profile = request.user.profile 
-    campaign_items = Campaign.objects.all()
+    user = request.user
+    # Get titles of rewards redeemed by the user
+    redeemed_titles = Redeemed.objects.filter(user=user).values_list('title', flat=True)
+    # Filter rewards not redeemed by the user
+    available_rewards = Rewards.objects.exclude(title__in=redeemed_titles)
+
+    redeemed_items = Redeemed.objects.filter(user=user)
 
     context = {
         'profile': profile,
-        'campaign_items': campaign_items,
+        'redeemed_items': redeemed_items,
+        'available_rewards': available_rewards,
         'required': True
     }
     return render(request, 'rewards.html', context)
+
+@login_required
+def redeem_reward(request):
+    if request.method == 'POST':
+        reward_id = request.POST.get('reward_id')
+        reward = get_object_or_404(Rewards, id=reward_id)
+
+        start_day = timezone.now().date()
+        end_day = start_day + timedelta(days=30)
+
+        profile = request.user.profile
+        profile.points -= reward.points
+        profile.save()
+
+        Redeemed.objects.create(
+            user=request.user,
+            title=reward.title,
+            date_begin=start_day,
+            date_end=end_day,
+            time_begin=time(0, 0),
+            time_end=time(23,59),
+            description=reward.description
+        )
+        return redirect('rewards')
 
 
 @login_required

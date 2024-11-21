@@ -134,12 +134,25 @@ class ReferralTask(models.Model):
         return f"Referral from {self.referrer.username} to {self.referee_email} - {'Completed' if self.completed else 'Pending'}"
 #create a new rewards
 class Rewards(models.Model):
-    reward_title = models.CharField(max_length=500)
+    title = models.CharField(max_length=500)
     date_begin = models.DateField()
     date_end = models.DateField()
     time_begin = models.TimeField()
     time_end = models.TimeField()
+    description = models.TextField(max_length=500)
     points = models.IntegerField(default=0)
                                  
     def __str__(self):
-        return self.reward_title
+        return self.title
+    
+class Redeemed(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=500)
+    date_begin = models.DateField()
+    date_end = models.DateField()
+    time_begin = models.TimeField()
+    time_end = models.TimeField()
+    description = models.TextField(max_length=500)
+
+    def __str__(self):
+        return self.title
