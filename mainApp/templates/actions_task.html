@@ -1,0 +1,42 @@
+<div class="task-item {{ task.status }}">
+    <div class="task-title">
+        <p>{{ task.title }}</p>
+    </div>
+    <div class="task-details">
+        <div class="points">{{ task.points }} points</div>
+        {% if not task.completed %}
+            <button 
+                class="status" 
+                type="button" 
+                onclick="showPopup('{{ task.id }}')"
+            >
+                Open
+            </button>
+        {% else %}
+            <button class="status" type="button" disabled>Completed</button>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Popup for task -->
+<div id="popup-{{ task.id }}" class="popup">
+    <div class="popup-title">
+        <h2>{{ task.title }}</h2>
+        <button class="close-button" onclick="hidePopup('{{ task.id }}')">
+            <i class="fa-solid fa-x"></i>
+        </button>
+    </div>
+    <p>Details for {{ task.title }}</p>
+    <label>
+        <input 
+            type="checkbox" 
+            name="{{ task.title }}" 
+            {% if task.completed %}checked disabled{% endif %} 
+            onclick="markTaskCompleted('{{ task.id }}', this)"
+        />
+        {{ task.title }}
+    </label>
+</div>
+
+<!-- Overlay for popup -->
+<div id="overlay-{{ task.id }}" class="overlay" onclick="hidePopup('{{ task.id }}')"></div>

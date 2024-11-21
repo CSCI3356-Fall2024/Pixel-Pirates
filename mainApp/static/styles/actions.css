@@ -130,6 +130,15 @@ html, body {
     color: #B8D8BE;
 }
 
+button.status:disabled {
+    color: #666;
+    cursor: not-allowed;
+}
+
+button.status:disabled:hover {
+    color: #666; 
+}
+
 .popup {
     display: none; /* Hidden by default */
     position: fixed;

@@ -41,59 +41,11 @@
         <div class="tasks-list">
             <h3>Daily Tasks</h3>
             {% for task in dynamic_tasks %}
-                <div class="task-item {{ task.status }}">
-                    <div class="task-title">
-                        <p>{{ task.title }}</p>
-                    </div>
-                    <div class="task-details">
-                        <div class="points">{{ task.points }} points</div>
-                        <button class="status" type="button" onclick="showPopup('{{ task.id }}')">
-                            {% if task.completed %}Completed{% else %}Open{% endif %}
-                        </button>
-                    </div>
-                </div>
-        
-                <!-- Unique popup for each task -->
-                <div id="popup-{{ task.id }}" class="popup">
-                    <div class="popup-title">
-                        <h2>{{ task.title }}</h2>
-                        <button class="close-button" onclick="hidePopup('{{ task.id }}')">
-                            <i class="fa-solid fa-x"></i>
-                        </button>
-                    </div>
-                    <p>Details for {{ task.title }}</p>
-                </div>
-        
-                <!-- Unique overlay for each task -->
-                <div id="overlay-{{ task.id }}" class="overlay" onclick="hidePopup('{{ task.id }}')"></div>
+                {% include 'actions_task.html' with task=task %}
             {% endfor %}
 
             {% for task in static_tasks %}
-            <div class="task-item {{ task.status }}">
-                <div class="task-title">
-                    <p>{{ task.title }}</p>
-                </div>
-                <div class="task-details">
-                    <div class="points">{{ task.points }} points</div>
-                    <button class="status" type="button" onclick="showPopup('{{ task.id }}')">
-                        {% if task.completed %}Completed{% else %}Open{% endif %}
-                    </button>
-                </div>
-            </div>
-    
-            <!-- Unique popup for each task -->
-            <div id="popup-{{ task.id }}" class="popup">
-                <div class="popup-title">
-                    <h2>{{ task.title }}</h2>
-                    <button class="close-button" onclick="hidePopup('{{ task.id }}')">
-                        <i class="fa-solid fa-x"></i>
-                    </button>
-                </div>
-                <p>Details for {{ task.title }}</p>
-            </div>
-    
-            <!-- Unique overlay for each task -->
-            <div id="overlay-{{ task.id }}" class="overlay" onclick="hidePopup('{{ task.id }}')"></div>
+                {% include 'actions_task.html' with task=task %}
             {% endfor %}
         </div>
     </div>
@@ -120,31 +72,7 @@
     <div class="weekly-task">
         <h3>Weekly Tasks</h3>
         {% for task in weekly_tasks %}
-            <div class="task-item {{ task.status }}">
-                <div class="task-title">
-                    <p>{{ task.title }}</p>
-                </div>
-                <div class="task-details">
-                    <div class="points">{{ task.points }} points</div>
-                    <button class="status" type="button" onclick="showPopup('{{ task.id }}')">
-                        {% if task.completed %}Completed{% else %}Open{% endif %}
-                    </button>
-                </div>
-            </div>
-
-            <!-- Unique popup for each task -->
-            <div id="popup-{{ task.id }}" class="popup">
-                <div class="popup-title">
-                    <h2>{{ task.title }}</h2>
-                    <button class="close-button" onclick="hidePopup('{{ task.id }}')">
-                        <i class="fa-solid fa-x"></i>
-                    </button>
-                </div>
-                <p>Details for {{ task.title }}</p>
-            </div>
-
-            <!-- Unique overlay for each task -->
-            <div id="overlay-{{ task.id }}" class="overlay" onclick="hidePopup('{{ task.id }}')"></div>
+        {% include 'actions_task.html' with task=task %}
         {% endfor %}
     </div>
 
@@ -152,13 +80,7 @@
     <div class="referral-task">
         <h3>Referral</h3>
         {% if referral_task %}
-            <div class="task-item {% if referral_task.completed %}completed{% else %}open{% endif %}">
-                <div class="task-title"><p>Referral</p></div>
-                <div class="task-details"> 
-                    <div class="points">{{ referral_task.points }} points</div>
-                    <button class="status">{% if referral_task.completed %}Completed{% else %}Open{% endif %}</button>
-                </div>
-            </div>
+            {% include 'actions_task.html' with task=referral_task %}
         {% endif %}
     </div>
 </div>

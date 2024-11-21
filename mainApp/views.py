@@ -2,15 +2,32 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
-from .forms import ProfileForm, CampaignForm, NewsForm
-from .models import Profile, News, Campaign, DailyTask, WeeklyTask, ReferralTask
+from django.http import JsonResponse
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.utils.timezone import now
+from django.dispatch import receiver
 from django.db import IntegrityError
 from django.db.models import F
-from django.dispatch import receiver
 from allauth.account.signals import user_logged_in
-from django.utils import timezone
 from datetime import timedelta
 import json
+
+from .models import (
+    Profile,
+    News,
+    Campaign,
+    DailyTask,
+    WeeklyTask,
+    ReferralTask,
+)
+
+from .forms import (
+    ProfileForm,
+    CampaignForm,
+    NewsForm,
+)
 
 @receiver(user_logged_in)
 def handle_login(sender, request, user, **kwargs):
@@ -38,30 +55,32 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    try:
-        # Get the profile linked to the user
-        profile = Profile.objects.get(username=request.user)
-    except Profile.DoesNotExist:
-        messages.error(request, "Profile not found. Creating a new profile.")
-        profile = Profile(username=request.user)
-        profile.save()
+    # Retrieve or create a profile for the logged-in user
+    profile, created = Profile.objects.get_or_create(username=request.user)
+
+    # If the profile is newly created, initialize required fields to ensure the user can edit it
+    if created:
+        messages.info(request, "Welcome! Please complete your profile.")
     
-    required_fields = False
-    if profile.name and profile.school and profile.major and profile.graduation_year:
-        required_fields = True 
+    # Check if the profile has all required fields filled
+    required_fields = bool(
+        profile.name and profile.school and profile.major and profile.graduation_year
+    )
 
     if request.method == 'POST':
-        # Bind the form to the POST data and files
         form = ProfileForm(request.POST, request.FILES, instance=profile)
-
-        # Print the POST data and form errors for debugging
-        print("POST Data:", request.POST)  # Debugging: Check what data is submitted
-        print("Form Errors:", form.errors)  # Debugging: Check for form validation errors
-
         if form.is_valid():
             try:
                 form.save()
                 messages.success(request, "Profile updated successfully!")
+                
+                # Recheck required fields after saving
+                required_fields = bool(
+                    profile.name and profile.school and profile.major and profile.graduation_year
+                )
+
+                # Redirect to refresh the page and reflect changes
+                return redirect('profile')
             except Exception as e:
                 messages.error(request, f"Error saving profile: {e}")
         else:
@@ -69,7 +88,11 @@ def profile_view(request):
     else:
         form = ProfileForm(instance=profile)
 
-    return render(request, 'profile.html', {'form': form, 'profile': profile, 'required': required_fields})
+    return render(
+        request,
+        'profile.html',
+        {'form': form, 'profile': profile, 'required': required_fields}
+    )
 
 def confirmation_view(request):  
     user = request.user
@@ -241,3 +264,38 @@ def actions_view(request):
 #         'calendar_weeks': calendar_weeks,
 #     }
 #     return render(request, 'actions.html', context)
+
+@csrf_exempt
+def complete_task(request, task_id):
+    if request.method == "POST":
+        try:
+            # Try finding the task in DailyTask, WeeklyTask, or ReferralTask
+            task = DailyTask.objects.get(id=task_id)
+        except DailyTask.DoesNotExist:
+            try:
+                task = WeeklyTask.objects.get(id=task_id)
+            except WeeklyTask.DoesNotExist:
+                try:
+                    task = ReferralTask.objects.get(id=task_id)
+                except ReferralTask.DoesNotExist:
+                    return JsonResponse({"error": "Task not found"}, status=404)
+
+        # If the task is already completed, return a response
+        if task.completed:
+            return JsonResponse({"error": "Task already completed"}, status=400)
+
+        # Mark the task as completed
+        task.completed = True
+        if hasattr(task, 'completion_date'):  # Set completion date if the field exists
+            task.completion_date = now().date()
+        task.save()
+
+        # Add points to the user's profile
+        points_to_add = task.points if hasattr(task, 'points') else task.points_awarded
+        user_profile = task.user.profile if hasattr(task, 'user') else task.referrer.profile
+        user_profile.points += points_to_add
+        user_profile.save()
+
+        return JsonResponse({"success": True, "points_added": points_to_add}, status=200)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
