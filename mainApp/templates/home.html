@@ -4,169 +4,167 @@
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'styles/home.css' %}">
-<div class="landing-page-container">
-    <div class="leaderboard-container">
-        <h2 class="section-title">Leaderboard</h2>
 
-        <!-- Bar Chart for Top 3 Users -->
-        <div class="chart-container">
-            <canvas id="leaderboardChart"></canvas>
-        </div>
+<div class="container">
+    <!-- Main Row for Leaderboard and News -->
+    <div class="row g-3">
+        <!-- Leaderboard Section -->
+        <div class="col-lg-8 col-md-12">
+            <div class="bg-white p-3 rounded shadow">
+                <h2 class="section-title">Leaderboard</h2>
 
-        <!-- Motivation Message -->
-        <div class="user-rank">
-            <p class="motivation-container">You are ranked {{ user_rank }} out of {{ total_users }}. {{ motivation_message }}</p>
-        </div>
+                <!-- Bar Chart -->
+                <div class="chart-container">
+                    <canvas id="leaderboardChart"></canvas>
+                </div>
 
-        <!-- Scrollable Leaderboard Table -->
-        <div class="leaderboard-table-container">
-            <table class="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Place</th>
-                        <th>Name</th>
-                        <th class="points-column">Points</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in leaderboard_data %}
-                    <tr class="{% if user.id == user_info.id %}highlighted-row{% endif %}">
-                        <td>
-                            <span class="rank-icon">
-                                {% if user.rank_change > 0 %}
-                                <span class="rank-up">▲</span>
-                                {% elif user.rank_change < 0 %}
-                                <span class="rank-down">▼</span>
-                                {% else %}
-                                <span class="rank-neutral">●</span>
-                                {% endif %}
-                            </span>
-                            {{ forloop.counter }}
-                        </td>
-                        <td>
-                            <img src="{% if user.picture %}{{ user.picture.url }}{% else %}{% static 'images/default_profile_image.jpg' %}{% endif %}"
-                                alt="Profile image" class="profile-image">
-                            {{ user.name }}
-                        </td>
-                        <td class="points-column">{{ user.points }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                <!-- Motivational Message -->
+                <div class="user-rank text-center mt-3">
+                    <p class="motivation-container">
+                        You are ranked {{ user_rank }} out of {{ total_users }}. {{ motivation_message }}
+                    </p>
+                </div>
 
-        <!-- Floating Row for the Logged-in User (if not in the top 50) -->
-        {% if not user_in_top_50 %}
-        <div class="floating-table-container">
-            <table class="leaderboard-table">
-                    <td>
+                <!-- Leaderboard Table -->
+                <div class="leaderboard-table-container table-responsive mt-3">
+                    <table class="table leaderboard-table table-striped table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Place</th>
+                                <th>Name</th>
+                                <th class="points-column">Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in leaderboard_data %}
+                            <tr class="{% if user.id == user_info.id %}highlighted-row{% endif %}">
+                                <td>
+                                    <span class="rank-icon">
+                                        {% if user.rank_change > 0 %}
+                                        <span class="rank-up text-success">▲</span>
+                                        {% elif user.rank_change < 0 %} <span class="rank-down text-danger">▼</span>
+                                    {% else %}
+                                    <span class="rank-neutral text-muted">●</span>
+                                    {% endif %}
+                                    </span>
+                                    {{ forloop.counter }}
+                                </td>
+                                <td>
+                                    <img src="{% if user.picture %}{{ user.picture.url }}{% else %}{% static 'images/default_profile_image.jpg' %}{% endif %}"
+                                        alt="Profile image" class="profile-image rounded-circle me-2">
+                                    {{ user.name }}
+                                </td>
+                                <td class="points-column text-end">{{ user.points }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Floating Row -->
+                {% if not user_in_top_50 %}
+                <div
+                    class="floating-row d-flex justify-content-between align-items-center p-3 rounded shadow mt-3">
+                    <!-- Place -->
+                    <div class="text-center" style="width: 10%; min-width: 40px;">
                         <span class="rank-icon rank-neutral">●</span>
-                        {{ user_info.rank }}
-                    </td>
-                    <td>
+                        <span class="fw-bold">{{ user_info.rank }}</span>
+                    </div>
+                    <!-- Name -->
+                    <div class="d-flex align-items-center">
                         <img src="{% if user_info.picture %}{{ user_info.picture }}{% else %}{% static 'images/default_profile_image.jpg' %}{% endif %}"
-                            alt="Profile image" class="profile-image">
-                        {{ user_info.name }}
-                    </td>
-                    <td class="points-column">{{ user_info.points }}</td>
-                </tr>
-            </table>
+                            alt="Profile image" class="profile-image rounded-circle me-2">
+                        <span>{{ user_info.name }}</span>
+                    </div>
+                    <!-- Points -->
+                    <div class="text-end fw-bold" style="width: 30%; min-width: 50px;">
+                        {{ user_info.points }}
+                    </div>
+                </div>
+
+                {% endif %}
+            </div>
         </div>
-        {% endif %}
-    </div>
-  
 
-
-    <!-- Latest News Section -->
-    <div class="latest-news">
-        <h2 class="section-title">Latest News</h2>
-        <p class="paragraph-font">
-            Be sustainable today! Check out what’s happening in the community and take part in sustainable events,
-            activities, and promotions.
-        </p>
-        <ul class="no-bullets">
-            <!-- Display campaigns if any -->
-            {% for campaign in campaign_items %}
-            {% if campaign.news %}
-            <li class="news-item">
-                <div class="news-box">
-                    <a href="{% url 'actions' %}" target="_blank">{{ campaign.title }}</a>
-                    
-                    {% if user.is_superuser %} <!-- Only show edit button to admins -->
-                    <a href="{% url 'edit_campaign' campaign.id %}" class="edit-icon">
-                        <i class="fas fa-pen"></i> <!-- Edit icon (pen) for each campaign -->
-                    </a>
-                    {% endif %}
-                </div>
-            </li>
-            {% endif %}
-            {% endfor %}
-            <!-- Display news items -->
-            {% for news in news_items %}
-            <li class="news-item">
-                <div class="news-box">
-                    {% if news.news_image %}
-                    <img src="{{ news.news_image.url }}" alt="News Image">
-                    {% endif %}
-                    <a href="{{ news.external_url }}" target="_blank">{{ news.display_title }}</a>
-                    
-                    {% if user.is_superuser %} <!-- Only show edit button to admins -->
-                    <a href="{% url 'edit_news' news.id %}" class="edit-icon">
-                        <i class="fas fa-pen"></i> <!-- Edit icon (pen) for each news item -->
-                    </a>
-                    {% endif %}
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
+        <!-- News Section -->
+        <div class="col-lg-4 col-md-12">
+            <div class="news-section p-3 rounded shadow">
+                <h2 class="section-title">Latest News</h2>
+                <p>
+                    Be sustainable today! Check out what’s happening in the community and take part in sustainable
+                    events,
+                    activities, and promotions.
+                </p>
+                <ul class="list-unstyled">
+                    {% for news in news_items %}
+                    <li class="news-item mb-3">
+                        <div
+                            class="news-box d-flex align-items-center justify-content-between p-2 rounded bg-white shadow">
+                            {% if news.news_image %}
+                            <img src="{{ news.news_image.url }}" alt="News Image" class="rounded me-3"
+                                style="width: 60px; height: 60px;">
+                            {% endif %}
+                            <a href="{{ news.external_url }}" target="_blank" class="flex-grow-1">{{ news.display_title }}</a>
+                            {% if user.is_superuser %}
+                            <a href="{% url 'edit_news' news.id %}" class="edit-icon ms-3">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 
+
 <!-- JavaScript for Chart -->
-    <div class="chart-container">
-        <canvas id="leaderboardChart"></canvas>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const top3Names = JSON.parse('{{ top_3_names|escapejs }}');
-            const top3Points = JSON.parse('{{ top_3_points|escapejs }}');
-            const ctx = document.getElementById('leaderboardChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: top3Names,
-                    datasets: [{
-                        label: 'Points',
-                        data: top3Points,
-                        backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
-                        borderColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
-                        borderWidth: 1,
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    plugins: {
-                        datalabels: {
-                            display: true,
-                            color: '#000',
-                            font: {
-                                weight: 'bold'
-                            },
-                            formatter: function (value) {
-                                return value;
-                            }
-                        }
-                    },
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
+<div class="chart-container">
+    <canvas id="leaderboardChart"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const top3Names = JSON.parse('{{ top_3_names|escapejs }}');
+        const top3Points = JSON.parse('{{ top_3_points|escapejs }}');
+        const ctx = document.getElementById('leaderboardChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: top3Names,
+                datasets: [{
+                    label: 'Points',
+                    data: top3Points,
+                    backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
+                    borderColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    datalabels: {
+                        display: true,
+                        color: '#000',
+                        font: {
+                            weight: 'bold'
+                        },
+                        formatter: function (value) {
+                            return value;
                         }
                     }
+                },
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
-            });
+            }
         });
-    </script>
-    {% endblock %}
+    });
+</script>
+{% endblock %}
