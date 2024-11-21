@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rewards{% endblock %}
+
+{% block content %}
+<link rel= "stylesheet" type= "text/css" href= "../static/styles/style.css">
+<link rel= "stylesheet" type= "text/css" href= "../static/styles/rewards.css">
+
+<div class="content-container">
+    <div class="points-display">
+        <h2 class="points-title">YOUR POINTS:</h2>
+        <h2 class="points">{{ profile.points }} </h2>
+    </div>
+
+    <!-- probably need some sort of model/context , so we can loop through 
+     the completed tasks, used points, and rewards; javascript? 
+     consider adding a feature where it indicates that ur eligible for that reward like highlighting it -->
+
+
+     <div class="scrollable-section redeem">
+        <div class="title"><h3>Redeem Rewards</h3></div>
+        <div class="reward">
+            <span class="reward-item">$25 BOOKSTORE GIFTCARD</span>
+            <span class="reward-points">500 points</span>
+        </div>
+        <div class="reward">
+            <span class="reward-item">COOKIE</span>
+            <span class="reward-points">10+ day streak</span>
+        </div>
+    </div>
+
+    <div class="scrollable-section completed-tasks">
+        <div class="title"><h3>Completed Tasks</h3></div>
+        <div class="task">
+            <span class="task-type">DAILY TASK</span>
+            <div class="task-wrapper">
+                <span class="task-points">15 points</span>
+                <span class="task-date">10/20/2024</span>
+            </div>
+        </div>
+        <div class="task">
+            <span class="task-type">WEEKLY TASK</span>
+            <div class="task-wrapper">
+                <span class="task-points">50 points</span>
+                <span class="task-date">10/13-10/19, 2024</span>
+            </div>
+        </div>
+        <div class="task">
+            <span class="task-type">WEEKLY TASK</span>
+            <div class="task-wrapper">
+                <span class="task-points">50 points</span>
+                <span class="task-date">10/13-10/19, 2024</span>
+            </div>
+        </div>
+        <div class="task">
+            <span class="task-type">WEEKLY TASK</span>
+            <div class="task-wrapper">
+                <span class="task-points">50 points</span>
+                <span class="task-date">10/13-10/19, 2024</span>
+            </div>
+        </div>
+        <div class="task">
+            <span class="task-type">WEEKLY TASK</span>
+            <div class="task-wrapper">
+                <span class="task-points">50 points</span>
+                <span class="task-date">10/13-10/19, 2024</span>
+            </div>
+        </div>
+        <div class="task">
+            <span class="task-type">WEEKLY TASK</span>
+            <div class="task-wrapper">
+                <span class="task-points">50 points</span>
+                <span class="task-date">10/13-10/19, 2024</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="scrollable-section history">
+        <div class="title"><h3>Used Points</h3></div>
+        <div class="used">
+            <div class="used-wrapper"> 
+                <span class="used-item">Bakery Item</span>
+                <span class="used-location">Lyons</span>
+            </div>
+            <div class="used-wrapper-2">
+                <span class="used-points">-50 points</span>
+                <span class="used-date">10/1/2024</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+{% endblock %}

@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from datetime import datetime
-from .models import Profile, Campaign, News
+from .models import Profile, Campaign, News, Rewards
 from .choices import SCHOOL_CHOICES, MAJOR_CHOICES, MINOR_CHOICES
 
 class ProfileForm(forms.ModelForm):
@@ -74,6 +74,30 @@ class NewsForm(forms.ModelForm):
         display_title = forms.CharField(required=True)
         external_url = forms.CharField(required=True)
         
+    def clean(self):
+        cleaned_data = super().clean()
+        date_begin = cleaned_data.get('date_begin')
+        date_end = cleaned_data.get('date_end')
+
+        # Validate that the end date is not before the start date
+        if date_begin and date_end and date_end < date_begin:
+            raise ValidationError("End date must be on or after the start date.")
+
+        return cleaned_data
+    
+class RewardsForm(forms.ModelForm):
+    class Meta:
+        model = Rewards
+        fields = ['reward_title', 'date_begin', 
+                  'date_end', 'time_begin', 'time_end', 'points']
+        widgets = {
+            'date_begin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'date_end': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'time_begin': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            'time_end': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+        }
+        reward_title = forms.CharField(required=True)
+
     def clean(self):
         cleaned_data = super().clean()
         date_begin = cleaned_data.get('date_begin')

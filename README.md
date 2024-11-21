@@ -1,7 +1,36 @@
 # Pixel-Pirates
 
-## To do for delivery 4
-1. News section: if campaign is checked as news, make sure it is added to the landing page news section (user could hover over item to see campaign details)
+## Delivery 5
+## anora
+### In Progress
+1. working on creating tasks on action page using celery beats to create a schedule so that the task refreshes every day (starting with daily tasks first)
+2. when using celery, run the command: celery -A Pixel_Pirates.celery worker --beat --loglevel=info, with runserver (not sure if this works yet still figuring it out)
+3. opening each task
+4. assign points to users when task are completed
+5. currently when the user first sign up, when they fill in the required information on the profile page, they have to save twice to access the sidebar, will fix this
+6. for the actions, some of them dont show up when signing in: 
+   - python manage.py update_tasks
+      - manally adds the actions
+
+## leah
+### In Progress
+1. Word search (once actions is in a workable state)
+2. Make campaigns once listed on landing page editable *works but might change to pop-up for more efficiency* fix CSS for it because wonky
+3. User can see where they are on ranking even if not on top 50
+4. Logic for if users have the same number of points
+5. Start mobile interface
+
+## meg
+### in progress
+1. Work with Jason to get the new rewards item to show up in rewards page
+2. Points to show up on rewards and subtracting them when rewards redeemed
+3. Show completed tasks on rewards page and points gained 
+4. Show redeemed rewards and points subtracted
+
+### done
+1. create new form to create rewards item
+
+## Delivery 4
 
 ## leah
 ### DONE
@@ -17,10 +46,12 @@
 
 
 ## anora
+### DONE
 1. created the basic layout for the campaign page 
 2. restricted the campaign page to superusers only
 3. found a problem for creating new users (it took them to a signup page instead of directly log in) - working on allowing the users create a profile directly based on google authentication
 4. finish the html for campaign page
+
 
 ## meg
 ### DONE
