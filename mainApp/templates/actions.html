@@ -33,9 +33,10 @@
     <div class="daily-progress">
         <h3>Daily Progress</h3>
         <div class="progress-bar">
-            <!-- <div class="progress-bar-fill" style="width: {{ daily_progress_percentage|default:'0' }}%;"></div> -->
+            <div class="progress-bar-fill" style="width: calc({{ daily_progress_percentage|default:0 }}%);"></div>
         </div>
-        <p>Progress: {{ daily_progress_percentage }}%</p>
+        <p style="padding-bottom: 10px;">Progress: {{ daily_progress_percentage|floatformat:1 }}%</p>
+
 
         <!-- Daily Tasks Section -->
         <div class="tasks-list">
@@ -53,8 +54,8 @@
     
 
     <!-- Streak Calendar Section -->
-    <!-- <div class="calendar-container">
-        <h4>Streaks <span class="info-icon">ℹ️</span></h4>
+    <div class="calendar-container">
+        <h4>Streaks</h4>
         <div class="calendar">
             {% for week in calendar_weeks %}
                 <div class="calendar-week">
@@ -66,7 +67,7 @@
                 </div>
             {% endfor %}
         </div>
-    </div> -->
+    </div>
 
     <!-- Weekly Task Section -->
     <div class="weekly-task">

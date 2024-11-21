@@ -51,3 +51,4 @@ function getCSRFToken() {
     }
     return null;
 }
+

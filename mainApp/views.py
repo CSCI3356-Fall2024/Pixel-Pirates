@@ -211,9 +211,17 @@ def actions_view(request):
     #weekly tasks 
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
-     # Fetch or create an open referral task for the current user
+     # Calculate progress
+    total_tasks = static_tasks.count() + dynamic_tasks.count() + weekly_tasks.count()
+    completed_tasks = (
+        static_tasks.filter(completed=True).count() +
+        dynamic_tasks.filter(completed=True).count() +
+        weekly_tasks.filter(completed=True).count()
+    )
+    daily_progress_percentage = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+
+    # Fetch or create an open referral task for the current user
     referral_task, created = ReferralTask.objects.get_or_create(referrer=request.user, completed=False, defaults={'points': 10})
-    
 
     context = {
         'profile': profile,
@@ -221,6 +229,7 @@ def actions_view(request):
         'dynamic_tasks': dynamic_tasks,
         'weekly_tasks': weekly_tasks,
         'referral_task': referral_task,
+        'daily_progress_percentage': daily_progress_percentage,
         'required': True
     }
     return render(request, 'actions.html', context)
