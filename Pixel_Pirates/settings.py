@@ -181,7 +181,7 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'reset-daily-tasks-every-midnight': {
-        'task': 'mainApp.tasks.reset_daily_tasks',
+        'task': 'mainApp.tasks.manage_daily_tasks',
         'schedule': crontab(minute=0, hour=0),  # Runs every day at midnight
     },
 }
@@ -196,6 +196,8 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend"
 )
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Disable email verification to simplify login
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'

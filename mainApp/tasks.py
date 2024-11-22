@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from .models import DailyTask, WeeklyTask
 from datetime import timedelta
 from .task_helpers import *
+import logging
+logger = logging.getLogger(__name__)
 
 @shared_task
 def manage_daily_tasks():
@@ -21,7 +23,7 @@ def manage_daily_tasks():
     ]
 
     for user in User.objects.all():
-        # Reset static tasks or create them if they do not exist
+        # Ensure static tasks exist or reset them
         for task_data in static_tasks:
             DailyTask.objects.update_or_create(
                 user=user,
@@ -34,7 +36,7 @@ def manage_daily_tasks():
                 }
             )
 
-        # Reset dynamic tasks or create them if they do not exist
+        # Handle dynamic tasks like static tasks by resetting their completed status
         for task_data in dynamic_tasks:
             task, created = DailyTask.objects.update_or_create(
                 user=user,
@@ -45,10 +47,12 @@ def manage_daily_tasks():
                     "completion_criteria": {'action_date': str(today)},
                 }
             )
+            logger.info(f"Dynamic Task {'created' if created else 'updated'}: {task.title} for {user.username}")
+            # If the task existed, reset its completed status
             if not created:
-                # Reset completed status for existing dynamic tasks
                 task.completed = False
                 task.save()
+
 
 @shared_task
 def generate_weekly_tasks():
