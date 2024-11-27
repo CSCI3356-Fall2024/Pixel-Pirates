@@ -12,7 +12,8 @@
 - Responsiveness/bootstrap:
     - Rewards page
     - Actions page
-    - Campaign/rewards/news (should all be relatively simple because they have the same layout)
+    - Campaign/rewards/news (should all be relatively simple because they have the same layout) DONE
+ - Campaign is not being added to news page on homepage even when checkbox for add to news is true
 
 ## Other
 - Wordsearch
