@@ -5,17 +5,12 @@
 
 {% block content %}
 
-<!-- External CSS Stylesheets -->
 <link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'styles/campaign.css' %}">
-
-<!-- JavaScript for Multiselect Dropdown -->
+<link rel="stylesheet" type="text/css" href="{% static 'styles/create_form.css' %}">
 <script type="text/javascript" src="{% static 'js/multiselect-dropdown.js' %}"></script>
 
-<!-- Form Validation Script -->
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
-        // Validation for date fields to ensure the end date is after the start date
         document.querySelector('form').addEventListener('submit', function (e) {
             const startDate = moment(document.getElementById('id_date_begin').value);
             const endDate = moment(document.getElementById('id_date_end').value);
@@ -28,11 +23,9 @@
     });
 </script>
 
-<!-- Form Content -->
-<form method="post" action="" class="form-group">
+<form method="post" action="" class="container mt-4">
     {% csrf_token %}
 
-    <!-- Display form errors -->
     {% if form.errors %}
         <div class="alert alert-danger">
             <ul>
@@ -49,78 +42,68 @@
     {% endif %}
 
     <!-- Form Fields -->
-    <div class="content-container"> 
-        <!-- Title Field -->
-        <div class="mb-3" style="grid-column: 1/3;">
-            <label for="id_title">Title</label>
+    <div class="row g-3">
+        <div class="col-md-12">
+            <label for="id_title" class="form-label">Title</label>
             {% render_field form.title class="form-control" %}
         </div>
 
-        <!-- Description Field -->
-        <div class="mb-3" style="grid-column: 1/3;">
-            <label for="id_description">Description</label>
-            {% render_field form.description class="form-control" style="height: 80px;" %}
+        <div class="col-md-12">
+            <label for="id_description" class="form-label">Description</label>
+            {% render_field form.description class="form-control" style="height: 100px;" %}
         </div>
 
-        <!-- Available From Date and Time -->
-        <div class="mb-3" style="grid-column: 1/3; padding-bottom: 0px;">
-            <p>Available From</p>
+        <div class="col-md-12">
+            <h5>Display From</h5>
         </div>
-        <div class="mb-3">
-            <label for="id_date_begin">Date</label>
+        <div class="col-md-6">
+            <label for="id_date_begin" class="form-label">Date</label>
             {% render_field form.date_begin class="form-control" %}
         </div>
-        <div class="mb-3">
-            <label for="id_time_begin">Time</label>
+        <div class="col-md-6">
+            <label for="id_time_begin" class="form-label">Time</label>
             {% render_field form.time_begin class="form-control" %}
         </div>
 
-        <!-- Until Date and Time -->
-        <div class="mb-3" style="grid-column: 1/3; padding-bottom: 0px;">
-            <p>Until</p>
+        <div class="col-md-12">
+            <h5>Display Until</h5>
         </div>
-        <div class="mb-3">
-            <label for="id_date_end">Date</label>
+        <div class="col-md-6">
+            <label for="id_date_end" class="form-label">Date</label>
             {% render_field form.date_end class="form-control" %}
         </div>
-        <div class="mb-3">
-            <label for="id_time_end">Time</label>
+        <div class="col-md-6">
+            <label for="id_time_end" class="form-label">Time</label>
             {% render_field form.time_end class="form-control" %}
         </div>
 
-        <!-- Points Awarded Field -->
-        <div class="mb-3">
-            <label for="id_points">Points Awarded</label>
+        <div class="col-md-6">
+            <label for="id_points" class="form-label">Points Awarded</label>
             {% render_field form.points class="form-control" %}
         </div>
 
-        <!-- News Checkbox Field -->
-        <div class="mb-3">
-            <div class="checkbox-container">
-                <label for="id_news">Add to News?</label>
-                {% render_field form.news class="form-check-input" %}
-            </div>
+        <div class="col-md-6">
+            <label for="id_news" class="form-label">Add to News?</label><br>
+            {% render_field form.news class="form-check-input" %}
         </div>
 
-        <!-- Validation Method Field -->
-        <div class="mb-3">
-            <label for="id_validation">Validation Method</label>
+        <div class="col-md-6">
+            <label for="id_validation" class="form-label">Validation Method</label>
             {% render_field form.validation class="form-control" %}
         </div>
 
-        <!-- Location(s) Field with Multiselect Dropdown -->
-        <div class="mb-3">
-            <label for="id_location">Location(s)</label>
+        <div class="col-md-6">
+            <label for="id_location" class="form-label">Location(s)</label>
             {% render_field form.location class="form-control multiselect-target" multiselect-select-all="true" %}
         </div>
 
-        <hr style="grid-column: 1/3;">
+        <div class="col-md-12">
+            <hr>
+        </div>
 
-        <!-- Submit Button -->
-        <div class="submit-container">
+        <div class="col-md-12 text-end">
             <button type="submit" class="btn btn-success">Create Campaign</button>
         </div>
-       
     </div>
 </form>
 
