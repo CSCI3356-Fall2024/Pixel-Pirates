@@ -5,17 +5,12 @@
 
 {% block content %}
 
-<!-- External CSS Stylesheets -->
 <link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'styles/news.css' %}">
-
-<!-- JavaScript for Multiselect Dropdown -->
+<link rel="stylesheet" type="text/css" href="{% static 'styles/create_form.css' %}">
 <script type="text/javascript" src="{% static 'js/multiselect-dropdown.js' %}"></script>
 
-<!-- Form Validation Script -->
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
-        // Validation for date fields to ensure the end date is after the start date
         document.querySelector('form').addEventListener('submit', function (e) {
             const startDate = moment(document.getElementById('id_date_begin').value);
             const endDate = moment(document.getElementById('id_date_end').value);
@@ -28,11 +23,9 @@
     });
 </script>
 
-<!-- Form Content -->
-<form method="post" action="" class="form-group" enctype="multipart/form-data">
+<form method="post" action="" class="container mt-4" enctype="multipart/form-data">
     {% csrf_token %}
 
-    <!-- Display form errors -->
     {% if form.errors %}
         <div class="alert alert-danger">
             <ul>
@@ -49,54 +42,51 @@
     {% endif %}
 
     <!-- Form Fields -->
-    <div class="content-container"> 
-        <!-- URL Field -->
-        <div class="mb-3" style="grid-column: 1/3;">
-            <label for="id_external_url">URL to News Item</label>
+    <div class="row g-3">
+        <div class="col-md-12">
+            <label for="id_external_url" class="form-label">URL to News Item</label>
             {% render_field form.external_url class="form-control" %}
         </div>
 
-        <!-- Title Field -->
-        <div class="mb-3" style="grid-column: 1/3;">
-            <label for="id_display_title">Title</label>
+        <div class="col-md-12">
+            <label for="id_display_title" class="form-label">Title</label>
             {% render_field form.display_title class="form-control" %}
         </div>
 
-        <!-- Display From Date and Time -->
-        <div class="mb-3" style="grid-column: 1/3; padding-bottom: 0px;">
-            <p>Display From</p>
+        <div class="col-md-12">
+            <h5>Display From</h5>
         </div>
-        <div class="mb-3">
-            <label for="id_date_begin">Date</label>
+        <div class="col-md-6">
+            <label for="id_date_begin" class="form-label">Date</label>
             {% render_field form.date_begin class="form-control" %}
         </div>
-        <div class="mb-3">
-            <label for="id_time_begin">Time</label>
+        <div class="col-md-6">
+            <label for="id_time_begin" class="form-label">Time</label>
             {% render_field form.time_begin class="form-control" %}
         </div>
 
-        <!-- Display Until Date and Time -->
-        <div class="mb-3" style="grid-column: 1/3; padding-bottom: 0px;">
-            <p>Display Until</p>
+        <div class="col-md-12">
+            <h5>Display Until</h5>
         </div>
-        <div class="mb-3">
-            <label for="id_date_end">Date</label>
+        <div class="col-md-6">
+            <label for="id_date_end" class="form-label">Date</label>
             {% render_field form.date_end class="form-control" %}
         </div>
-        <div class="mb-3">
-            <label for="id_time_end">Time</label>
+        <div class="col-md-6">
+            <label for="id_time_end" class="form-label">Time</label>
             {% render_field form.time_end class="form-control" %}
-        </div>       
+        </div>
 
-        <!-- Upload Image -->
-        <div class="mb-3">
-            <label for="id_news_image">Choose Image to Display</label>
-            <!-- input type="submit" value="Submit" class="btn btn-secondary" -->
+        <div class="col-md-12">
+            <label for="id_news_image" class="form-label">Choose Image to Display</label>
             {% render_field form.news_image class="form-control" %}
         </div>
 
-            <!-- Submit Button -->
-        <div class="submit-container">
+        <div class="col-md-12">
+            <hr>
+        </div>
+
+        <div class="col-md-12 text-end">
             <button type="submit" class="btn btn-success">Create News Item</button>
         </div>
     </div>
