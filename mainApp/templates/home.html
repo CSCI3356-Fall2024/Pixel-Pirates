@@ -96,6 +96,20 @@
                     activities, and promotions.
                 </p>
                 <ul class="list-unstyled">
+                    {% for campaign in campaign_items %}
+                    {% if campaign.news %}
+                    <li class="news-item mb-3">
+                        <div class="news-box d-flex align-items-center justify-content-between p-2 rounded bg-white shadow">
+                            <a href="{% url 'actions' %}" target="_blank" class="flex-grow-1">{{ campaign.title }}</a>
+                            {% if user.is_superuser %}
+                            <a href="{% url 'edit_campaign' campaign.id %}" class="edit-icon ms-3">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
                     {% for news in news_items %}
                     <li class="news-item mb-3">
                         <div
