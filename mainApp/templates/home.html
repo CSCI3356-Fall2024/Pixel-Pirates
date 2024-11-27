@@ -63,8 +63,7 @@
 
                 <!-- Floating Row -->
                 {% if not user_in_top_50 %}
-                <div
-                    class="floating-row d-flex justify-content-between align-items-center p-3 rounded shadow mt-3">
+                <div class="floating-row d-flex justify-content-between align-items-center p-3 rounded shadow mt-3">
                     <!-- Place -->
                     <div class="text-center" style="width: 10%; min-width: 40px;">
                         <span class="rank-icon rank-neutral">●</span>
@@ -92,93 +91,105 @@
                 <h2 class="section-title">Latest News</h2>
                 <p>
                     Be sustainable today! Check out what’s happening in the community and take part in sustainable
-                    events,
-                    activities, and promotions.
+                    events, activities, and promotions.
                 </p>
                 <ul class="list-unstyled">
+                    <!-- News and Campaign Items -->
+                    {% for news in news_items %}
+                    <li class="news-item mb-3">
+                        <div class="news-box d-flex align-items-center p-2 rounded bg-white shadow">
+                            <!-- Image Column (with consistent placeholder if missing) -->
+                            <div style="width: 60px; height: 60px; margin-right: 10px;">
+                                {% if news.news_image %}
+                                <img src="{{ news.news_image.url }}" alt="News Image" class="rounded"
+                                    style="width: 100%; height: 100%; object-fit: cover;">
+                                {% endif %}
+                            </div>
+                            <!-- Title and Edit Icon -->
+                            <div class="flex-grow-1 d-flex justify-content-between align-items-center">
+                                <span class="flex-grow-1">{{ news.display_title }}</span>
+                                {% if user.is_superuser %}
+                                <a href="{% url 'edit_news' news.id %}" class="edit-icon ms-3">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+
+                    <!-- Campaign Items marked as news -->
                     {% for campaign in campaign_items %}
                     {% if campaign.news %}
                     <li class="news-item mb-3">
-                        <div class="news-box d-flex align-items-center justify-content-between p-2 rounded bg-white shadow">
-                            <a href="{% url 'actions' %}" target="_blank" class="flex-grow-1">{{ campaign.title }}</a>
-                            {% if user.is_superuser %}
-                            <a href="{% url 'edit_campaign' campaign.id %}" class="edit-icon ms-3">
-                                <i class="fas fa-pen"></i>
-                            </a>
-                            {% endif %}
+                        <div class="news-box d-flex align-items-center p-2 rounded bg-white shadow">
+                            <!-- Placeholder Image to keep alignment consistent -->
+                            <div style="width: 60px; height: 60px; margin-right: 10px;">
+                                <!-- Add placeholder or leave blank for campaigns -->
+                            </div>
+                            <!-- Title and Edit Icon -->
+                            <div class="d-flex flex-grow-1 justify-content-between align-items-center">
+                                <span class="flex-grow-1">{{ campaign.title }}</span>
+                                {% if user.is_superuser %}
+                                <a href="{% url 'edit_campaign' campaign.id %}" class="edit-icon ms-3">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                {% endif %}
+                            </div>
                         </div>
                     </li>
                     {% endif %}
                     {% endfor %}
-                    {% for news in news_items %}
-                    <li class="news-item mb-3">
-                        <div
-                            class="news-box d-flex align-items-center justify-content-between p-2 rounded bg-white shadow">
-                            {% if news.news_image %}
-                            <img src="{{ news.news_image.url }}" alt="News Image" class="rounded me-3"
-                                style="width: 60px; height: 60px;">
-                            {% endif %}
-                            <a href="{{ news.external_url }}" target="_blank" class="flex-grow-1">{{ news.display_title }}</a>
-                            {% if user.is_superuser %}
-                            <a href="{% url 'edit_news' news.id %}" class="edit-icon ms-3">
-                                <i class="fas fa-pen"></i>
-                            </a>
-                            {% endif %}
-                        </div>
-                    </li>
-                    {% endfor %}
                 </ul>
             </div>
         </div>
-    </div>
-</div>
 
 
-<!-- JavaScript for Chart -->
-<div class="chart-container">
-    <canvas id="leaderboardChart"></canvas>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const top3Names = JSON.parse('{{ top_3_names|escapejs }}');
-        const top3Points = JSON.parse('{{ top_3_points|escapejs }}');
-        const ctx = document.getElementById('leaderboardChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: top3Names,
-                datasets: [{
-                    label: 'Points',
-                    data: top3Points,
-                    backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
-                    borderColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
-                    borderWidth: 1,
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                plugins: {
-                    datalabels: {
-                        display: true,
-                        color: '#000',
-                        font: {
-                            weight: 'bold'
+        <!-- JavaScript for Chart -->
+        <div class="chart-container">
+            <canvas id="leaderboardChart"></canvas>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const top3Names = JSON.parse('{{ top_3_names|escapejs }}');
+                const top3Points = JSON.parse('{{ top_3_points|escapejs }}');
+                const ctx = document.getElementById('leaderboardChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: top3Names,
+                        datasets: [{
+                            label: 'Points',
+                            data: top3Points,
+                            backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
+                            borderColor: ['#FFD700', '#C0C0C0', '#CD7F32'],
+                            borderWidth: 1,
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: {
+                            datalabels: {
+                                display: true,
+                                color: '#000',
+                                font: {
+                                    weight: 'bold'
+                                },
+                                formatter: function (value) {
+                                    return value;
+                                }
+                            }
                         },
-                        formatter: function (value) {
-                            return value;
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }
-                },
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    });
-</script>
-{% endblock %}
+                });
+            });
+        </script>
+        {% endblock %}
