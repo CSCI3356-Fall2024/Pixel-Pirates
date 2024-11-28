@@ -15,7 +15,21 @@ class Profile(models.Model):
     picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     points = models.IntegerField(default=0)
+    total_points = models.IntegerField(default=0)  # All-time accumulated points
     previous_rank = models.IntegerField(null=True, blank=True)
+    last_points_update = models.DateTimeField(default=timezone.now)
+
+    def update_points(self, new_points):
+        self.points = new_points
+        self.last_points_update = timezone.now()
+        self.save()
+
+    def save(self, *args, **kwargs):
+        if self.pk:  
+            original = Profile.objects.get(pk=self.pk)
+            if original.points != self.points:
+                self.last_points_update = timezone.now()
+        super(Profile, self).save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.username.username}'s Profile"

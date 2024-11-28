@@ -15,6 +15,8 @@ from datetime import timedelta
 import json
 from django.utils import timezone
 from datetime import timedelta, time 
+from django.db.models import Window
+from django.db.models.functions import Rank
 
 from .models import *
 from .forms import *
@@ -219,32 +221,43 @@ def edit_rewards(request, id):
 
 @login_required
 def home_view(request):
-    if request.user.is_authenticated:
-        try:
-            profile = request.user.profile
-            if not (profile.name and profile.school and profile.major):
-                return redirect('profile')
-            required = True
-        except Profile.DoesNotExist:
+    try:
+        profile = request.user.profile
+        if not (profile.name and profile.school and profile.major):
             return redirect('profile')
-    else:
-        return redirect('login')
+        required = True
+    except Profile.DoesNotExist:
+        return redirect('profile')
 
-    leaderboard_data = Profile.objects.order_by('-points').annotate(
-        rank=F('points')
-    )[:50]
+    # Calculate rank for all profiles, ordering by points and last_points_update to break ties
+    leaderboard_data = (
+        Profile.objects.annotate(rank=Window(
+            expression=Rank(),
+            order_by=[F('points').desc(), F('last_points_update').asc()]
+        ))
+        .order_by('rank')[:50]
+    )
 
-    top_3_users = leaderboard_data[:3]
-    top_3_names = [user.name for user in top_3_users]
-    top_3_points = [user.points for user in top_3_users]
+    # Update the rank for the current user
+    all_profiles = (
+        Profile.objects.annotate(rank=Window(
+            expression=Rank(),
+            order_by=[F('points').desc(), F('last_points_update').asc()]
+        ))
+        .order_by('rank')
+    )
 
-    news_items = News.objects.all()
-    campaign_items = Campaign.objects.all()
+    # Correctly get the rank for the current user
+    user_rank = None
+    for user in all_profiles:
+        if user.id == profile.id:
+            user_rank = user.rank
+            break
 
     total_users = Profile.objects.count()
-    user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
+    user_in_top_50 = user_rank <= 50  # Check if the user is in the top 50
 
-    user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
+    # User info dictionary
     user_info = {
         'rank': user_rank,
         'name': profile.name,
@@ -252,10 +265,16 @@ def home_view(request):
         'picture': profile.picture.url if profile.picture else None,
     }
 
-    leaderboard_data = Profile.objects.order_by('-points')[:50]
-    user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
-    user_in_top_50 = user_rank <= 50  # Check if the user is in the top 50
+    # Top 3 users for leaderboard display
+    top_3_users = leaderboard_data[:3]
+    top_3_names = [user.name for user in top_3_users]
+    top_3_points = [user.points for user in top_3_users]
 
+    # Get news and campaign items for the homepage
+    news_items = News.objects.all()
+    campaign_items = Campaign.objects.all()
+
+    # Determine motivational message based on correct user rank
     if user_rank <= 10:
         motivation_message = "Amazing job! You're in the Top 10. Keep up the good work!"
     elif user_rank <= 20:
@@ -281,9 +300,10 @@ def home_view(request):
         "leaderboard_points": json.dumps(profile.points),
         "user_in_top_50": user_in_top_50,
         "user_info": user_info,
-        "required": required,  
     }
+
     return render(request, 'home.html', context)
+
 
 @login_required
 def actions_view(request):
