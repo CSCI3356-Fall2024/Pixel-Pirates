@@ -16,6 +16,9 @@ import json
 from django.utils import timezone
 from django.db.models import Window
 from django.db.models.functions import Rank
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User
+from django.db.models.functions import RowNumber
 
 from .models import *
 from .forms import *
@@ -228,23 +231,35 @@ def home_view(request):
     except Profile.DoesNotExist:
         return redirect('profile')
 
-    # Calculate rank for all profiles, ordering by points and last_points_update to break ties
-    leaderboard_data = (
-        Profile.objects.annotate(rank=Window(
-            expression=Rank(),
-            order_by=[F('points').desc(), F('last_points_update').asc()]
-        ))
-        .order_by('rank')[:50]
-    )
-
-    # Update the rank for the current user
+        # Update the rank for the current user
     all_profiles = (
         Profile.objects.annotate(rank=Window(
-            expression=Rank(),
+            expression=RowNumber(),
             order_by=[F('points').desc(), F('last_points_update').asc()]
         ))
         .order_by('rank')
     )
+
+    leaderboard_data = []
+    for user in all_profiles[:50]:
+        # Calculate rank change
+        rank_change = None
+        if user.previous_rank:
+            rank_change = user.previous_rank - user.rank
+
+        # Update the user's previous rank
+        user.previous_rank = user.rank
+        user.save()
+
+        leaderboard_data.append({
+            'id': user.id,
+            'name': user.name,
+            'points': user.points,
+            'picture': user.picture.url if user.picture else None,
+            'rank': user.rank,
+            'rank_change': rank_change or 0,  # Default to 0 if no previous rank available
+            #'abs_rank_change': abs(rank_change) if rank_change is not None else 0,  # Calculate absolute rank change
+        })
 
     # Correctly get the rank for the current user
     user_rank = None
@@ -266,8 +281,8 @@ def home_view(request):
 
     # Top 3 users for leaderboard display
     top_3_users = leaderboard_data[:3]
-    top_3_names = [user.name for user in top_3_users]
-    top_3_points = [user.points for user in top_3_users]
+    top_3_names = [user['name'] for user in top_3_users]
+    top_3_points = [user['points'] for user in top_3_users]
 
     # Get news and campaign items for the homepage
     news_items = News.objects.all()
@@ -303,6 +318,27 @@ def home_view(request):
 
     return render(request, 'home.html', context)
 
+@login_required
+def manage_users(request):
+    if not request.user.is_superuser:
+        return redirect('home')  # Redirect if not superuser
+
+    users = User.objects.all()
+    context = {
+        'required': True
+    }
+
+    return render(request, 'manage_users.html', {'users': users}, context)
+
+@user_passes_test(lambda u: u.is_superuser)  # Only superusers can access this
+def toggle_supervisor(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if user.is_superuser:
+        user.is_superuser = False
+    else:
+        user.is_superuser = True
+    user.save()
+    return redirect('manage_users')  # Redirect to the manage users page
 
 @login_required
 def actions_view(request):
