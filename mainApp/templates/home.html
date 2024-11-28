@@ -41,16 +41,18 @@
                                 <td>
                                     <span class="rank-icon">
                                         {% if user.rank_change > 0 %}
-                                        <span class="rank-up text-success">▲</span>
-                                        {% elif user.rank_change < 0 %} <span class="rank-down text-danger">▼</span>
-                                    {% else %}
-                                    <span class="rank-neutral text-muted">●</span>
-                                    {% endif %}
+                                        <span class="rank-up text-success">▲</span> {{ user.abs_rank_change }}
+                                        {% elif user.rank_change < 0 %}
+                                        <span class="rank-down text-danger">▼</span> {{ user.abs_rank_change }}
+
+                                        {% else %}
+                                            <span class="rank-neutral text-muted">●</span>
+                                        {% endif %}
                                     </span>
-                                    {{ forloop.counter }}
+                                    {{ user.rank }}
                                 </td>
                                 <td>
-                                    <img src="{% if user.picture %}{{ user.picture.url }}{% else %}{% static 'images/default_profile_image.jpg' %}{% endif %}"
+                                    <img src="{% if user.picture %}{{ user.picture }}{% else %}{% static 'images/default_profile_image.jpg' %}{% endif %}"
                                         alt="Profile image" class="profile-image rounded-circle me-2">
                                     {{ user.name }}
                                 </td>
@@ -58,6 +60,7 @@
                             </tr>
                             {% endfor %}
                         </tbody>
+                        
                     </table>
                 </div>
 
