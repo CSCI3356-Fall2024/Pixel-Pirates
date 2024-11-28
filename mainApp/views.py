@@ -11,10 +11,9 @@ from django.dispatch import receiver
 from django.db import IntegrityError
 from django.db.models import F
 from allauth.account.signals import user_logged_in
-from datetime import timedelta
+from datetime import timedelta, time
 import json
 from django.utils import timezone
-from datetime import timedelta, time 
 from django.db.models import Window
 from django.db.models.functions import Rank
 

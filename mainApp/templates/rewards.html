@@ -8,90 +8,96 @@
     // Ensure the modal stays hidden initially
     document.addEventListener("DOMContentLoaded", function () {
         const confirmModal = document.getElementById("confirmModal");
-        confirmModal.style.display = "none";  // Ensure hidden on load
+        confirmModal.style.display = "none";  
     });
-
+    
     // Show the logout modal when the logout link is clicked
     function showConfirmModal(event) {
         // Get the reward element that was clicked
         const rewardElement = event.currentTarget;
-
+        
         // Extract the reward ID from the data attribute
         const rewardId = rewardElement.getAttribute('data-reward-id');
-
         // Set the reward ID in the hidden input field in the modal
         document.getElementById('rewardIdField').value = rewardId;
-
         // Show the modal
         event.preventDefault();
         document.getElementById("confirmModal").style.display = "flex";
     }
-    // Somehow create an object currently a work in progress 
-    function confirmRedemption() {
-        window.location.href = '/profile/'
-    }
 
-    // Hide the logout modal
+    // Somehow create an object currently a work in progress 
     function hideConfirmModal() {
         document.getElementById("confirmModal").style.display = "none";
     }
 </script>
 
-<link rel= "stylesheet" type= "text/css" href= "../static/styles/style.css">
-<link rel= "stylesheet" type= "text/css" href= "../static/styles/rewards.css">
+<link rel= "stylesheet" type= "text/css" href= "{% static 'styles/style.css' %}">
+<link rel= "stylesheet" type= "text/css" href= "{% static 'styles/rewards.css' %}">
 
-<div class="content-container">
-
-     <div class="points-display">
-        <h2 class="points-title">YOUR POINTS:</h2>
-        <h2 class="points">{{ profile.points }} </h2>
-    </div>
-
-    <div class="scrollable-section user-history">
-        <div class="title"><h3>History</h3></div>
-        <div class="history">
-            <span class="history-item">Bakery Item</span>
-            <div class="history-wrapper">
-                <span class="history-points">-50 points</span>
-                <span class="history-date">10/1/2024</span>
+<div class="container mt-4 mb-10">
+    <div class="row g-4">
+        <!-- Points Display (Upper Left) -->
+        <div class="col-lg-6 col-md-12">
+            <div class="points-display text-center p-4 shadow">
+                <h2 class="points-title">YOUR POINTS:</h2>
+                <h2 class="points">{{ profile.points }}</h2>
             </div>
         </div>
-    </div>
 
-     <div class="scrollable-section redeem">
-        <div class="title"><h3>Redeem Rewards</h3></div>
-        {% for reward in available_rewards %}
-            {% if profile.points >= reward.points %}
-            <div class="reward" data-reward-id="{{ reward.id }}" onclick="showConfirmModal(event)">
-                <span class="reward-item">{{reward.title}}</span>
-                <div class="reward-wrapper"> 
-                    <span class="reward-points">{{ reward.points }} points</span>
-                    <span class="reward-date">Available from: {{ reward.date_begin|date:"m/d"}}-{{reward.date_end|date:"m/d" }}</span>
-                </div>
-            </div>
-            {% else %}
-            <!-- no hover or onlcick -->
-            <div class="ineligible-reward">
-            <span class="reward-item">{{reward.title}}</span>
-                <div class="reward-wrapper"> 
-                    <span class="reward-points">{{ reward.points }}</span>
-                    <span class="reward-date">Available from: {{ reward.date_begin|date:"m/d"}}-{{reward.date_end|date:"m/d" }}</span>
-                </div>
-            </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-
-    <div class="scrollable-section user-rewards">
-        <div class="title"><h3>Your Rewards</h3></div>
-        {% for redeemed in redeemed_items %}
-        <div class="redeemed">
-            <div class="redeemed-wrapper">
-                <span class="redeemed-item">{{ redeemed.title }}</span>
-                <span class="redeemed-date">Available from: {{ redeemed.date_begin|date:"m/d"}}-{{redeemed.date_end|date:"m/d" }}</span>
+        <!-- Redeem Rewards (Upper Right) -->
+        <div class="col-lg-6 col-md-6">
+            <div class="scrollable-section redeem p-4 rounded shadow">
+                <div class="title text-center"><h3>Redeem Rewards</h3></div>
+                {% for reward in available_rewards %}
+                    {% if profile.points >= reward.points %}
+                    <div class="reward bg-white p-3 rounded mb-3 shadow-sm" data-reward-id="{{ reward.id }}" onclick="showConfirmModal(event)">
+                        <span class="reward-item">{{ reward.title }}</span>
+                        <div class="reward-wrapper"> 
+                            <span class="reward-points">{{ reward.points }} points</span>
+                            <span class="reward-date">Available from: {{ reward.date_begin|date:"m/d" }}-{{ reward.date_end|date:"m/d" }}</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="ineligible-reward bg-white p-3 rounded mb-3 shadow-sm">
+                        <span class="reward-item">{{ reward.title }}</span>
+                        <div class="reward-wrapper"> 
+                            <span class="reward-points">{{ reward.points }} points</span>
+                            <span class="reward-date">Available from: {{ reward.date_begin|date:"m/d" }}-{{ reward.date_end|date:"m/d" }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
+
+        <!-- History Section (Lower Left) -->
+        <div class="col-lg-6 col-md-6">
+            <div class="scrollable-section user-history p-4 rounded shadow">
+                <div class="title text-center"><h3>History</h3></div>
+                <div class="history bg-white p-3 rounded mb-3 shadow-sm">
+                    <span class="history-item">Bakery Item</span>
+                    <div class="history-wrapper">
+                        <span class="history-points">-50 points</span>
+                        <span class="history-date">10/1/2024</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Rewards (Lower Right) -->
+        <div class="col-lg-6 col-md-6">
+            <div class="scrollable-section user-rewards p-4 rounded shadow">
+                <div class="title text-center"><h3>Your Rewards</h3></div>
+                {% for redeemed in redeemed_items %}
+                <div class="redeemed bg-white p-3 rounded mb-3 shadow-sm">
+                    <div class="redeemed-wrapper">
+                        <span class="redeemed-item">{{ redeemed.title }}</span>
+                        <span class="redeemed-date">Available from: {{ redeemed.date_begin|date:"m/d" }}-{{ redeemed.date_end|date:"m/d" }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -102,13 +108,11 @@
             {% csrf_token %}
             <input type="hidden" name="reward_id" id="rewardIdField" value="">
             <div class="modal-buttons">
-                <button type="submit" class="confirm-button">Yes</button>
-                <button type="button" class="cancel-button" onclick="hideConfirmModal()">Cancel</button>
+                <button type="submit" class="btn btn-danger">Yes</button>
+                <button type="button" class="btn btn-secondary" onclick="hideConfirmModal()">Cancel</button>
             </div>
         </form>
     </div>
 </div>
-
-
 
 {% endblock %}
