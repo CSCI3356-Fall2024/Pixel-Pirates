@@ -6,14 +6,15 @@
 - Leader ranking — based on total points and user won’t fall on the leaderboard if they redeem their points
     - Floating row if user is not on the top 50; not aligned
     - If user is part of the top 50, they will be highlighted in the table
-    - If user has the same number of points, who is going to be first? 
-    - Where the user falls on the table sometimes does not match the motivation message (tied to if user has the same number of points, who is going to be first)
+    - If user has the same number of points, who is going to be first? DONE
+    - Where the user falls on the table sometimes does not match the motivation message (tied to if user has the same number of points, who is going to be first) DONE
+    - User will not lose rank when redeeming rewards (create total points)
 - Hamburger menu: when the user is on a mobile interface, the side bar will disappear 
 - Responsiveness/bootstrap:
     - Rewards page
     - Actions page
     - Campaign/rewards/news (should all be relatively simple because they have the same layout) DONE
- - Campaign is not being added to news page on homepage even when checkbox for add to news is true
+ - Campaign is not being added to news page on homepage even when checkbox for add to news is true DONE
 
 ## Other
 - Wordsearch
