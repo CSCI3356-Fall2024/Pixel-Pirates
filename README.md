@@ -3,22 +3,23 @@
 ## Delivery 6
 
 ## Leah (currently tackling these -- mostly logic/buggy parts)
-- Leader ranking — based on total points and user won’t fall on the leaderboard if they redeem their points
+- Leader ranking
+    - Based on total points and user won’t fall on the leaderboard if they redeem their points
     - Floating row if user is not on the top 50; not aligned
     - If user is part of the top 50, they will be highlighted in the table
     - If user has the same number of points, who is going to be first? DONE
     - Where the user falls on the table sometimes does not match the motivation message (tied to if user has the same number of points, who is going to be first) DONE
-    - User will not lose rank when redeeming rewards (create total points)
 - Hamburger menu: when the user is on a mobile interface, the side bar will disappear 
 - Responsiveness/bootstrap:
-    - Rewards page
-    - Actions page
+    - Rewards page DONE
     - Campaign/rewards/news (should all be relatively simple because they have the same layout) DONE
  - Campaign is not being added to news page on homepage even when checkbox for add to news is true DONE
 
 ## Other
 - Wordsearch
 - Photo upload
+- Supervisor Landing Page
+- A Django superuser will have access to a webpage where they can define that a register user is a supervisor 
 
 
 ## Delivery 5
