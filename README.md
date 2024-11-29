@@ -7,9 +7,10 @@
     - Based on total points and user won’t fall on the leaderboard if they redeem their points
     - Floating row if user is not on the top 50; not aligned
     - If user is part of the top 50, they will be highlighted in the table
+    - Arrows for ranking when you move up are not persisting after refresh
     - If user has the same number of points, who is going to be first? DONE
     - Where the user falls on the table sometimes does not match the motivation message (tied to if user has the same number of points, who is going to be first) DONE
-- Hamburger menu: when the user is on a mobile interface, the side bar will disappear 
+- Hamburger menu: when the user is on a mobile interface, the side bar will disappear DONE
 - Responsiveness/bootstrap:
     - Rewards page DONE
     - Campaign/rewards/news (should all be relatively simple because they have the same layout) DONE
