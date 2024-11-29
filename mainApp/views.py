@@ -248,8 +248,9 @@ def home_view(request):
             rank_change = user.previous_rank - user.rank
 
         # Update the user's previous rank
+        user.rank_change = rank_change
         user.previous_rank = user.rank
-        user.save()
+        user.save(update_fields=['rank_change', 'previous_rank'])
 
         leaderboard_data.append({
             'id': user.id,

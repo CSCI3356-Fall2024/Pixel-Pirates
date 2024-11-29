@@ -1,14 +1,18 @@
 /* Sidebar styling */
 .sidenav {
     height: 100%;
-    width: 100px;
+    width: 80px;
     position: fixed;
     z-index: 1;
     top: 0;
     left: 0;
     background-color: #B8D8BE;
     overflow-x: hidden;
-    padding-top: 20px;
+    padding-top: 70px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s ease;
 }
 
 .sidenav a {
@@ -30,11 +34,23 @@
     padding-bottom: 10px;
 }
 
+/* Main content styling */
 .main {
     margin-left: 100px;
     padding: 10px;
     height: 100vh;
     width: calc(100% - 100px);
+    transition: margin-left 0.3s ease;
+}
+
+/* Hamburger Menu */
+.hamburger-menu {
+    position: fixed;
+    top: 20px; 
+    left: 27px;
+    font-size: 30px;
+    z-index: 10;
+    cursor: pointer;
 }
 
 /* Modal styling */
@@ -47,7 +63,6 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
     justify-content: center;
     align-items: center;
 }
@@ -84,4 +99,34 @@
     background-color: lightgray;
     color: gray;
     font-weight: bold;
+}
+
+/* Mobile responsiveness: Hide sidebar and show hamburger on small screens */
+@media (max-width: 768px) {
+    .hamburger-menu {
+        display: block; 
+    }
+
+    .sidenav {
+        display: none; 
+    }
+
+    .main {
+        margin-left: 0; 
+        width: 100%; 
+    }
+}
+
+
+.sidenav.open {
+    display: flex; 
+}
+
+
+.sidenav {
+    transition: all 0.3s ease-in-out;
+}
+
+.main {
+    transition: margin-left 0.3s ease-in-out;
 }
