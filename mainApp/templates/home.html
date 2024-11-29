@@ -41,7 +41,7 @@
                                 <td>
                                     <span class="rank-icon">
                                         {% if user.rank_change > 0 %}
-                                        <span class="rank-up text-success">▲</span> {{ user.abs_rank_change }}
+                                            <span class="rank-up text-success">▲</span> {{ user.abs_rank_change }}
                                         {% elif user.rank_change < 0 %}
                                         <span class="rank-down text-danger">▼</span> {{ user.abs_rank_change }}
 
