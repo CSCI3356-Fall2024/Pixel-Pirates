@@ -109,7 +109,7 @@
                                 {% endif %}
                             </div>
                             <!-- Title and Edit Icon -->
-                            <div class="flex-grow-1 d-flex justify-content-between align-items-center">
+                            <div class="flex-grow-1 d-flex justify-content-between text-end">
                                 <span class="flex-grow-1">{{ news.display_title }}</span>
                                 {% if user.is_superuser %}
                                 <a href="{% url 'edit_news' news.id %}" class="edit-icon ms-3">
@@ -131,7 +131,7 @@
                                 <!-- Add placeholder or leave blank for campaigns -->
                             </div>
                             <!-- Title and Edit Icon -->
-                            <div class="d-flex flex-grow-1 justify-content-between align-items-center">
+                            <div class="d-flex flex-grow-1 justify-content-between text-end">
                                 <span class="flex-grow-1">{{ campaign.title }}</span>
                                 {% if user.is_superuser %}
                                 <a href="{% url 'edit_campaign' campaign.id %}" class="edit-icon ms-3">

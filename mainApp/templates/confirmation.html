@@ -16,8 +16,8 @@
 <div class="content">
     <h2>Name: {{ profile.name }}</h2>
     <h2>Role: {% if profile.username.is_superuser %} Supervisor
-        <div class="mt-4">
-            <a href="{% url 'manage_users' %}" class="btn btn-primary">Manage Users</a>
+        <div class="mt-4 center-button">
+            <a href="{% url 'manage_users' %}" class="btn btn-success">Manage Users</a>
         </div>
         {% else %} Student </h2>
     
