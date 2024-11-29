@@ -323,14 +323,15 @@ def home_view(request):
 @login_required
 def manage_users(request):
     if not request.user.is_superuser:
-        return redirect('home')  # Redirect if not superuser
+        return redirect('home')  
 
     users = User.objects.all()
     context = {
-        'required': True
+        'users': users,
+        'required': True  
     }
 
-    return render(request, 'manage_users.html', {'users': users}, context)
+    return render(request, 'manage_users.html', context)
 
 @user_passes_test(lambda u: u.is_superuser)  # Only superusers can access this
 def toggle_supervisor(request, user_id):
