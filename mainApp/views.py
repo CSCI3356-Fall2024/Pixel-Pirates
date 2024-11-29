@@ -259,6 +259,7 @@ def home_view(request):
             'picture': user.picture.url if user.picture else None,
             'rank': user.rank,
             'rank_change': rank_change or 0,  # Default to 0 if no previous rank available
+            'is_current_user': user.id == profile.id,
             #'abs_rank_change': abs(rank_change) if rank_change is not None else 0,  # Calculate absolute rank change
         })
 
