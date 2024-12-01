@@ -243,8 +243,8 @@ def home_view(request):
     leaderboard_data = []
     for user in all_profiles[:50]:
         # Calculate rank change
-        rank_change = None
-        if user.previous_rank:
+        rank_change = 0 # Change default to 0
+        if user.previous_rank is not None:
             rank_change = user.previous_rank - user.rank
 
         # Update the user's previous rank
@@ -258,7 +258,7 @@ def home_view(request):
             'points': user.points,
             'picture': user.picture.url if user.picture else None,
             'rank': user.rank,
-            'rank_change': rank_change or 0,  # Default to 0 if no previous rank available
+            'rank_change': rank_change,  # Changed so dealt with default in above lines
             'is_current_user': user.id == profile.id,
             #'abs_rank_change': abs(rank_change) if rank_change is not None else 0,  # Calculate absolute rank change
         })
