@@ -1,14 +1,3 @@
-* {
-    box-sizing: border-box;
-}
-
-html, body {
-    font-family: "Times New Roman", Times;
-    margin: 0;
-    padding: 0;
-    height: 100%; /* Ensures full height for the content */
-}
-
 .actions-page-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
