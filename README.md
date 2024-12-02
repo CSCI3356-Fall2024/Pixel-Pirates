@@ -1,6 +1,16 @@
 # Pixel-Pirates
 
 ## Delivery 6
+## Anora
+### In Progress
+1. fixing dropdown duplication for profile page
+2. fixing creating campaign/news/rewards
+   
+### Done
+1. django-celery-beats for scheduling daily tasks and weekly tasks
+2. streaks calendar and calculating streaks
+3. celery -A Pixel_Pirates.celery worker --beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler 
+    - run this command along with runserver 
 
 ## Grace
 - working on
