@@ -69,8 +69,16 @@
                 <div class="floating-row d-flex justify-content-between align-items-center p-3 rounded shadow mt-3">
                     <!-- Place -->
                     <div class="" style="width: 10%; min-width: 40px;">
-                        <span class="rank-icon rank-neutral">●</span>
-                        <span class="fw-bold">{{ user_info.rank }}</span>
+                        <span class="rank-icon">
+                            {% if user.rank_change > 0 %}
+                                <span class="rank-up text-success">▲</span> {{ user.abs_rank_change }}
+                            {% elif user.rank_change < 0 %}
+                            <span class="rank-down text-danger">▼</span> {{ user.abs_rank_change }}
+
+                            {% else %}
+                                <span class="rank-neutral text-muted">●</span>
+                            {% endif %}
+                        </span>
                     </div>
                     <!-- Name -->
                     <div class="d-flex align-items-center">

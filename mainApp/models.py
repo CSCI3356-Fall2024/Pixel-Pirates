@@ -18,8 +18,9 @@ class Profile(models.Model):
     points = models.IntegerField(default=0)
     total_points = models.IntegerField(default=0)  # All-time accumulated points
     previous_rank = models.IntegerField(null=True, blank=True)
+    current_rank = models.IntegerField(null=True, blank=True)
     last_points_update = models.DateTimeField(default=timezone.now)
-    rank_change = models.IntegerField(default=0)
+    rank_change = models.IntegerField(default=0, null=True)
     streak_status = models.IntegerField(default=0)
 
     def update_points(self, new_points):

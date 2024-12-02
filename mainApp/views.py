@@ -280,40 +280,40 @@ def home_view(request):
         .order_by('rank')
     )
 
-    leaderboard_data = []
-    for user in all_profiles[:50]:
-        # Calculate rank change
-        rank_change = 0 # Change default to 0
+    for user in all_profiles:
+        user.previous_rank = user.current_rank
+        user.current_rank = user.rank
+
         if user.previous_rank is not None:
-            rank_change = user.previous_rank - user.rank
+            user.rank_change = user.previous_rank - user.current_rank
+        else:
+            user.rank_change = 0
 
-        # Update the user's previous rank
-        user.rank_change = rank_change
-        user.previous_rank = user.rank
-        user.save(update_fields=['rank_change', 'previous_rank'])
+        user.save(update_fields=['previous_rank', 'current_rank', 'rank_change'])
 
-        leaderboard_data.append({
+    # Refresh profile instance to ensure changes are loaded
+    profile.refresh_from_db()
+
+    # Use the latest rank to determine motivational message
+    user_rank = profile.current_rank
+    total_users = Profile.objects.count()
+    user_in_top_50 = user_rank <= 50 if user_rank else False
+
+    # Update the leaderboard data with persisted rank changes
+    leaderboard_data = [
+        {
             'id': user.id,
             'name': user.name,
             'points': user.points,
             'picture': user.picture.url if user.picture else None,
-            'rank': user.rank,
-            'rank_change': rank_change,  # Changed so dealt with default in above lines
+            'rank': user.current_rank,
+            'rank_change': user.rank_change,
             'is_current_user': user.id == profile.id,
-            #'abs_rank_change': abs(rank_change) if rank_change is not None else 0,  # Calculate absolute rank change
-        })
+        }
+        for user in all_profiles[:50]
+    ]
 
-    # Correctly get the rank for the current user
-    user_rank = None
-    for user in all_profiles:
-        if user.id == profile.id:
-            user_rank = user.rank
-            break
-
-    total_users = Profile.objects.count()
-    user_in_top_50 = user_rank <= 50  # Check if the user is in the top 50
-
-    # User info dictionary
+    # Create user info dictionary
     user_info = {
         'rank': user_rank,
         'name': profile.name,
