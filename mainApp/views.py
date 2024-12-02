@@ -336,12 +336,9 @@ def manage_users(request):
 @user_passes_test(lambda u: u.is_superuser)  # Only superusers can access this
 def toggle_supervisor(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    if user.is_superuser:
-        user.is_superuser = False
-    else:
-        user.is_superuser = True
+    user.is_superuser = not user.is_superuser  # Toggle superuser status
     user.save()
-    return redirect('manage_users')  # Redirect to the manage users page
+    return redirect('manage_users')
 
 @login_required
 def actions_view(request):
