@@ -54,48 +54,51 @@
     
 
     <!-- Streak Calendar Section -->
-    <div class="calendar-container"> 
-        <h5>Streaks</h5>
-        <div class="calendar-navigation">
-            <div class="month-text"> 
-                <form method="get" class="calendar-controls">
-                    <select name="month_year" id="month-year-select" onchange="this.form.submit()">
-                        {% for date_option in month_year_options %}
-                            <option value="{{ date_option.value }}" {% if date_option.value == current_month_year %}selected{% endif %}>
-                                {{ date_option.label }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </form>
-            </div>
+    
+        <div class="calendar-container"> 
+            <h5>Streaks</h5>
+            <div class="streaks">
+            <div class="calendar-navigation">
+                <div class="month-text"> 
+                    <form method="get" class="calendar-controls">
+                        <select name="month_year" id="month-year-select" onchange="this.form.submit()">
+                            {% for date_option in month_year_options %}
+                                <option value="{{ date_option.value }}" {% if date_option.value == current_month_year %}selected{% endif %}>
+                                    {{ date_option.label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
 
-            <div class="month-navigation">
-                <a href="?month={{ previous_month }}&year={{ previous_year }}" class="btn">&lt;</a>   
-                <a href="?month={{ next_month }}&year={{ next_year }}" class="btn"> &gt;</a>
+                <div class="month-navigation">
+                    <a href="?month={{ previous_month }}&year={{ previous_year }}" class="btn">&lt;</a>   
+                    <a href="?month={{ next_month }}&year={{ next_year }}" class="btn"> &gt;</a>
+                </div>
             </div>
-        </div>
-        
-        <div class="streak-calendar">
-            <div class="calendar-header">
-                <div class="calendar-cell week-title">Sun</div>
-                <div class="calendar-cell week-title">Mon</div>
-                <div class="calendar-cell week-title">Tue</div>
-                <div class="calendar-cell week-title">Wed</div>
-                <div class="calendar-cell week-title">Thu</div>
-                <div class="calendar-cell week-title">Fri</div>
-                <div class="calendar-cell week-title">Sat</div>
-            </div>
-        
-            <div class="calendar">
-                {% for week in calendar_weeks %}
-                    {% for day in week %}
-                        <div class="calendar-cell {% if day.completed %}completed{% elif not day.date %}empty{% endif %}">
-                            {% if day.date %}
-                                {{ day.date|date:"j" }}
-                            {% endif %}
-                        </div>
+            
+            <div class="streak-calendar">
+                <div class="calendar-header">
+                    <div class="calendar-cell week-title">Sun</div>
+                    <div class="calendar-cell week-title">Mon</div>
+                    <div class="calendar-cell week-title">Tue</div>
+                    <div class="calendar-cell week-title">Wed</div>
+                    <div class="calendar-cell week-title">Thu</div>
+                    <div class="calendar-cell week-title">Fri</div>
+                    <div class="calendar-cell week-title">Sat</div>
+                </div>
+            
+                <div class="calendar">
+                    {% for week in calendar_weeks %}
+                        {% for day in week %}
+                            <div class="calendar-cell {% if day.completed %}completed{% elif not day.date %}empty{% endif %}">
+                                {% if day.date %}
+                                    {{ day.date|date:"j" }}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
                     {% endfor %}
-                {% endfor %}
+                </div>
             </div>
         </div>
     </div>
