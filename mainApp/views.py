@@ -29,6 +29,8 @@ from .tasks import *
 from .utils import *
 from .models import *
 from .forms import *
+from .word_search import *
+
 
 @receiver(user_logged_in)
 def handle_login(sender, request, user, **kwargs):
@@ -108,50 +110,36 @@ def confirmation_view(request):
 @login_required
 def choose_action_view(request):
     required = request.user.is_authenticated
-    campaign_form = CampaignForm()
-    news_form = NewsForm()
-    reward_form = RewardsForm()
-    return render(request, 'choose_action.html', {
-        'required': required,
-        'campaign_form': campaign_form,
-        'news_form': news_form,
-        'reward_form': reward_form,
-    })
-
-@login_required
-def campaign_view(request):
-    required = request.user.is_authenticated  
     if request.method == 'POST':
-        form = CampaignForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()  # Save the form data to the database
+        campaign_form = CampaignForm(request.POST, request.FILES)
+        news_form = NewsForm(request.POST, request.FILES)
+        reward_form = RewardsForm(request.POST, request.FILES)
+        if campaign_form.is_valid():
+            campaign_form.save()  # Save the form data to the database
             return redirect('home')  # Redirect to the home page after successful save
-    else:
-        form = CampaignForm()  # Display an empty form on GET request
-
-    return render(request, 'create_campaign.html', {'form': form, 'required': required})
-
-def news_view(request):
-    required = request.user.is_authenticated
-    if request.method == 'POST':
-        form = NewsForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
+        if news_form.is_valid():
+            news_form.save()
+            return redirect('home') 
+        if reward_form.is_valid():
+            reward_form.save()
             return redirect('home')  
+        return render(request, 'choose_action.html', {
+            'required': required,
+            'campaign_form': campaign_form,
+            'news_form': news_form,
+            'reward_form': reward_form,
+        })
     else:
-        form = NewsForm()
-    return render(request, 'create_news.html', {'form': form, 'required': required})
+        campaign_form = CampaignForm()  # Display an empty form on GET request
+        news_form = NewsForm()
+        reward_form = RewardsForm()
+        return render(request, 'choose_action.html', {
+            'required': required,
+            'campaign_form': campaign_form,
+            'news_form': news_form,
+            'reward_form': reward_form,
+        })
 
-def create_reward(request):
-    required = request.user.is_authenticated
-    if request.method == 'POST':
-        form = RewardsForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('home')  
-    else:
-        form = RewardsForm()
-    return render(request, 'create_reward.html', {'form': form, 'required': required})
 
 @login_required
 def rewards_view(request):
@@ -437,7 +425,13 @@ def actions_view(request):
 
     # Retrieve tasks
     static_tasks = DailyTask.objects.filter(user=user, is_static=True)
+    word_of_the_day = choose_word()
+    generated_board = create_word_search(word_of_the_day)
+    board_string = get_board_string(generated_board)
     dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
+    for task in dynamic_tasks:
+        if task.title == "WORD OF THE DAY":
+            task.info = board_string
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
     # Calculate daily progress
