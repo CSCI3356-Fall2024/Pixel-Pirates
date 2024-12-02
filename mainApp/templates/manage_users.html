@@ -60,26 +60,27 @@
         const confirmModal = document.getElementById("confirmModal");
         confirmModal.style.display = "none";  
     });
-    
-    // Show the confirm modal when the button is clicked
+
     function showConfirmModal(event) {
         event.preventDefault();
         
         const button = event.currentTarget;
         const userId = button.getAttribute('data-user-id');
+        
+        // Debug to make sure we get the right userId
+        console.log("User ID:", userId);
 
         // Set the user ID in the hidden input field in the modal
         document.getElementById('userIdField').value = userId;
 
         // Update the form action to include the correct user ID in the URL
         const toggleForm = document.getElementById('toggleForm');
-        toggleForm.action = toggleForm.action.replace('0', userId);
-        
+        toggleForm.action = `/toggle-supervisor/${userId}/`;
+
         // Show the modal
         document.getElementById("confirmModal").style.display = "flex";
     }
 
-    // Hide the confirm modal
     function hideConfirmModal() {
         document.getElementById("confirmModal").style.display = "none";
     }
