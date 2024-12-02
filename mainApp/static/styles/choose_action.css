@@ -1,5 +1,4 @@
 body {
-    background-color: #DFEDE2;
     height: 100vh;
     overflow: hidden;
 }
@@ -9,7 +8,7 @@ body {
     flex-direction: column;
     height: 40%;
     width: 90%;
-    background: #B8D8BE;
+    background: white;
     align-items: center;
     justify-content: center;
     margin: 15% 5%;
@@ -17,19 +16,37 @@ body {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-    color: #49454F;
+.nav-tabs .nav-link.active {
+    background-color: #E8F4EA;
+    color: #40826D;
+    font-weight: bold;
+    border-color: #40826D;
 }
 
-button {
-    border-radius: 20px;
-    color: gray;
-    font-size: 20px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    border: 1px solid #D9D9D9;
-    background-color: white;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 5px 20px;
-    cursor: pointer;
+.nav-tabs .nav-link {
+    color: #73A497;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #E8F4EA;
+}
+
+.tab-content {
+    padding: 20px;
+    border-radius: 0.5rem;
+}
+
+.container h1 {
+    color: #007BFF;
+}
+
+button[type="submit"] {
+    background-color: #007BFF;
+    border-color: #007BFF;
+    color: white;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
 }

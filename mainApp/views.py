@@ -104,7 +104,15 @@ def confirmation_view(request):
 @login_required
 def choose_action_view(request):
     required = request.user.is_authenticated
-    return render(request, 'choose_action.html', {'required': required})
+    campaign_form = CampaignForm()
+    news_form = NewsForm()
+    reward_form = RewardsForm()
+    return render(request, 'choose_action.html', {
+        'required': required,
+        'campaign_form': campaign_form,
+        'news_form': news_form,
+        'reward_form': reward_form,
+    })
 
 @login_required
 def campaign_view(request):
