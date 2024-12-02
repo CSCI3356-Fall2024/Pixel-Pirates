@@ -2,6 +2,16 @@
 
 ## Delivery 6
 
+## Grace
+- working on
+    - photo upload to compelte task
+    - finish word search and integrate with tasks (not just views) and make interactive with javascript
+    - article quiz
+- done
+    - campaign, news, and rewards items are saved to database and show up on home page
+    - fix links for items on home page
+    - word search code and css
+
 ## Leah (currently tackling these -- mostly logic/buggy parts)
 - Leader ranking
     - Based on total points and user won’t fall on the leaderboard if they redeem their points
