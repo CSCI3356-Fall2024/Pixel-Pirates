@@ -22,10 +22,10 @@
             {% endif %}
         </div>
         <div class="profile-info">
-            <h2>{{ user.profile.name }}</h2>
+            <h2 style="color: #40826D; font-weight: bold;">{{ user.profile.name }}</h2>
             <p>{{ user.profile.points }} Points Earned This Week</p>
-            <p>Streak Status: {{ user.profile.streak_status }} Days</p>
-            <p>Streak Bonus: {{ user.profile.streak_bonus }}x</p>
+            <p>{{ streak_description }}</p>
+            <p>Streak Multiplier: {{ profile.streak_bonus }}x</p>
         </div>
     </div>
 
@@ -41,13 +41,9 @@
         <!-- Daily Tasks Section -->
         <div class="tasks-list">
             <h3>Daily Tasks</h3>
-            {% if dynamic_tasks %}
-                {% for task in dynamic_tasks %}
-                    {{ task.title }} - {{ task.completed }}
-                {% endfor %}
-            {% else %}
-                <p>No dynamic tasks found.</p>
-            {% endif %}
+            {% for task in dynamic_tasks %}
+                {% include 'actions_task.html' with task=task %}
+            {% endfor %}
 
             {% for task in static_tasks %}
                 {% include 'actions_task.html' with task=task %}

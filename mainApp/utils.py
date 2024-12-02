@@ -1,22 +1,24 @@
-from datetime import timedelta
+import calendar
+from datetime import date
 
-def generate_calendar(start_date, end_date, completed_dates):
-    from datetime import timedelta
-    import calendar
+def generate_calendar(year, month, completed_dates):
+    # Get the calendar for the month
+    cal = calendar.Calendar(firstweekday=calendar.SUNDAY)
+    month_days = cal.monthdayscalendar(year, month)  # Returns weeks with day numbers
 
-    days = []
-    current_date = start_date
-    while current_date <= end_date:
-        days.append({
-            'date': current_date,
-            'completed': str(current_date) in completed_dates,
-        })
-        current_date += timedelta(days=1)
-
-    # Pad the first week
-    first_weekday = start_date.weekday()
-    days = [{'date': None, 'completed': False}] * first_weekday + days
-
-    # Split into weeks (7 days each)
-    weeks = [days[i:i + 7] for i in range(0, len(days), 7)]
-    return weeks
+    # Build the calendar structure with completed status
+    calendar_weeks = []
+    for week in month_days:
+        week_data = []
+        for day in week:
+            if day == 0:  # Days outside the month
+                week_data.append({"date": None, "completed": False})
+            else:
+                day_date = date(year, month, day)
+                week_data.append({
+                    "date": day_date,
+                    "completed": day_date.strftime("%Y-%m-%d") in completed_dates
+                })
+        calendar_weeks.append(week_data)
+    
+    return calendar_weeks

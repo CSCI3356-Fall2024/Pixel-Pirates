@@ -10,7 +10,12 @@
 
 .profile-icon {
     font-size: 4rem; 
-    color: black;
+    color: #73A497;
+}
+
+.profile-info {
+    color: #659588;
+    font-weight: 500;
 }
 
 .profile-summary {

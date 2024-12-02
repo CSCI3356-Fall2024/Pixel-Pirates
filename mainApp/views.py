@@ -353,7 +353,7 @@ def actions_view(request):
     start_of_week = today - timedelta(days=today.weekday())
     end_of_week = start_of_week + timedelta(days=6)
     start_date = today - timedelta(days=30)  # Start date for streak calendar
-    
+
     # Get the month and year from the query parameters
     year = request.GET.get('year', today.year)
     month = request.GET.get('month', today.month)
@@ -385,7 +385,7 @@ def actions_view(request):
                 "value": f"{y}-{m:02d}",
                 "label": f"{date(y, m, 1).strftime('%B %Y')}"
             })
-    
+
     # Check for mandatory profile fields
     try:
         profile = user.profile
@@ -399,12 +399,11 @@ def actions_view(request):
     dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
-    # Calculate progress
-    total_tasks = static_tasks.count() + dynamic_tasks.count() + weekly_tasks.count()
+    # Calculate daily progress
+    total_tasks = static_tasks.count() + dynamic_tasks.count()
     completed_tasks = (
         static_tasks.filter(completed=True).count() +
-        dynamic_tasks.filter(completed=True).count() +
-        weekly_tasks.filter(completed=True).count()
+        dynamic_tasks.filter(completed=True).count()
     )
     daily_progress_percentage = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
 
@@ -422,6 +421,10 @@ def actions_view(request):
     current_streak = 0
     date_pointer = today
 
+    while date_pointer.strftime("%Y-%m-%d") in completed_dates:
+        current_streak += 1
+        date_pointer -= timedelta(days=1)
+
     # Calculate streak multiplier
     streak_multiplier = 1 + (current_streak // 7) * 0.1  # Increment multiplier by 0.1 for each 7 days
 
@@ -430,13 +433,15 @@ def actions_view(request):
     user.profile.streak_bonus = round(streak_multiplier, 1)  # Round multiplier to 1 decimal
     user.profile.save()
 
-    # Check if the user has consecutive streak days from today backward
-    while date_pointer.strftime("%Y-%m-%d") in completed_dates:
-        current_streak += 1
-        date_pointer -= timedelta(days=1)
+    # Adjust streak description for singular/plural
+    streak_description = (
+        f"{current_streak} Day Streak"
+        if current_streak == 1
+        else f"{current_streak} Days Streak"
+    )
 
     # Generate calendar
-    calendar_weeks = generate_calendar(first_day_of_month, last_day_of_month, completed_dates)
+    calendar_weeks = generate_calendar(year, month, completed_dates)
 
     # Referral task
     referral_task, created = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
@@ -445,19 +450,19 @@ def actions_view(request):
         'profile': user.profile,
         'static_tasks': static_tasks,
         'dynamic_tasks': dynamic_tasks,
-        'weekly_tasks': weekly_tasks,
+        'weekly_tasks': weekly_tasks,  # Add weekly tasks back to the context
         'referral_task': referral_task,
         'daily_progress_percentage': daily_progress_percentage,
         'calendar_weeks': calendar_weeks,
         'completed_dates': completed_dates,
-        "completed_dates": completed_dates,
         'month_year_options': available_months_years,
         'current_month_year': f"{year}-{month:02d}",
         'current_month': first_day_of_month.strftime("%B"),
-        "previous_month": previous_month,
-        "previous_year": previous_year,
-        "next_month": next_month,
-        "next_year": next_year,
+        'previous_month': previous_month,
+        'previous_year': previous_year,
+        'next_month': next_month,
+        'next_year': next_year,
+        'streak_description': streak_description,
         'required': True,
     }
     return render(request, 'actions.html', context)
