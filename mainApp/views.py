@@ -118,6 +118,17 @@ def news_view(request):
         form = NewsForm()
     return render(request, 'create_news.html', {'form': form, 'required': required})
 
+def quiz_view(request):
+    required = request.user.is_authenticated
+    if request.method == 'POST':
+        form = ArticleQuizForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  
+    else:
+        form = ArticleQuizForm()
+    return render(request, 'create_quiz.html', {'form': form, 'required': required})
+
 @login_required
 def choose_action_view(request):
     required = request.user.is_authenticated
@@ -125,6 +136,7 @@ def choose_action_view(request):
         campaign_form = CampaignForm(request.POST, request.FILES)
         news_form = NewsForm(request.POST, request.FILES)
         reward_form = RewardsForm(request.POST, request.FILES)
+        quiz_form = ArticleQuizForm(request.POST, request.FILES)
         if campaign_form.is_valid():
             campaign_form.save()  # Save the form data to the database
             return redirect('home')  # Redirect to the home page after successful save
@@ -134,21 +146,27 @@ def choose_action_view(request):
         if reward_form.is_valid():
             reward_form.save()
             return redirect('home')  
+        if quiz_form.is_valid():
+            quiz_form.save()
+            return redirect('home') 
         return render(request, 'choose_action.html', {
             'required': required,
             'campaign_form': campaign_form,
             'news_form': news_form,
             'reward_form': reward_form,
+            'quiz_form': quiz_form
         })
     else:
         campaign_form = CampaignForm()  # Display an empty form on GET request
         news_form = NewsForm()
         reward_form = RewardsForm()
+        quiz_form = ArticleQuizForm()
         return render(request, 'choose_action.html', {
             'required': required,
             'campaign_form': campaign_form,
             'news_form': news_form,
             'reward_form': reward_form,
+            'quiz_form': quiz_form
         })
 
 @login_required
