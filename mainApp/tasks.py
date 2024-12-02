@@ -7,7 +7,6 @@ from .task_helpers import *
 import logging
 logger = logging.getLogger(__name__)
 
-@shared_task
 def manage_daily_tasks():
     today = timezone.now().date()
 
@@ -28,11 +27,10 @@ def manage_daily_tasks():
             DailyTask.objects.update_or_create(
                 user=user,
                 title=task_data["title"],
+                is_static=True,  # Ensure static tasks are targeted
                 defaults={
                     "points": task_data["points"],
                     "completed": False,
-                    "is_static": task_data["is_static"],
-                    "completion_criteria": {'action_date': ''},
                 }
             )
 
@@ -41,17 +39,18 @@ def manage_daily_tasks():
             task, created = DailyTask.objects.update_or_create(
                 user=user,
                 title=task_data["title"],
+                is_static=False,
+                completion_criteria={'action_date': str(today)},  # Ensure this is unique
                 defaults={
                     "points": task_data["points"],
-                    "is_static": False,
-                    "completion_criteria": {'action_date': str(today)},
+                    "completed": False,
                 }
             )
-            logger.info(f"Dynamic Task {'created' if created else 'updated'}: {task.title} for {user.username}")
-            # If the task existed, reset its completed status
-            if not created:
-                task.completed = False
-                task.save()
+            if created:
+                logger.info(f"Dynamic Task created: {task.title} for {user.username}")
+            else:
+                logger.info(f"Dynamic Task exists: {task.title} for {user.username}")
+
 
 
 @shared_task

@@ -66,6 +66,10 @@
     grid-row: 3/5;
 }
 
+.weekly-task {
+    margin-top: 30px;
+}
+
 .task-item {
     display: flex;
     justify-content: space-between;
@@ -174,4 +178,55 @@ button.status:disabled:hover {
     background-color: #73A497;
     color: white;
     padding: 0 20px;
+}
+
+.calendar-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.streak-calendar {
+    margin: 20px auto;
+    text-align: center;
+    width: 100%;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-week {
+    display: contents;
+}
+
+.calendar-cell {
+    padding: 10px;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+.calendar-cell.completed {
+    background-color: #c8e6c9;
+    font-weight: bold;
+}
+
+#month-year-select {
+    border: none; 
+    background-color: transparent; 
+    font-size: 1rem;
+    padding: 5px; 
+    outline: none; 
+    cursor: pointer;
 }

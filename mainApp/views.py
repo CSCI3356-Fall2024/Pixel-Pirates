@@ -19,7 +19,10 @@ from django.db.models.functions import Rank
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.db.models.functions import RowNumber
+from calendar import monthrange
+from datetime import date
 
+from .utils import *
 from .models import *
 from .forms import *
 
@@ -349,8 +352,41 @@ def actions_view(request):
     today = timezone.now().date()
     start_of_week = today - timedelta(days=today.weekday())
     end_of_week = start_of_week + timedelta(days=6)
+    start_date = today - timedelta(days=30)  # Start date for streak calendar
     
-   # Check for mandatory profile fields
+    # Get the month and year from the query parameters
+    year = request.GET.get('year', today.year)
+    month = request.GET.get('month', today.month)
+
+    try:
+        # Ensure year and month are integers
+        year = int(year)
+        month = int(month)
+    except ValueError:
+        # Fallback to current year and month if conversion fails
+        year = today.year
+        month = today.month
+
+    # Calculate the first and last days of the selected month
+    first_day_of_month = date(year, month, 1)
+    last_day_of_month = date(year, month, monthrange(year, month)[1])
+
+    # Get the previous and next month for navigation
+    previous_month = month - 1 if month > 1 else 12
+    previous_year = year - 1 if month == 1 else year
+    next_month = month + 1 if month < 12 else 1
+    next_year = year + 1 if month == 12 else year
+
+    # Generate a list of months and years for the dropdown
+    available_months_years = []
+    for y in range(today.year - 2, today.year + 3):  # 2 years before and after the current year
+        for m in range(1, 13):
+            available_months_years.append({
+                "value": f"{y}-{m:02d}",
+                "label": f"{date(y, m, 1).strftime('%B %Y')}"
+            })
+    
+    # Check for mandatory profile fields
     try:
         profile = user.profile
         if not (profile.name and profile.school and profile.major and profile.graduation_year):
@@ -358,16 +394,12 @@ def actions_view(request):
     except Profile.DoesNotExist:
         return redirect('profile')
 
-    # Retrieve static tasks (e.g., recurring daily tasks)
+    # Retrieve tasks
     static_tasks = DailyTask.objects.filter(user=user, is_static=True)
-    
-    # Retrieve dynamic tasks for today (e.g., changing daily tasks)
     dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
-
-    #weekly tasks 
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
-     # Calculate progress
+    # Calculate progress
     total_tasks = static_tasks.count() + dynamic_tasks.count() + weekly_tasks.count()
     completed_tasks = (
         static_tasks.filter(completed=True).count() +
@@ -376,8 +408,22 @@ def actions_view(request):
     )
     daily_progress_percentage = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
 
-    # Fetch or create an open referral task for the current user
-    referral_task, created = ReferralTask.objects.get_or_create(referrer=request.user, completed=False, defaults={'points': 10})
+    # Completed dates for streaks
+    streak_days = DailyTask.objects.filter(
+        user=user,
+        completed=True,
+        is_static=False,
+        completion_criteria__action_date__gte=str(start_date),
+        completion_criteria__action_date__lte=str(today)
+    ).values_list('completion_criteria__action_date', flat=True)
+    completed_dates = set(streak_days)
+
+    # Generate calendar
+    calendar_weeks = generate_calendar(first_day_of_month, last_day_of_month, completed_dates)
+
+
+    # Referral task
+    referral_task, created = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
 
     context = {
         'profile': profile,
@@ -386,9 +432,20 @@ def actions_view(request):
         'weekly_tasks': weekly_tasks,
         'referral_task': referral_task,
         'daily_progress_percentage': daily_progress_percentage,
-        'required': True
+        'calendar_weeks': calendar_weeks,
+        'completed_dates': completed_dates,
+        "completed_dates": completed_dates,
+        'month_year_options': available_months_years,
+        'current_month_year': f"{year}-{month:02d}",
+        'current_month': first_day_of_month.strftime("%B"),
+        "previous_month": previous_month,
+        "previous_year": previous_year,
+        "next_month": next_month,
+        "next_year": next_year,
+        'required': True,
     }
     return render(request, 'actions.html', context)
+
 
 # def actions_view(request):
 #     # Ensure the user has a complete profile

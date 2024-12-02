@@ -180,9 +180,13 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
-    'reset-daily-tasks-every-midnight': {
+     'reset-daily-tasks': {
         'task': 'mainApp.tasks.manage_daily_tasks',
-        'schedule': crontab(minute=0, hour=0),  # Runs every day at midnight
+        'schedule': crontab(hour=0, minute=0),
+    },
+    'reset-weekly-tasks': {
+        'task': 'mainApp.tasks.generate_weekly_tasks',
+        'schedule': crontab(hour=0, minute=0, day_of_week=1),  # Monday at midnight
     },
 }
 
