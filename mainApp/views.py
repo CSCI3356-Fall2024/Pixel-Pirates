@@ -104,15 +104,35 @@ def confirmation_view(request):
 @login_required
 def choose_action_view(request):
     required = request.user.is_authenticated
-    campaign_form = CampaignForm()
-    news_form = NewsForm()
-    reward_form = RewardsForm()
-    return render(request, 'choose_action.html', {
-        'required': required,
-        'campaign_form': campaign_form,
-        'news_form': news_form,
-        'reward_form': reward_form,
-    })
+    if request.method == 'POST':
+        campaign_form = CampaignForm(request.POST, request.FILES)
+        news_form = NewsForm(request.POST, request.FILES)
+        reward_form = RewardsForm(request.POST, request.FILES)
+        if campaign_form.is_valid():
+            campaign_form.save()  # Save the form data to the database
+            return redirect('home')  # Redirect to the home page after successful save
+        if news_form.is_valid():
+            news_form.save()
+            return redirect('home') 
+        if reward_form.is_valid():
+            reward_form.save()
+            return redirect('home')  
+        return render(request, 'choose_action.html', {
+            'required': required,
+            'campaign_form': campaign_form,
+            'news_form': news_form,
+            'reward_form': reward_form,
+        })
+    else:
+        campaign_form = CampaignForm()  # Display an empty form on GET request
+        news_form = NewsForm()
+        reward_form = RewardsForm()
+        return render(request, 'choose_action.html', {
+            'required': required,
+            'campaign_form': campaign_form,
+            'news_form': news_form,
+            'reward_form': reward_form,
+        })
 
 @login_required
 def campaign_view(request):
@@ -147,7 +167,7 @@ def create_reward(request):
             return redirect('home')  
     else:
         form = RewardsForm()
-    return render(request, 'create_reward.html', {'form': form, 'required': required})
+    return render(request, 'create_reward.html', {'form': form, 'required' : required})
 
 @login_required
 def rewards_view(request):

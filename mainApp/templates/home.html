@@ -110,7 +110,7 @@
                             </div>
                             <!-- Title and Edit Icon -->
                             <div class="flex-grow-1 d-flex justify-content-between text-end">
-                                <span class="flex-grow-1">{{ news.display_title }}</span>
+                                <a href="{{ news.external_url }}" target="_blank">{{ news.display_title }}</a>
                                 {% if user.is_superuser %}
                                 <a href="{% url 'edit_news' news.id %}" class="edit-icon ms-3">
                                     <i class="fas fa-pen"></i>
@@ -132,7 +132,7 @@
                             </div>
                             <!-- Title and Edit Icon -->
                             <div class="d-flex flex-grow-1 justify-content-between text-end">
-                                <span class="flex-grow-1">{{ campaign.title }}</span>
+                                <a href="{% url 'actions' %}">{{ campaign.title }}</a>
                                 {% if user.is_superuser %}
                                 <a href="{% url 'edit_campaign' campaign.id %}" class="edit-icon ms-3">
                                     <i class="fas fa-pen"></i>
