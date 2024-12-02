@@ -10,6 +10,8 @@ from django.utils.timezone import now
 from django.dispatch import receiver
 from django.db import IntegrityError
 from django.db.models import F
+from django.http import HttpResponse
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from allauth.account.signals import user_logged_in
 from datetime import timedelta, time
 import json
@@ -19,9 +21,16 @@ from django.db.models.functions import Rank
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.db.models.functions import RowNumber
+from calendar import monthrange
+from datetime import date
+from django.db.models import Count
 
+from .tasks import *
+from .utils import *
 from .models import *
 from .forms import *
+from .word_search import *
+
 
 @receiver(user_logged_in)
 def handle_login(sender, request, user, **kwargs):
@@ -98,10 +107,49 @@ def confirmation_view(request):
     }
     return render(request, "confirmation.html", context)
 
+def news_view(request):
+    required = request.user.is_authenticated
+    if request.method == 'POST':
+        form = NewsForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  
+    else:
+        form = NewsForm()
+    return render(request, 'create_news.html', {'form': form, 'required': required})
+
 @login_required
 def choose_action_view(request):
     required = request.user.is_authenticated
-    return render(request, 'choose_action.html', {'required': required})
+    if request.method == 'POST':
+        campaign_form = CampaignForm(request.POST, request.FILES)
+        news_form = NewsForm(request.POST, request.FILES)
+        reward_form = RewardsForm(request.POST, request.FILES)
+        if campaign_form.is_valid():
+            campaign_form.save()  # Save the form data to the database
+            return redirect('home')  # Redirect to the home page after successful save
+        if news_form.is_valid():
+            news_form.save()
+            return redirect('home') 
+        if reward_form.is_valid():
+            reward_form.save()
+            return redirect('home')  
+        return render(request, 'choose_action.html', {
+            'required': required,
+            'campaign_form': campaign_form,
+            'news_form': news_form,
+            'reward_form': reward_form,
+        })
+    else:
+        campaign_form = CampaignForm()  # Display an empty form on GET request
+        news_form = NewsForm()
+        reward_form = RewardsForm()
+        return render(request, 'choose_action.html', {
+            'required': required,
+            'campaign_form': campaign_form,
+            'news_form': news_form,
+            'reward_form': reward_form,
+        })
 
 @login_required
 def campaign_view(request):
@@ -116,27 +164,6 @@ def campaign_view(request):
 
     return render(request, 'create_campaign.html', {'form': form, 'required': required})
 
-def news_view(request):
-    required = request.user.is_authenticated
-    if request.method == 'POST':
-        form = NewsForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('home')  
-    else:
-        form = NewsForm()
-    return render(request, 'create_news.html', {'form': form, 'required': required})
-
-def create_reward(request):
-    required = request.user.is_authenticated
-    if request.method == 'POST':
-        form = RewardsForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('home')  
-    else:
-        form = RewardsForm()
-    return render(request, 'create_reward.html', {'form': form, 'required': required})
 
 @login_required
 def rewards_view(request):
@@ -157,6 +184,17 @@ def rewards_view(request):
     }
     return render(request, 'rewards.html', context)
 
+def create_reward(request):
+    required = request.user.is_authenticated
+    if request.method == 'POST':
+        form = RewardsForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  
+    else:
+        form = RewardsForm()
+    return render(request, 'create_reward.html', {'form': form, 'required': required})
+
 @login_required
 def redeem_reward(request):
     if request.method == 'POST':
@@ -168,6 +206,8 @@ def redeem_reward(request):
 
         profile = request.user.profile
         profile.points -= reward.points
+        reward.amount -= 1
+        reward.save()
         profile.save()
 
         Redeemed.objects.create(
@@ -346,8 +386,70 @@ def actions_view(request):
     today = timezone.now().date()
     start_of_week = today - timedelta(days=today.weekday())
     end_of_week = start_of_week + timedelta(days=6)
-    
-   # Check for mandatory profile fields
+    start_date = today - timedelta(days=30)  # Start date for streak calendar
+
+    # Check if the request is to schedule tasks
+    if request.method == "POST" and request.POST.get("schedule_tasks"):
+        # Daily tasks schedule
+        interval, _ = IntervalSchedule.objects.get_or_create(
+            every=1,  # Change to a smaller interval for debugging, e.g., 1 minute
+            period=IntervalSchedule.MINUTES,
+        )
+
+        PeriodicTask.objects.get_or_create(
+            interval=interval,
+            name="Generate Daily Tasks",
+            task="mainApp.tasks.generate_daily_tasks",
+        )
+
+        # Weekly tasks schedule
+        weekly_interval, _ = IntervalSchedule.objects.get_or_create(
+            every=7,
+            period=IntervalSchedule.DAYS,
+        )
+
+        PeriodicTask.objects.get_or_create(
+            interval=weekly_interval,
+            name="Generate Weekly Tasks",
+            task="mainApp.tasks.generate_weekly_tasks",
+        )
+
+        return JsonResponse({"success": True, "message": "Daily and Weekly tasks scheduled successfully."})
+
+
+    # Get the month and year from the query parameters
+    year = request.GET.get('year', today.year)
+    month = request.GET.get('month', today.month)
+
+    try:
+        # Ensure year and month are integers
+        year = int(year)
+        month = int(month)
+    except ValueError:
+        # Fallback to current year and month if conversion fails
+        year = today.year
+        month = today.month
+
+    # Calculate the first and last days of the selected month
+    first_day_of_month = date(year, month, 1)
+    last_day_of_month = date(year, month, monthrange(year, month)[1])
+
+    # Get the previous and next month for navigation
+    previous_month = month - 1 if month > 1 else 12
+    previous_year = year - 1 if month == 1 else year
+    next_month = month + 1 if month < 12 else 1
+    next_year = year + 1 if month == 12 else year
+
+    # Generate a list of months and years for the dropdown
+    available_months_years = []
+    for y in range(today.year - 2, today.year + 3):  # 2 years before and after the current year
+        for m in range(1, 13):
+            available_months_years.append({
+                "value": f"{y}-{m:02d}",
+                "label": f"{date(y, m, 1).strftime('%B %Y')}"
+            })
+
+    # Check for mandatory profile fields
     try:
         profile = user.profile
         if not (profile.name and profile.school and profile.major and profile.graduation_year):
@@ -355,78 +457,93 @@ def actions_view(request):
     except Profile.DoesNotExist:
         return redirect('profile')
 
-    # Retrieve static tasks (e.g., recurring daily tasks)
+    # Retrieve tasks
     static_tasks = DailyTask.objects.filter(user=user, is_static=True)
-    
-    # Retrieve dynamic tasks for today (e.g., changing daily tasks)
+    word_of_the_day = choose_word()
+    generated_board = create_word_search(word_of_the_day)
+    board_string = get_board_string(generated_board)
     dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
-
-    #weekly tasks 
+    for task in dynamic_tasks:
+        if task.title == "WORD OF THE DAY":
+            task.info = board_string
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
-     # Calculate progress
-    total_tasks = static_tasks.count() + dynamic_tasks.count() + weekly_tasks.count()
+    # Calculate daily progress
+    total_tasks = static_tasks.count() + dynamic_tasks.count()
     completed_tasks = (
         static_tasks.filter(completed=True).count() +
-        dynamic_tasks.filter(completed=True).count() +
-        weekly_tasks.filter(completed=True).count()
+        dynamic_tasks.filter(completed=True).count()
     )
     daily_progress_percentage = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
 
-    # Fetch or create an open referral task for the current user
-    referral_task, created = ReferralTask.objects.get_or_create(referrer=request.user, completed=False, defaults={'points': 10})
+    # Get completed dates for streaks
+    completed_dates = (
+        DailyTask.objects.filter(
+            user=user,
+            completed=True,
+            is_static=False,
+            completion_criteria__action_date__gte=str(start_date),
+            completion_criteria__action_date__lte=str(today)
+        )
+        .values('completion_criteria__action_date')
+        .annotate(completed_task_count=Count('id'))  # Count the number of completed tasks per date
+        .filter(completed_task_count=2)  # Ensure both tasks are completed on the same day
+        .values_list('completion_criteria__action_date', flat=True)
+    )
+
+    # Convert to a set for easy lookup
+    completed_dates_set = set(completed_dates)
+
+    # Calculate streak status (current streak)
+    current_streak = 0
+    date_pointer = today
+
+    while date_pointer.strftime("%Y-%m-%d") in completed_dates_set:
+        current_streak += 1
+        date_pointer -= timedelta(days=1)
+
+    # Calculate streak multiplier
+    streak_multiplier = 1 + (current_streak // 7) * 0.1  # Increment multiplier by 0.1 for each 7 days
+
+    # Update the profile dynamically
+    user.profile.streak_status = current_streak
+    user.profile.streak_bonus = round(streak_multiplier, 1)  # Round multiplier to 1 decimal
+    user.profile.save()
+
+    # Adjust streak description for singular/plural
+    streak_description = (
+        f"{current_streak} Day Streak"
+        if current_streak == 1
+        else f"{current_streak} Days Streak"
+    )
+
+    # Generate calendar
+    calendar_weeks = generate_calendar(year, month, completed_dates)
+
+    # Referral task
+    referral_task, created = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
 
     context = {
-        'profile': profile,
+        'profile': user.profile,
         'static_tasks': static_tasks,
         'dynamic_tasks': dynamic_tasks,
-        'weekly_tasks': weekly_tasks,
+        'weekly_tasks': weekly_tasks,  # Add weekly tasks back to the context
         'referral_task': referral_task,
         'daily_progress_percentage': daily_progress_percentage,
-        'required': True
+        'calendar_weeks': calendar_weeks,
+        'completed_dates': completed_dates,
+        'month_year_options': available_months_years,
+        'current_month_year': f"{year}-{month:02d}",
+        'current_month': first_day_of_month.strftime("%B"),
+        'previous_month': previous_month,
+        'previous_year': previous_year,
+        'next_month': next_month,
+        'next_year': next_year,
+        'streak_description': streak_description,
+        'required': True,
     }
     return render(request, 'actions.html', context)
 
-# def actions_view(request):
-#     # Ensure the user has a complete profile
-#     profile = request.user.profile
-#     if not (profile.name and profile.school and profile.major and profile.graduation_year):
-#         return redirect('profile')
-
-#     # Get today's date for filtering daily tasks
-#     today = timezone.now().date()
-
-#     # Retrieve daily tasks associated with the user
-#     daily_tasks_different = DailyTask.objects.filter(user=request.user, title__in=["WORD OF THE DAY", "PICTURE IN ACTION"])
-#     daily_tasks_same = DailyTask.objects.filter(user=request.user, title__in=["COMPOSTING", "RECYCLING", "GREEN2GO CONTAINER"])
-
-#     # Retrieve the weekly task for the user (assuming one weekly task per user)
-#     weekly_task = WeeklyTask.objects.filter(user=request.user).first()
-
-#     # Retrieve an active referral task if available
-#     referral_task = ReferralTask.objects.filter(referrer=request.user, completed=False).first()
-
-#     # Calculate daily progress as a percentage based on completed tasks
-#     total_daily_tasks = daily_tasks_different.count() + daily_tasks_same.count()
-#     completed_daily_tasks = daily_tasks_different.filter(completed=True).count() + daily_tasks_same.filter(completed=True).count()
-#     daily_progress_percentage = (completed_daily_tasks / total_daily_tasks * 100) if total_daily_tasks > 0 else 0
-
-#     # Example static data for calendar weeks; ideally, this would be dynamically generated
-#     calendar_weeks = [
-#         [{'day': 1, 'is_today': False, 'is_streak': False}, {'day': 2, 'is_today': True, 'is_streak': True}, ...],
-#     ]
-
-#     # Pass all data to the template
-#     context = {
-#         'profile': profile,
-#         'daily_tasks_different': daily_tasks_different,
-#         'daily_tasks_same': daily_tasks_same,
-#         'weekly_task': weekly_task,
-#         'referral_task': referral_task,
-#         'daily_progress_percentage': daily_progress_percentage,
-#         'calendar_weeks': calendar_weeks,
-#     }
-#     return render(request, 'actions.html', context)
 
 @csrf_exempt
 @login_required
@@ -463,3 +580,59 @@ def complete_task(request, task_id):
         return JsonResponse({"success": True, "points_added": points_to_add}, status=200)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+# def run_daily_task(request):
+#     """Manually trigger the daily tasks."""
+#     generate_daily_tasks.delay()
+#     return HttpResponse("Daily tasks started!")
+
+# def run_weekly_task(request):
+#     """Manually trigger the weekly tasks."""
+#     generate_weekly_tasks.delay()
+#     return HttpResponse("Weekly tasks started!")
+
+# def schedule_tasks(request):
+#     """Schedule daily and weekly tasks using django-celery-beat."""
+#     # Daily tasks schedule
+#     interval, _ = IntervalSchedule.objects.get_or_create(
+#         every=1,
+#         period=IntervalSchedule.MINUTES,
+#     )
+
+#     PeriodicTask.objects.get_or_create(
+#         interval=interval,
+#         name="Generate Daily Tasks",
+#         task="mainApp.tasks.generate_daily_tasks",
+#     )
+
+#     # Weekly tasks schedule
+#     weekly_interval, _ = IntervalSchedule.objects.get_or_create(
+#         every=7,
+#         period=IntervalSchedule.DAYS,
+#     )
+
+#     PeriodicTask.objects.get_or_create(
+#         interval=weekly_interval,
+#         name="Generate Weekly Tasks",
+#         task="mainApp.tasks.generate_weekly_tasks",
+#     )
+
+#     return HttpResponse("Daily and Weekly tasks scheduled!")
+
+# def index(request):
+#     my_task.delay()
+#     return HttpResponse("Task Started")
+
+# def schedule_task(request):
+#     interval, _ = IntervalSchedule.objects.get_or_create(
+#         every=1,
+#         period=IntervalSchedule.MINUTES,
+#     )
+
+#     PeriodicTask.objects.get_or_create(
+#         interval=interval,
+#         name="My Tasks",
+#         task="mainApp.tasks.generate_daily_tasks",
+#     )
+
+#     return HttpResponse("Task Scheduled")

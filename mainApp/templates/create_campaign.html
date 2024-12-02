@@ -1,9 +1,8 @@
-{% extends 'base.html' %}
+
 {% load static widget_tweaks %}  
 
 {% block title %}Campaign{% endblock %}
 
-{% block content %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'styles/create_form.css' %}">
@@ -94,7 +93,7 @@
 
         <div class="col-md-6">
             <label for="id_location" class="form-label">Location(s)</label>
-            {% render_field form.location class="form-control multiselect-target" multiselect-select-all="true" %}
+            {% render_field form.location class="form-control multiselect-target" multiselect-select-all="true" placeholder="Select Locations(s)" %}
         </div>
 
         <div class="col-md-12">
@@ -107,4 +106,3 @@
     </div>
 </form>
 
-{% endblock %}

@@ -22,16 +22,16 @@
             {% endif %}
         </div>
         <div class="profile-info">
-            <h2>{{ user.profile.name }}</h2>
+            <h2 style="color: #40826D; font-weight: bold;">{{ user.profile.name }}</h2>
             <p>{{ user.profile.points }} Points Earned This Week</p>
-            <p>Streak Status: {{ user.profile.streak_status }} Days</p>
-            <p>Streak Bonus: {{ user.profile.streak_bonus }}x</p>
+            <p>{{ streak_description }}</p>
+            <p>Streak Multiplier: {{ profile.streak_bonus }}x</p>
         </div>
     </div>
 
     <!-- Daily Progress Section -->
     <div class="daily-progress">
-        <h3>Daily Progress</h3>
+        <h5>Daily Progress</h5>
         <div class="progress-bar">
             <div class="progress-bar-fill" style="width: calc({{ daily_progress_percentage|default:0 }}%);"></div>
         </div>
@@ -40,7 +40,7 @@
 
         <!-- Daily Tasks Section -->
         <div class="tasks-list">
-            <h3>Daily Tasks</h3>
+            <h5>Daily Tasks</h5>
             {% for task in dynamic_tasks %}
                 {% include 'actions_task.html' with task=task %}
             {% endfor %}
@@ -54,24 +54,58 @@
     
 
     <!-- Streak Calendar Section -->
-    <div class="calendar-container">
-        <h4>Streaks</h4>
-        <div class="calendar">
-            {% for week in calendar_weeks %}
-                <div class="calendar-week">
-                    {% for day in week %}
-                        <div class="calendar-day {% if day.is_today %}today{% endif %} {% if day.is_streak %}streak{% endif %}">
-                            {{ day.day }}
-                        </div>
+    
+        <div class="calendar-container"> 
+            <h5>Streaks</h5>
+            <div class="streaks">
+            <div class="calendar-navigation">
+                <div class="month-text"> 
+                    <form method="get" class="calendar-controls">
+                        <select name="month_year" id="month-year-select" onchange="this.form.submit()">
+                            {% for date_option in month_year_options %}
+                                <option value="{{ date_option.value }}" {% if date_option.value == current_month_year %}selected{% endif %}>
+                                    {{ date_option.label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+
+                <div class="month-navigation">
+                    <a href="?month={{ previous_month }}&year={{ previous_year }}" class="btn">&lt;</a>   
+                    <a href="?month={{ next_month }}&year={{ next_year }}" class="btn"> &gt;</a>
+                </div>
+            </div>
+            
+            <div class="streak-calendar">
+                <div class="calendar-header">
+                    <div class="calendar-cell week-title">Sun</div>
+                    <div class="calendar-cell week-title">Mon</div>
+                    <div class="calendar-cell week-title">Tue</div>
+                    <div class="calendar-cell week-title">Wed</div>
+                    <div class="calendar-cell week-title">Thu</div>
+                    <div class="calendar-cell week-title">Fri</div>
+                    <div class="calendar-cell week-title">Sat</div>
+                </div>
+            
+                <div class="calendar">
+                    {% for week in calendar_weeks %}
+                        {% for day in week %}
+                            <div class="calendar-cell {% if day.completed %}completed{% elif not day.date %}empty{% endif %}">
+                                {% if day.date %}
+                                    {{ day.date|date:"j" }}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
                     {% endfor %}
                 </div>
-            {% endfor %}
+            </div>
         </div>
     </div>
-
+    
     <!-- Weekly Task Section -->
     <div class="weekly-task">
-        <h3>Weekly Tasks</h3>
+        <h5>Weekly Tasks</h5>
         {% for task in weekly_tasks %}
         {% include 'actions_task.html' with task=task %}
         {% endfor %}
@@ -79,7 +113,7 @@
 
     <!-- Referral Section -->
     <div class="referral-task">
-        <h3>Referral</h3>
+        <h5>Referral</h5>
         {% if referral_task %}
             {% include 'actions_task.html' with task=referral_task %}
         {% endif %}

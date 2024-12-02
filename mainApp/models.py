@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from multiselectfield import MultiSelectField
 from .choices import MAJOR_CHOICES, MINOR_CHOICES, SCHOOL_CHOICES
+from django.utils.timezone import now
 
 class Profile(models.Model):
     username = models.OneToOneField(User, on_delete=models.CASCADE) #this is just the user itself, not the actual username of the user
@@ -20,6 +21,7 @@ class Profile(models.Model):
     current_rank = models.IntegerField(null=True, blank=True)
     last_points_update = models.DateTimeField(default=timezone.now)
     rank_change = models.IntegerField(default=0, null=True)
+    streak_status = models.IntegerField(default=0)
 
     def update_points(self, new_points):
         self.points = new_points
@@ -81,50 +83,23 @@ class News(models.Model):
         return self.display_title
     
 class DailyTask(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='daily_tasks')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
     points = models.IntegerField(default=0)
-    completed = models.BooleanField(default=False)
-    is_static = models.BooleanField(default=True)
+    is_static = models.BooleanField(default=False)
     completion_criteria = models.JSONField(default=dict)
-
-    def check_completion(self):
-        today = timezone.now().date()
-        action_date = self.completion_criteria.get('aciton_date')
-
-        if action_date == str(today):
-            self.completed = True
-            self.user.profile.points += self.points  
-            self.user.profile.save()
-            self.save()
-
-    def __str__(self):
-        return f"{self.title} - {'Completed' if self.completed else 'Open'}"
-
+    completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=now)
 
 class WeeklyTask(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="weekly_tasks")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+    description = models.TextField()
     points = models.IntegerField(default=0)
-    completed = models.BooleanField(default=False)
     start_date = models.DateField()
     end_date = models.DateField()
-    completion_criteria = models.JSONField(default=dict)
+    completed = models.BooleanField(default=False,)
 
-    def check_completion(self):
-        today = timezone.now().date()
-
-        if self.start_date <= today <= self.end_date and self.completion_criteria.get('criteria_met'):
-            self.completed = True
-            self.user.profile.points += self.points  
-            self.user.profile.save()
-            self.save()
-    
-    def __str__(self):
-        return f"{self.title} - {'Completed' if self.completed else 'Open'}"
-    
 class ReferralTask(models.Model):
     referrer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='referrals')
     referee_email = models.EmailField()
@@ -157,6 +132,7 @@ class Rewards(models.Model):
     time_end = models.TimeField()
     description = models.TextField(max_length=500)
     points = models.IntegerField(default=0)
+    amount = models.IntegerField(default=0)
                                  
     def __str__(self):
         return self.title

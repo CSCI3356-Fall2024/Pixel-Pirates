@@ -89,7 +89,7 @@ class RewardsForm(forms.ModelForm):
     class Meta:
         model = Rewards
         fields = ['title', 'date_begin', 
-                  'date_end', 'time_begin', 'time_end', 'description', 'points']
+                  'date_end', 'time_begin', 'time_end', 'description', 'points', 'amount']
         widgets = {
             'date_begin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_end': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -108,3 +108,5 @@ class RewardsForm(forms.ModelForm):
             raise ValidationError("End date must be on or after the start date.")
 
         return cleaned_data
+    
+

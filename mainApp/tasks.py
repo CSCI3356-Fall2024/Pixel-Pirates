@@ -3,12 +3,24 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from .models import DailyTask, WeeklyTask
 from datetime import timedelta
-from .task_helpers import *
+from time import sleep
+import logging
+
+logger = logging.getLogger(__name__)
+
+@shared_task 
+def my_task():
+    for i in range(11): 
+        print(i)
+        sleep(1)
+    return "Task Completed"
 
 @shared_task
-def manage_daily_tasks():
+def generate_daily_tasks():
+    """Generate or reset daily tasks for all users."""
     today = timezone.now().date()
 
+    # Define static and dynamic daily tasks
     static_tasks = [
         {"title": "COMPOSTING", "points": 5, "is_static": True},
         {"title": "RECYCLING", "points": 5, "is_static": True},
@@ -21,42 +33,42 @@ def manage_daily_tasks():
     ]
 
     for user in User.objects.all():
-        # Reset static tasks or create them if they do not exist
-        for task_data in static_tasks:
+        # Create or update static tasks
+        for task in static_tasks:
             DailyTask.objects.update_or_create(
                 user=user,
-                title=task_data["title"],
+                title=task["title"],
+                is_static=True,
                 defaults={
-                    "points": task_data["points"],
+                    "points": task["points"],
                     "completed": False,
-                    "is_static": task_data["is_static"],
-                    "completion_criteria": {'action_date': ''},
                 }
             )
 
-        # Reset dynamic tasks or create them if they do not exist
-        for task_data in dynamic_tasks:
-            task, created = DailyTask.objects.update_or_create(
+        # Create or update dynamic tasks
+        for task in dynamic_tasks:
+            DailyTask.objects.update_or_create(
                 user=user,
-                title=task_data["title"],
+                title=task["title"],
+                is_static=False,
+                completion_criteria=task["completion_criteria"],
                 defaults={
-                    "points": task_data["points"],
-                    "is_static": False,
-                    "completion_criteria": {'action_date': str(today)},
+                    "points": task["points"],
+                    "completed": False,
                 }
             )
-            if not created:
-                # Reset completed status for existing dynamic tasks
-                task.completed = False
-                task.save()
+
+    logger.info("Daily tasks generated successfully.")
+
 
 @shared_task
 def generate_weekly_tasks():
     """Generate or update weekly tasks for all users."""
     today = timezone.now().date()
-    start_of_week = today - timedelta(days=today.weekday())  # Start of the current week
-    end_of_week = start_of_week + timedelta(days=6)         # End of the current week
+    start_of_week = today - timedelta(days=today.weekday())
+    end_of_week = start_of_week + timedelta(days=6)
 
+    # Define weekly tasks
     weekly_tasks = [
         {"title": "ARTICLE QUIZ", "points": 20, "description": "Complete the weekly quiz"}
     ]
@@ -74,3 +86,6 @@ def generate_weekly_tasks():
                     "end_date": end_of_week,
                 }
             )
+
+    logger.info("Weekly tasks generated successfully.")
+
