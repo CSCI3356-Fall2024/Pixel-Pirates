@@ -418,15 +418,31 @@ def actions_view(request):
     ).values_list('completion_criteria__action_date', flat=True)
     completed_dates = set(streak_days)
 
+    # Calculate streak status (current streak)
+    current_streak = 0
+    date_pointer = today
+
+    # Calculate streak multiplier
+    streak_multiplier = 1 + (current_streak // 7) * 0.1  # Increment multiplier by 0.1 for each 7 days
+
+    # Update the profile dynamically
+    user.profile.streak_status = current_streak
+    user.profile.streak_bonus = round(streak_multiplier, 1)  # Round multiplier to 1 decimal
+    user.profile.save()
+
+    # Check if the user has consecutive streak days from today backward
+    while date_pointer.strftime("%Y-%m-%d") in completed_dates:
+        current_streak += 1
+        date_pointer -= timedelta(days=1)
+
     # Generate calendar
     calendar_weeks = generate_calendar(first_day_of_month, last_day_of_month, completed_dates)
-
 
     # Referral task
     referral_task, created = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
 
     context = {
-        'profile': profile,
+        'profile': user.profile,
         'static_tasks': static_tasks,
         'dynamic_tasks': dynamic_tasks,
         'weekly_tasks': weekly_tasks,
