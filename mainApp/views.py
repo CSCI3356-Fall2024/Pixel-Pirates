@@ -10,6 +10,8 @@ from django.utils.timezone import now
 from django.dispatch import receiver
 from django.db import IntegrityError
 from django.db.models import F
+from django.http import HttpResponse
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from allauth.account.signals import user_logged_in
 from datetime import timedelta, time
 import json
@@ -21,7 +23,9 @@ from django.contrib.auth.models import User
 from django.db.models.functions import RowNumber
 from calendar import monthrange
 from datetime import date
+from django.db.models import Count
 
+from .tasks import *
 from .utils import *
 from .models import *
 from .forms import *
@@ -362,6 +366,35 @@ def actions_view(request):
     end_of_week = start_of_week + timedelta(days=6)
     start_date = today - timedelta(days=30)  # Start date for streak calendar
 
+    # Check if the request is to schedule tasks
+    if request.method == "POST" and request.POST.get("schedule_tasks"):
+        # Daily tasks schedule
+        interval, _ = IntervalSchedule.objects.get_or_create(
+            every=1,  # Change to a smaller interval for debugging, e.g., 1 minute
+            period=IntervalSchedule.MINUTES,
+        )
+
+        PeriodicTask.objects.get_or_create(
+            interval=interval,
+            name="Generate Daily Tasks",
+            task="mainApp.tasks.generate_daily_tasks",
+        )
+
+        # Weekly tasks schedule
+        weekly_interval, _ = IntervalSchedule.objects.get_or_create(
+            every=7,
+            period=IntervalSchedule.DAYS,
+        )
+
+        PeriodicTask.objects.get_or_create(
+            interval=weekly_interval,
+            name="Generate Weekly Tasks",
+            task="mainApp.tasks.generate_weekly_tasks",
+        )
+
+        return JsonResponse({"success": True, "message": "Daily and Weekly tasks scheduled successfully."})
+
+
     # Get the month and year from the query parameters
     year = request.GET.get('year', today.year)
     month = request.GET.get('month', today.month)
@@ -415,21 +448,29 @@ def actions_view(request):
     )
     daily_progress_percentage = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
 
-    # Completed dates for streaks
-    streak_days = DailyTask.objects.filter(
-        user=user,
-        completed=True,
-        is_static=False,
-        completion_criteria__action_date__gte=str(start_date),
-        completion_criteria__action_date__lte=str(today)
-    ).values_list('completion_criteria__action_date', flat=True)
-    completed_dates = set(streak_days)
+    # Get completed dates for streaks
+    completed_dates = (
+        DailyTask.objects.filter(
+            user=user,
+            completed=True,
+            is_static=False,
+            completion_criteria__action_date__gte=str(start_date),
+            completion_criteria__action_date__lte=str(today)
+        )
+        .values('completion_criteria__action_date')
+        .annotate(completed_task_count=Count('id'))  # Count the number of completed tasks per date
+        .filter(completed_task_count=2)  # Ensure both tasks are completed on the same day
+        .values_list('completion_criteria__action_date', flat=True)
+    )
+
+    # Convert to a set for easy lookup
+    completed_dates_set = set(completed_dates)
 
     # Calculate streak status (current streak)
     current_streak = 0
     date_pointer = today
 
-    while date_pointer.strftime("%Y-%m-%d") in completed_dates:
+    while date_pointer.strftime("%Y-%m-%d") in completed_dates_set:
         current_streak += 1
         date_pointer -= timedelta(days=1)
 
@@ -476,47 +517,6 @@ def actions_view(request):
     return render(request, 'actions.html', context)
 
 
-# def actions_view(request):
-#     # Ensure the user has a complete profile
-#     profile = request.user.profile
-#     if not (profile.name and profile.school and profile.major and profile.graduation_year):
-#         return redirect('profile')
-
-#     # Get today's date for filtering daily tasks
-#     today = timezone.now().date()
-
-#     # Retrieve daily tasks associated with the user
-#     daily_tasks_different = DailyTask.objects.filter(user=request.user, title__in=["WORD OF THE DAY", "PICTURE IN ACTION"])
-#     daily_tasks_same = DailyTask.objects.filter(user=request.user, title__in=["COMPOSTING", "RECYCLING", "GREEN2GO CONTAINER"])
-
-#     # Retrieve the weekly task for the user (assuming one weekly task per user)
-#     weekly_task = WeeklyTask.objects.filter(user=request.user).first()
-
-#     # Retrieve an active referral task if available
-#     referral_task = ReferralTask.objects.filter(referrer=request.user, completed=False).first()
-
-#     # Calculate daily progress as a percentage based on completed tasks
-#     total_daily_tasks = daily_tasks_different.count() + daily_tasks_same.count()
-#     completed_daily_tasks = daily_tasks_different.filter(completed=True).count() + daily_tasks_same.filter(completed=True).count()
-#     daily_progress_percentage = (completed_daily_tasks / total_daily_tasks * 100) if total_daily_tasks > 0 else 0
-
-#     # Example static data for calendar weeks; ideally, this would be dynamically generated
-#     calendar_weeks = [
-#         [{'day': 1, 'is_today': False, 'is_streak': False}, {'day': 2, 'is_today': True, 'is_streak': True}, ...],
-#     ]
-
-#     # Pass all data to the template
-#     context = {
-#         'profile': profile,
-#         'daily_tasks_different': daily_tasks_different,
-#         'daily_tasks_same': daily_tasks_same,
-#         'weekly_task': weekly_task,
-#         'referral_task': referral_task,
-#         'daily_progress_percentage': daily_progress_percentage,
-#         'calendar_weeks': calendar_weeks,
-#     }
-#     return render(request, 'actions.html', context)
-
 @csrf_exempt
 @login_required
 def complete_task(request, task_id):
@@ -552,3 +552,59 @@ def complete_task(request, task_id):
         return JsonResponse({"success": True, "points_added": points_to_add}, status=200)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+# def run_daily_task(request):
+#     """Manually trigger the daily tasks."""
+#     generate_daily_tasks.delay()
+#     return HttpResponse("Daily tasks started!")
+
+# def run_weekly_task(request):
+#     """Manually trigger the weekly tasks."""
+#     generate_weekly_tasks.delay()
+#     return HttpResponse("Weekly tasks started!")
+
+# def schedule_tasks(request):
+#     """Schedule daily and weekly tasks using django-celery-beat."""
+#     # Daily tasks schedule
+#     interval, _ = IntervalSchedule.objects.get_or_create(
+#         every=1,
+#         period=IntervalSchedule.MINUTES,
+#     )
+
+#     PeriodicTask.objects.get_or_create(
+#         interval=interval,
+#         name="Generate Daily Tasks",
+#         task="mainApp.tasks.generate_daily_tasks",
+#     )
+
+#     # Weekly tasks schedule
+#     weekly_interval, _ = IntervalSchedule.objects.get_or_create(
+#         every=7,
+#         period=IntervalSchedule.DAYS,
+#     )
+
+#     PeriodicTask.objects.get_or_create(
+#         interval=weekly_interval,
+#         name="Generate Weekly Tasks",
+#         task="mainApp.tasks.generate_weekly_tasks",
+#     )
+
+#     return HttpResponse("Daily and Weekly tasks scheduled!")
+
+# def index(request):
+#     my_task.delay()
+#     return HttpResponse("Task Started")
+
+# def schedule_task(request):
+#     interval, _ = IntervalSchedule.objects.get_or_create(
+#         every=1,
+#         period=IntervalSchedule.MINUTES,
+#     )
+
+#     PeriodicTask.objects.get_or_create(
+#         interval=interval,
+#         name="My Tasks",
+#         task="mainApp.tasks.generate_daily_tasks",
+#     )
+
+#     return HttpResponse("Task Scheduled")

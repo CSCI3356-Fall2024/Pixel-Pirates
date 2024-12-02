@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_celery_beat",
     "Pixel_Pirates",
     "widget_tweaks",
     'mainApp',
@@ -177,18 +178,7 @@ MEDIA_URL = '/media/'
 # CELERY Configuration
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
-from celery.schedules import crontab
-CELERY_BEAT_SCHEDULE = {
-     'reset-daily-tasks': {
-        'task': 'mainApp.tasks.manage_daily_tasks',
-        'schedule': crontab(hour=0, minute=0),
-    },
-    'reset-weekly-tasks': {
-        'task': 'mainApp.tasks.generate_weekly_tasks',
-        'schedule': crontab(hour=0, minute=0, day_of_week=1),  # Monday at midnight
-    },
-}
+CELERY_RESULT_EXTENDED = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
