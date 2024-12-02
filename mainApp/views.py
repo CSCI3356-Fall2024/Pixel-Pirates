@@ -206,6 +206,8 @@ def redeem_reward(request):
 
         profile = request.user.profile
         profile.points -= reward.points
+        reward.amount -= 1
+        reward.save()
         profile.save()
 
         Redeemed.objects.create(

@@ -49,22 +49,24 @@
             <div class="scrollable-section redeem p-4 rounded shadow">
                 <div class="title text-center"><h3>Redeem Rewards</h3></div>
                 {% for reward in available_rewards %}
-                    {% if profile.points >= reward.points %}
-                    <div class="reward bg-white p-3 rounded mb-3 shadow-sm" data-reward-id="{{ reward.id }}" onclick="showConfirmModal(event)">
-                        <span class="reward-item">{{ reward.title }}</span>
-                        <div class="reward-wrapper"> 
-                            <span class="reward-points">{{ reward.points }} points</span>
-                            <span class="reward-date">Available from: {{ reward.date_begin|date:"m/d" }}-{{ reward.date_end|date:"m/d" }}</span>
+                    {% if reward.amount > 0 %}
+                        {% if profile.points >= reward.points %}
+                        <div class="reward bg-white p-3 rounded mb-3 shadow-sm" data-reward-id="{{ reward.id }}" onclick="showConfirmModal(event)">
+                            <span class="reward-item">{{ reward.title }}</span>
+                            <div class="reward-wrapper"> 
+                                <span class="reward-points">{{ reward.points }} points</span>
+                                <span class="reward-date">Available from: {{ reward.date_begin|date:"m/d" }}-{{ reward.date_end|date:"m/d" }}</span>
+                            </div>
                         </div>
-                    </div>
-                    {% else %}
-                    <div class="ineligible-reward bg-white p-3 rounded mb-3 shadow-sm">
-                        <span class="reward-item">{{ reward.title }}</span>
-                        <div class="reward-wrapper"> 
-                            <span class="reward-points">{{ reward.points }} points</span>
-                            <span class="reward-date">Available from: {{ reward.date_begin|date:"m/d" }}-{{ reward.date_end|date:"m/d" }}</span>
+                        {% else %}
+                        <div class="ineligible-reward bg-white p-3 rounded mb-3 shadow-sm">
+                            <span class="reward-item">{{ reward.title }}</span>
+                            <div class="reward-wrapper"> 
+                                <span class="reward-points">{{ reward.points }} points</span>
+                                <span class="reward-date">Available from: {{ reward.date_begin|date:"m/d" }}-{{ reward.date_end|date:"m/d" }}</span>
+                            </div>
                         </div>
-                    </div>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
             </div>

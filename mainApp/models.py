@@ -131,6 +131,7 @@ class Rewards(models.Model):
     time_end = models.TimeField()
     description = models.TextField(max_length=500)
     points = models.IntegerField(default=0)
+    amount = models.IntegerField(default=0)
                                  
     def __str__(self):
         return self.title
