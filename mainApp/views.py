@@ -107,6 +107,17 @@ def confirmation_view(request):
     }
     return render(request, "confirmation.html", context)
 
+def news_view(request):
+    required = request.user.is_authenticated
+    if request.method == 'POST':
+        form = NewsForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  
+    else:
+        form = NewsForm()
+    return render(request, 'create_news.html', {'form': form, 'required': required})
+
 @login_required
 def choose_action_view(request):
     required = request.user.is_authenticated
@@ -140,6 +151,19 @@ def choose_action_view(request):
             'reward_form': reward_form,
         })
 
+@login_required
+def campaign_view(request):
+    required = request.user.is_authenticated  
+    if request.method == 'POST':
+        form = CampaignForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()  # Save the form data to the database
+            return redirect('home')  # Redirect to the home page after successful save
+    else:
+        form = CampaignForm()  # Display an empty form on GET request
+
+    return render(request, 'create_campaign.html', {'form': form, 'required': required})
+
 
 @login_required
 def rewards_view(request):
@@ -159,6 +183,17 @@ def rewards_view(request):
         'required': True
     }
     return render(request, 'rewards.html', context)
+
+def create_reward(request):
+    required = request.user.is_authenticated
+    if request.method == 'POST':
+        form = RewardsForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  
+    else:
+        form = RewardsForm()
+    return render(request, 'create_reward.html', {'form': form, 'required': required})
 
 @login_required
 def redeem_reward(request):

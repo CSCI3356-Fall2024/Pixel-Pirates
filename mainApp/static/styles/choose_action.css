@@ -1,20 +1,9 @@
 body {
     height: 100vh;
     overflow: hidden;
+    background-color: white;
 }
 
-.content {
-    display: flex;
-    flex-direction: column;
-    height: 40%;
-    width: 90%;
-    background: white;
-    align-items: center;
-    justify-content: center;
-    margin: 15% 5%;
-    border-radius: 20px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
 
 .nav-tabs .nav-link.active {
     background-color: #E8F4EA;
