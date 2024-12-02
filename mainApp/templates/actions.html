@@ -31,7 +31,7 @@
 
     <!-- Daily Progress Section -->
     <div class="daily-progress">
-        <h3>Daily Progress</h3>
+        <h5>Daily Progress</h5>
         <div class="progress-bar">
             <div class="progress-bar-fill" style="width: calc({{ daily_progress_percentage|default:0 }}%);"></div>
         </div>
@@ -40,7 +40,7 @@
 
         <!-- Daily Tasks Section -->
         <div class="tasks-list">
-            <h3>Daily Tasks</h3>
+            <h5>Daily Tasks</h5>
             {% for task in dynamic_tasks %}
                 {% include 'actions_task.html' with task=task %}
             {% endfor %}
@@ -55,6 +55,7 @@
 
     <!-- Streak Calendar Section -->
     <div class="calendar-container"> 
+        <h5>Streaks</h5>
         <div class="calendar-navigation">
             <div class="month-text"> 
                 <form method="get" class="calendar-controls">
@@ -101,7 +102,7 @@
     
     <!-- Weekly Task Section -->
     <div class="weekly-task">
-        <h3>Weekly Tasks</h3>
+        <h5>Weekly Tasks</h5>
         {% for task in weekly_tasks %}
         {% include 'actions_task.html' with task=task %}
         {% endfor %}
@@ -109,7 +110,7 @@
 
     <!-- Referral Section -->
     <div class="referral-task">
-        <h3>Referral</h3>
+        <h5>Referral</h5>
         {% if referral_task %}
             {% include 'actions_task.html' with task=referral_task %}
         {% endif %}

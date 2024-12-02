@@ -38,8 +38,10 @@
 .main {
     margin-left: 100px;
     padding: 10px;
-    height: 100vh;
     width: calc(100% - 100px);
+    transition: margin-left 0.3s ease;
+    margin-top: 30px;
+    height: 95%;
 }
 
 /* Hamburger Menu */
@@ -130,6 +132,3 @@
     transition: all 0.3s ease;
 }
 
-.main {
-    transition: margin-left 0.3s ease;
-}
