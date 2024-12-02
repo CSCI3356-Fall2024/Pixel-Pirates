@@ -147,3 +147,26 @@ class Redeemed(models.Model):
 
     def __str__(self):
         return self.title
+
+class ArticleQuiz(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=500)
+    article_url = models.URLField(max_length=500, blank=True, null=True)  # field for external URL to display on landing page
+    date_begin = models.DateField()
+    date_end = models.DateField()
+    time_begin = models.TimeField()
+    time_end = models.TimeField()
+    question_1 = models.CharField(max_length=100, null=True, blank=True)
+    q1_false_answer_1 = models.CharField(max_length=100, null=True, blank=True)
+    q1_false_answer_2 = models.CharField(max_length=100, null=True, blank=True)
+    q1_correct_answer = models.CharField(max_length=100, null=True, blank=True)
+    question_2 = models.CharField(max_length=100, null=True, blank=True)
+    q2_false_answer_1 = models.CharField(max_length=100, null=True, blank=True)
+    q2_false_answer_2 = models.CharField(max_length=100, null=True, blank=True)
+    q2_correct_answer = models.CharField(max_length=100, null=True, blank=True)
+    question_3 = models.CharField(max_length=100, null=True, blank=True)
+    q3_false_answer_1 = models.CharField(max_length=100, null=True, blank=True)
+    q3_false_answer_2 = models.CharField(max_length=100, null=True, blank=True)
+    q3_correct_answer = models.CharField(max_length=100, null=True, blank=True)
+    def __str__(self) -> str:
+        return self.title
