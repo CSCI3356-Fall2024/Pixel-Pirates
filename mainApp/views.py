@@ -25,6 +25,8 @@ from datetime import date
 from .utils import *
 from .models import *
 from .forms import *
+from .word_search import *
+
 
 @receiver(user_logged_in)
 def handle_login(sender, request, user, **kwargs):
@@ -390,7 +392,13 @@ def actions_view(request):
 
     # Retrieve tasks
     static_tasks = DailyTask.objects.filter(user=user, is_static=True)
+    word_of_the_day = choose_word()
+    generated_board = create_word_search(word_of_the_day)
+    board_string = get_board_string(generated_board)
     dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
+    for task in dynamic_tasks:
+        if task.title == "WORD OF THE DAY":
+            task.info = board_string
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
     # Calculate daily progress

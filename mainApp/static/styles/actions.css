@@ -256,3 +256,15 @@ button.status:disabled:hover {
     outline: none; 
     cursor: pointer;
 }
+.word-search-box {
+    display: flex;
+    padding: 10px;
+    padding-bottom: 0px;
+    word-wrap: break-word;
+    white-space: pre-wrap;  /* Preserve spaces and line breaks */
+    word-break: break-all;
+    border-radius: 10px;
+    box-shadow: 0px 3px rgba(0, 0, 0, 0.2);
+    font-family: monospace;
+    background-color: #DFEDE2;
+}
