@@ -22,6 +22,9 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="rewards-tab" data-bs-toggle="tab" data-bs-target="#rewards" type="button" role="tab" aria-controls="rewards" aria-selected="false">Rewards</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="article-quiz-tab" data-bs-toggle="tab" data-bs-target="#article-quiz" type="button" role="tab" aria-controls="article-quiz" aria-selected="false">Article Quiz</button>
+        </li>
     </ul>
 
     <div class="tab-content mt-4">
@@ -33,6 +36,9 @@
         </div>
         <div class="tab-pane fade" id="rewards" role="tabpanel" aria-labelledby="rewards-tab">
             {% include 'create_reward.html' with form=reward_form %}
+        </div>
+        <div class="tab-pane fade" id="article-quiz" role="tabpanel" aria-labelledby="article-quiz-tab">
+            {% include 'create_quiz.html' with form=quiz_form %}
         </div>
     </div>
     
