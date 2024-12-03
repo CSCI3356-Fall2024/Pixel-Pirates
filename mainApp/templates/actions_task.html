@@ -37,7 +37,6 @@
             onclick="markTaskCompleted('{{ task.id }}', this)"
         /> -->
         {{ task.title }}
-        {{ task.word }}
         {% if task.title == "WORD OF THE DAY" %}
         <div class="word-search-box">
             <p>{{ task.content }}</p>
