@@ -638,6 +638,19 @@ def complete_task(request, task_id):
         user_profile.points += points_to_add
         user_profile.save()
 
+        start = timezone.now() - timedelta(hours=5)
+        start_day = start.date()
+
+        History.objects.create(
+            user=task.user,
+            title=task.title,
+            date_created=start_day,
+            time_created=start.time(), 
+            points=task.points,
+            is_redeem=False,
+            location=None,
+        )
+
         return JsonResponse({"success": True, "points_added": points_to_add}, status=200)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)

@@ -80,7 +80,7 @@
                     <div class="history bg-white p-3 rounded mb-3 shadow-sm">
                         <span class="history-item">{{ item.title }}</span>
                         <div class="history-wrapper">
-                            <span class="history-points">{% if item.is_redeem %}-{% endif %}{{ item.points}} points</span>
+                            <span class="history-points">{% if item.is_redeem %}-{% else %}+{% endif %}{{ item.points}} points</span>
                             <span class="history-date">{{ item.date_created|date:"m/d/y" }}</span>
                         </div>
                     </div>
