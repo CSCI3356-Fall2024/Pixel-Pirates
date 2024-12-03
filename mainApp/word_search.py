@@ -4,7 +4,7 @@ import string
 # found code on https://medium.com/@msgold/creating-a-word-search-puzzle-b499533e938
 
 POSSIBLE_WORDS = ["RECYCLE", "REUSE", "REDUCE", "WATER", "GREEN2GO",
-                  "COMPOSTE", "POWER", "CONSERVE", "ENERGY", "NATURE",
+                  "COMPOST", "POWER", "CONSERVE", "ENERGY", "NATURE",
                   "WASTE", "CLEAN", "SCIENCE", "EARTH"]
 
 # place word in word search
