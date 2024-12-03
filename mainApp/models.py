@@ -205,3 +205,25 @@ class ArticleQuiz(models.Model):
     q3_correct_answer = models.CharField(max_length=100, null=True, blank=True)
     def __str__(self) -> str:
         return self.title
+    
+class History(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=500)
+    date_created = models.DateField()
+    time_created = models.TimeField()
+    points = models.IntegerField(default=0)
+    is_redeem = models.BooleanField(default=False)
+
+    LOCATION_CHOICES = [
+        ('Lower', 'Lower'),
+        ('McElroy', 'McElroy'),
+        ('Stuart', 'Stuart'),
+        ("Addie's", "Addie's"),
+        ("Eagle's Nest", "Eagle's Nest"),
+    ]
+    location = MultiSelectField(choices=LOCATION_CHOICES, null=True, blank=True)
+
+    
+
+    def __str__(self):
+        return self.title

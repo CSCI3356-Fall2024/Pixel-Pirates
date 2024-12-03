@@ -76,13 +76,15 @@
         <div class="col-lg-6 col-md-6">
             <div class="scrollable-section user-history p-4 rounded shadow">
                 <div class="title text-center"><h3>History</h3></div>
-                <div class="history bg-white p-3 rounded mb-3 shadow-sm">
-                    <span class="history-item">Bakery Item</span>
-                    <div class="history-wrapper">
-                        <span class="history-points">-50 points</span>
-                        <span class="history-date">10/1/2024</span>
+                {% for item in history_items %}
+                    <div class="history bg-white p-3 rounded mb-3 shadow-sm">
+                        <span class="history-item">{{ item.title }}</span>
+                        <div class="history-wrapper">
+                            <span class="history-points">{% if item.is_redeem %}-{% else %}+{% endif %}{{ item.points}} points</span>
+                            <span class="history-date">{{ item.date_created|date:"m/d/y" }}</span>
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
 

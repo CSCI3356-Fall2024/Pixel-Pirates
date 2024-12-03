@@ -187,17 +187,48 @@ def campaign_view(request):
 def rewards_view(request):
     profile = request.user.profile 
     user = request.user
+
+    history_items = History.objects.filter(user=user)
+    now = timezone.now() #in UTC
     # Get titles of rewards redeemed by the user
     redeemed_titles = Redeemed.objects.filter(user=user).values_list('title', flat=True)
     # Filter rewards not redeemed by the user
-    available_rewards = Rewards.objects.exclude(title__in=redeemed_titles)
+    filtered_rewards = Rewards.objects.exclude(title__in=redeemed_titles)
+    available_rewards = []
 
-    redeemed_items = Redeemed.objects.filter(user=user)
+    for reward in filtered_rewards:
+        start_datetime = datetime.combine(reward.date_begin, reward.time_begin)
+        end_datetime = datetime.combine(reward.date_end, reward.time_end)
+
+        start_datetime = timezone.make_aware(start_datetime, timezone.get_current_timezone()) #adjusts to UTC 
+        end_datetime = timezone.make_aware(end_datetime, timezone.get_current_timezone()) #adjusts to UTC 
+
+        if start_datetime <= now <= end_datetime:
+            available_rewards.append(reward)
+
+    filtered_redeem = Redeemed.objects.filter(user=user)
+    redeemed_items = []
+
+    for redeem in filtered_redeem:
+        start_datetime = datetime.combine(redeem.date_begin, redeem.time_begin)
+        end_datetime = datetime.combine(redeem.date_end, redeem.time_end)
+
+        start_datetime = timezone.make_aware(start_datetime, timezone.get_current_timezone())
+        end_datetime = timezone.make_aware(end_datetime, timezone.get_current_timezone())
+
+        if start_datetime <= now <= end_datetime:
+            redeemed_items.append(redeem)
+
+    redeemed_items = reversed(redeemed_items)
+    available_rewards = reversed(available_rewards)
+    history_items = reversed(history_items)
+
 
     context = {
         'profile': profile,
         'redeemed_items': redeemed_items,
         'available_rewards': available_rewards,
+        'history_items': history_items,
         'required': True
     }
     return render(request, 'rewards.html', context)
@@ -219,7 +250,9 @@ def redeem_reward(request):
         reward_id = request.POST.get('reward_id')
         reward = get_object_or_404(Rewards, id=reward_id)
 
-        start_day = timezone.now().date()
+        start = timezone.now() - timedelta(hours=5)
+        start_day = start.date()
+
         end_day = start_day + timedelta(days=30)
 
         profile = request.user.profile
@@ -236,6 +269,16 @@ def redeem_reward(request):
             time_begin=time(0, 0),
             time_end=time(23,59),
             description=reward.description
+        )
+
+        History.objects.create(
+            user=request.user,
+            title=reward.title,
+            date_created=start_day,
+            time_created=start.time(), 
+            points=reward.points,
+            is_redeem=True,
+            location=None,
         )
         return redirect('rewards')
 
@@ -555,6 +598,19 @@ def complete_task(request, task_id):
         user_profile = getattr(task, 'user', getattr(task, 'referrer', None)).profile
         user_profile.points += points_to_add
         user_profile.save()
+
+        start = timezone.now() - timedelta(hours=5)
+        start_day = start.date()
+
+        History.objects.create(
+            user=task.user,
+            title=task.title,
+            date_created=start_day,
+            time_created=start.time(), 
+            points=task.points,
+            is_redeem=False,
+            location=None,
+        )
 
         return JsonResponse({"success": True, "points_added": points_to_add}, status=200)
 
