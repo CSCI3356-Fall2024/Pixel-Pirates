@@ -147,5 +147,8 @@ class ArticleQuizForm(forms.ModelForm):
         if date_begin and date_end and date_end < date_begin:
             raise ValidationError("End date must be on or after the start date.")
         return cleaned_data
-   
+
+class WODAnswerForm(forms.Form):
+    response = forms.CharField(max_length=255)
+
 
