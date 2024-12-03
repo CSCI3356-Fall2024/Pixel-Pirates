@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.db.models.signals import post_save
 from .models import Profile, ReferralTask
 from django.contrib.auth.models import User
-from django.utils.timezone import now
+from django.utils.timezone import localtime
 from .task_helpers import *
 
 @receiver(user_signed_up)
@@ -78,7 +78,8 @@ def create_default_tasks_for_new_user(sender, instance, created, **kwargs):
 
         logger = logging.getLogger(__name__)
         logger.info(f"Creating tasks for new user: {instance.username}")
-        today = now().date()
+        local_now = localtime()
+        today = local_now.date()
         
         # Define tasks
         daily_tasks = [
@@ -96,20 +97,28 @@ def create_default_tasks_for_new_user(sender, instance, created, **kwargs):
         start_of_week = today - timedelta(days=today.weekday())
         end_of_week = start_of_week + timedelta(days=6)
         
-        # Create daily tasks
+        # Create daily tasks without duplicates
         for task in daily_tasks:
-            DailyTask.objects.get_or_create(
+            task_exists = DailyTask.objects.filter(
                 user=instance,
                 title=task["title"],
                 is_static=task["is_static"],
-                defaults={
-                    "points": task["points"],
-                    "completed": False,
-                    "date_created": today,
-                    "time_created": now(),
-                    "completion_criteria": task.get("completion_criteria", {}),
-                }
-            )
+                completion_criteria=task.get("completion_criteria", {})
+            ).exists()
+
+            if not task_exists:
+                DailyTask.objects.create(
+                    user=instance,
+                    title=task["title"],
+                    is_static=task["is_static"],
+                    points=task["points"],
+                    completed=False,
+                    date_created=today,
+                    time_created=local_now,
+                    completion_criteria=task.get("completion_criteria", {}),
+                )
+                logger.info(f"Created task: {task['title']} (Static: {task['is_static']}) for user {instance.username}")
+
         
         # Create weekly tasks
         for task in weekly_tasks:
