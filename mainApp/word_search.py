@@ -4,8 +4,8 @@ import string
 # found code on https://medium.com/@msgold/creating-a-word-search-puzzle-b499533e938
 
 POSSIBLE_WORDS = ["RECYCLE", "REUSE", "REDUCE", "WATER", "GREEN2GO",
-                  "COMPOSTE", "POWER", "CONSERVE", "ENERGY", "NATURE",
-                  "WASTE", "CLEAN", "SCIENCE", "EARTH"]
+                "COMPOST", "POWER", "CONSERVE", "ENERGY", "NATURE",
+                "WASTE", "CLEAN", "SCIENCE", "EARTH"]
 
 # place word in word search
 def place_word(board, word):
@@ -103,6 +103,7 @@ def choose_word():
 
 def get_word_search_string():
     chosen_word = choose_word()
+    print(chosen_word)
     board = create_word_search([chosen_word])
     board_string = get_board_string(board)
     return board_string, chosen_word

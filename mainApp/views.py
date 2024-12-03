@@ -590,7 +590,11 @@ def actions_view(request):
             wod_form = WODAnswerForm(request.POST)
             if wod_form.is_valid(): 
                 answer = wod_form.cleaned_data['response']
-            if answer == task_word:
+                print(type(answer))
+                print(type(task_word))
+                print(answer)
+                print(task_word)
+            if answer.lower() == task_word.lower():
                 task.completed = True
                 task.save()
                 return redirect("actions")
