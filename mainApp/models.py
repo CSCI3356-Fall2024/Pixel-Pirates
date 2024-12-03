@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from multiselectfield import MultiSelectField
 from .choices import MAJOR_CHOICES, MINOR_CHOICES, SCHOOL_CHOICES
-from django.utils.timezone import now
+from django.utils.timezone import localtime
 
 class Profile(models.Model):
     username = models.OneToOneField(User, on_delete=models.CASCADE) #this is just the user itself, not the actual username of the user
@@ -89,17 +89,23 @@ class DailyTask(models.Model):
     completed = models.BooleanField(default=False)
     is_static = models.BooleanField(default=True)
     completion_criteria = models.JSONField(default=dict)
-    date_created = models.DateField(default=now)  
-    time_created = models.DateTimeField(default=now)  # Added field to store both date and time
+    date_created = models.DateField(editable=False)
+    time_created = models.DateTimeField(default=localtime)  # Added field to store both date and time
 
     class Meta:
-        unique_together = ('user', 'title', 'is_static', 'completion_criteria')
+        # unique_together = ('user', 'title', 'is_static', 'completion_criteria')
+        constraints = []
+    
+    def save(self, *args, **kwargs):
+        # Set `date_created` explicitly from `time_created`
+        self.date_created = self.time_created.date()
+        super().save(*args, **kwargs)
 
     def complete_task(self):
         """Mark the task as completed and set the submission time."""
         if not self.completed:
             self.completed = True
-            self.time_submitted = now()  # Set current date and time
+            self.time_submitted = localtime()  # Set current date and time
             self.save()
 
     def __str__(self):

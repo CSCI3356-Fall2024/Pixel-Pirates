@@ -6,12 +6,12 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from django.utils.timezone import now
+from django.utils.timezone import localtime
 from django.dispatch import receiver
 from django.db import IntegrityError
 from django.db.models import F
 from django.http import HttpResponse
-from django_celery_beat.models import PeriodicTask, IntervalSchedule
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
 from allauth.account.signals import user_logged_in
 from datetime import timedelta, time
 import json
@@ -401,52 +401,20 @@ def toggle_supervisor(request, user_id):
 @login_required
 def actions_view(request):
     user = request.user
-    today = timezone.now().date()
+    today = localtime().date()
     start_of_week = today - timedelta(days=today.weekday())
     end_of_week = start_of_week + timedelta(days=6)
     start_date = today - timedelta(days=30)  # Start date for streak calendar
-
-    # Check if the request is to schedule tasks
-    if request.method == "POST" and request.POST.get("schedule_tasks"):
-        # Daily tasks schedule
-        interval, _ = IntervalSchedule.objects.get_or_create(
-            every=1,  # Change to a smaller interval for debugging, e.g., 1 minute
-            period=IntervalSchedule.MINUTES,
-        )
-
-        PeriodicTask.objects.get_or_create(
-            interval=interval,
-            name="Generate Daily Tasks",
-            task="mainApp.tasks.generate_daily_tasks",
-        )
-
-        # Weekly tasks schedule
-        weekly_interval, _ = IntervalSchedule.objects.get_or_create(
-            every=7,
-            period=IntervalSchedule.DAYS,
-        )
-
-        PeriodicTask.objects.get_or_create(
-            interval=weekly_interval,
-            name="Generate Weekly Tasks",
-            task="mainApp.tasks.generate_weekly_tasks",
-        )
-
-        return JsonResponse({"success": True, "message": "Daily and Weekly tasks scheduled successfully."})
-
 
     # Get the month and year from the query parameters
     year = request.GET.get('year', today.year)
     month = request.GET.get('month', today.month)
 
     try:
-        # Ensure year and month are integers
         year = int(year)
         month = int(month)
     except ValueError:
-        # Fallback to current year and month if conversion fails
-        year = today.year
-        month = today.month
+        year, month = today.year, today.month
 
     # Calculate the first and last days of the selected month
     first_day_of_month = date(year, month, 1)
@@ -459,20 +427,17 @@ def actions_view(request):
     next_year = year + 1 if month == 12 else year
 
     # Generate a list of months and years for the dropdown
-    available_months_years = []
-    for y in range(today.year - 2, today.year + 3):  # 2 years before and after the current year
-        for m in range(1, 13):
-            available_months_years.append({
-                "value": f"{y}-{m:02d}",
-                "label": f"{date(y, m, 1).strftime('%B %Y')}"
-            })
+    available_months_years = [
+        {"value": f"{y}-{m:02d}", "label": f"{date(y, m, 1).strftime('%B %Y')}"}
+        for y in range(today.year - 2, today.year + 3) for m in range(1, 13)
+    ]
 
     # Check for mandatory profile fields
     try:
         profile = user.profile
         if not (profile.name and profile.school and profile.major and profile.graduation_year):
             return redirect('profile')
-    except Profile.DoesNotExist:
+    except AttributeError:
         return redirect('profile')
 
     # Retrieve tasks
@@ -481,6 +446,7 @@ def actions_view(request):
     generated_board = create_word_search(word_of_the_day)
     board_string = get_board_string(generated_board)
     dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
+
     for task in dynamic_tasks:
         if task.title == "WORD OF THE DAY":
             task.info = board_string
@@ -504,31 +470,27 @@ def actions_view(request):
             completion_criteria__action_date__lte=str(today)
         )
         .values('completion_criteria__action_date')
-        .annotate(completed_task_count=Count('id'))  # Count the number of completed tasks per date
-        .filter(completed_task_count=2)  # Ensure both tasks are completed on the same day
+        .annotate(completed_task_count=Count('id'))
+        .filter(completed_task_count=2)
         .values_list('completion_criteria__action_date', flat=True)
     )
 
-    # Convert to a set for easy lookup
     completed_dates_set = set(completed_dates)
 
-    # Calculate streak status (current streak)
+    # Calculate streak status
     current_streak = 0
     date_pointer = today
-
     while date_pointer.strftime("%Y-%m-%d") in completed_dates_set:
         current_streak += 1
         date_pointer -= timedelta(days=1)
 
-    # Calculate streak multiplier
-    streak_multiplier = 1 + (current_streak // 7) * 0.1  # Increment multiplier by 0.1 for each 7 days
+    streak_multiplier = 1 + (current_streak // 7) * 0.1
 
     # Update the profile dynamically
     user.profile.streak_status = current_streak
-    user.profile.streak_bonus = round(streak_multiplier, 1)  # Round multiplier to 1 decimal
+    user.profile.streak_bonus = round(streak_multiplier, 1)
     user.profile.save()
 
-    # Adjust streak description for singular/plural
     streak_description = (
         f"{current_streak} Day Streak"
         if current_streak == 1
@@ -539,13 +501,13 @@ def actions_view(request):
     calendar_weeks = generate_calendar(year, month, completed_dates)
 
     # Referral task
-    referral_task, created = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
+    referral_task, _ = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
 
     context = {
         'profile': user.profile,
         'static_tasks': static_tasks,
         'dynamic_tasks': dynamic_tasks,
-        'weekly_tasks': weekly_tasks,  # Add weekly tasks back to the context
+        'weekly_tasks': weekly_tasks,
         'referral_task': referral_task,
         'daily_progress_percentage': daily_progress_percentage,
         'calendar_weeks': calendar_weeks,
@@ -561,7 +523,6 @@ def actions_view(request):
         'required': True,
     }
     return render(request, 'actions.html', context)
-
 
 @csrf_exempt
 @login_required
@@ -586,7 +547,7 @@ def complete_task(request, task_id):
         # Mark the task as completed
         task.completed = True
         if hasattr(task, 'completion_date'):  # Set completion date if the field exists
-            task.completion_date = now().date()
+            task.completion_date = localtime().date()
         task.save()
 
         # Add points to the user's profile
