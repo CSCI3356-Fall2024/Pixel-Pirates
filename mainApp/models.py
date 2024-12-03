@@ -91,7 +91,8 @@ class DailyTask(models.Model):
     completion_criteria = models.JSONField(default=dict)
     date_created = models.DateField(default=now)  
     time_created = models.DateTimeField(default=now)  # Added field to store both date and time
-
+    content = models.CharField(max_length=500, null=True, blank=True)
+    word = models.CharField(max_length=500, null=True, blank=True)
     class Meta:
         unique_together = ('user', 'title', 'is_static', 'completion_criteria')
 

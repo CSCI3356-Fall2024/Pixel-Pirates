@@ -100,3 +100,9 @@ def get_board_string(board):
 def choose_word():
     chosen_word = random.choice(POSSIBLE_WORDS)
     return chosen_word
+
+def get_word_search_string():
+    chosen_word = choose_word()
+    board = create_word_search(chosen_word)
+    board_string = get_board_string(board)
+    return board_string, chosen_word

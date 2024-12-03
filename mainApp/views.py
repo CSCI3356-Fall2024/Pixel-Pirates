@@ -520,13 +520,14 @@ def actions_view(request):
 
     # Retrieve tasks
     static_tasks = DailyTask.objects.filter(user=user, is_static=True)
-    word_of_the_day = choose_word()
-    generated_board = create_word_search(word_of_the_day)
-    board_string = get_board_string(generated_board)
     dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
-    for task in dynamic_tasks:
+    for task in dynamic_tasks: 
         if task.title == "WORD OF THE DAY":
-            task.info = board_string
+            result = get_word_search_string()
+            task.content = result[0]
+            task.word = result[1]
+            task_word = task.word
+            task.save()
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
     # Calculate daily progress
@@ -584,6 +585,20 @@ def actions_view(request):
     # Referral task
     referral_task, created = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
 
+    for task in dynamic_tasks: 
+        if task.title == "WORD OF THE DAY" and request.method == 'POST':
+            wod_form = WODAnswerForm(request.POST)
+            if wod_form.is_valid(): 
+                answer = wod_form.cleaned_data['response']
+            if answer == task_word:
+                task.completed = True
+                task.save()
+                return redirect("actions")
+            else:
+                task.completed = False
+    else:
+        wod_form = WODAnswerForm(request.POST)
+
     context = {
         'profile': user.profile,
         'static_tasks': static_tasks,
@@ -602,8 +617,9 @@ def actions_view(request):
         'next_year': next_year,
         'streak_description': streak_description,
         'required': True,
+        'task_word': task_word
     }
-    return render(request, 'actions.html', context)
+    return render(request, 'actions.html', {**context, 'form': wod_form})
 
 
 @csrf_exempt

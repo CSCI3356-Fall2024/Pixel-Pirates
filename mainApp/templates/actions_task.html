@@ -1,3 +1,5 @@
+{% load static widget_tweaks %}  
+
 <div class="task-item {{ task.status }}">
     <div class="task-title">
         <p>{{ task.title }}</p>
@@ -28,16 +30,28 @@
     </div>
     <p>Details for {{ task.title }}</p>
     <label>
-        <input 
+        <!-- <input 
             type="checkbox" 
             name="{{ task.title }}" 
             {% if task.completed %}checked disabled{% endif %} 
             onclick="markTaskCompleted('{{ task.id }}', this)"
-        />
+        /> -->
         {{ task.title }}
-        <div class="word-search-box"">
-            <p>{{ task.info }}</p>
+        {{ task.word }}
+        {% if task.title == "WORD OF THE DAY" %}
+        <div class="word-search-box">
+            <p>{{ task.content }}</p>
         </div>
+        {% endif %} 
+        <!-- Form for word search -->
+        <form method="post">
+            {% csrf_token %}
+            {% render_field form.response class="form-control" %}
+            <button type="submit">Submit</button>
+        </form>
+        {% if task.completed %}
+            <button class="status" type="button" disabled>Completed</button>
+        {% endif %}
     </label>
 </div>
 
