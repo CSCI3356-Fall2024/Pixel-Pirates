@@ -486,15 +486,32 @@ def actions_view(request):
     # Retrieve tasks
     static_tasks = DailyTask.objects.filter(user=user, is_static=True)
     dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
-    for task in dynamic_tasks: 
-        if task.title == "WORD OF THE DAY":
-            result = get_word_search_string()
-            task.content = result[0]
-            task.word = result[1]
-            task_word = task.word
-            task.save()
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
+    task_word = None
+    word_task = dynamic_tasks.filter(title="WORD OF THE DAY").first()
+
+    # Handle the "WORD OF THE DAY" task
+    if word_task:
+        if not word_task.word:  # Only assign if not already set
+            result = get_word_search_string()
+            word_task.content = result[0]
+            word_task.word = result[1]
+            word_task.save()
+        task_word = word_task.word
+
+    # Check "WORD OF THE DAY" answer
+    wod_form = WODAnswerForm(request.POST or None)
+    if request.method == 'POST' and word_task:
+        if wod_form.is_valid():
+            answer = wod_form.cleaned_data['response']
+            word_task.completed = answer == task_word
+            print(answer)
+            print(task_word)
+            word_task.save()
+            if word_task.completed:
+                return redirect("actions")
+            
     # Calculate daily progress
     total_tasks = static_tasks.count() + dynamic_tasks.count()
     completed_tasks = (
@@ -551,7 +568,7 @@ def actions_view(request):
             wod_form = WODAnswerForm(request.POST)
             if wod_form.is_valid(): 
                 answer = wod_form.cleaned_data['response']
-            if answer == task_word:
+            if answer == task.word:
                 task.completed = True
                 task.save()
                 return redirect("actions")
