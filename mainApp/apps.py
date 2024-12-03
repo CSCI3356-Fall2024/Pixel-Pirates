@@ -34,8 +34,8 @@ class MainAppConfig(AppConfig):
 
         # Schedule daily tasks to run every minute (for testing purposes)
         daily_crontab, created = CrontabSchedule.objects.get_or_create(
-            minute="*/2",
-            hour="*",
+            minute="0",
+            hour="0",
             day_of_month="*",
             month_of_year="*",
             day_of_week="*",  # Every day

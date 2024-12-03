@@ -34,33 +34,21 @@ def generate_daily_tasks():
 
     for user in User.objects.all():
         for task in daily_tasks:
-            # Create unique completion criteria using action_date and time_suffix
-            unique_criteria = {
-                "action_date": str(today_date),
-                "time_suffix": time_suffix,
-            }
-
-            # Check for existing task with the same criteria
-            task_exists = DailyTask.objects.filter(
+            DailyTask.objects.update_or_create(
                 user=user,
                 title=task["title"],
                 is_static=task["is_static"],
-                completion_criteria=unique_criteria
-            ).exists()
+                completion_criteria=task.get("completion_criteria", {}),
+                date_created=localtime,  # Ensure date uniqueness
+                defaults={
+                    "points": task["points"],
+                    "completed": False,
+                    "time_created": localtime(),
+                },
+            )
 
-            if not task_exists:
-                # Create the new task
-                DailyTask.objects.create(
-                    user=user,
-                    title=task["title"],
-                    points=task["points"],
-                    is_static=task["is_static"],
-                    completed=False,
-                    completion_criteria=unique_criteria,
-                    date_created=today_date,  # Save the date the task is created
-                )
+    logger.info("Daily tasks generated successfully for today's date.")
 
-    logger.info(f"Daily tasks generated successfully with unique criteria at {time_suffix}.")
 @shared_task
 def generate_weekly_tasks():
     """Generate or update weekly tasks for all users."""

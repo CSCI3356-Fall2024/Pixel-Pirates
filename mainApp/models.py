@@ -93,8 +93,8 @@ class DailyTask(models.Model):
     time_created = models.DateTimeField(default=localtime)  # Added field to store both date and time
 
     class Meta:
-        # unique_together = ('user', 'title', 'is_static', 'completion_criteria')
-        constraints = []
+        unique_together = ('user', 'title', 'is_static', 'completion_criteria', 'date_created')
+        # constraints = []
     
     def save(self, *args, **kwargs):
         # Set `date_created` explicitly from `time_created`
