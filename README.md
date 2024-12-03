@@ -1,5 +1,28 @@
 # Pixel-Pirates
 
+## Delivery 6
+
+## Leah (currently tackling these -- mostly logic/buggy parts)
+- Leader ranking
+    - Based on total points and user won’t fall on the leaderboard if they redeem their points
+    - Floating row if user is not on the top 50; not aligned
+    - If user is part of the top 50, they will be highlighted in the table
+    - Arrows for ranking when you move up are not persisting after refresh
+    - If user has the same number of points, who is going to be first? DONE
+    - Where the user falls on the table sometimes does not match the motivation message (tied to if user has the same number of points, who is going to be first) DONE
+- Hamburger menu: when the user is on a mobile interface, the side bar will disappear DONE
+- Responsiveness/bootstrap:
+    - Rewards page DONE
+    - Campaign/rewards/news (should all be relatively simple because they have the same layout) DONE
+ - Campaign is not being added to news page on homepage even when checkbox for add to news is true DONE
+
+## Other
+- Wordsearch
+- Photo upload
+- Supervisor Landing Page
+- A Django superuser will have access to a webpage where they can define that a register user is a supervisor 
+
+
 ## Delivery 5
 ## anora
 ### In Progress
@@ -14,11 +37,11 @@
 
 ## leah
 ### In Progress
-1. Word search (once actions is in a workable state)
 2. Make campaigns once listed on landing page editable *works but might change to pop-up for more efficiency* fix CSS for it because wonky
-3. User can see where they are on ranking even if not on top 50
-4. Logic for if users have the same number of points
-5. Start mobile interface
+3. User can see where they are on ranking even if not on top 50 -- wonky
+4. Logic for if users have the same number of points (also is leaderboard tracking total number of points so points won't be deducted when they exchange for rewards
+5. Start mobile interface (home and profile are responsive)
+6. Make sidebar disappear when mobile - hmaburger
 
 ## meg
 ### in progress

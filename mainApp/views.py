@@ -11,10 +11,14 @@ from django.dispatch import receiver
 from django.db import IntegrityError
 from django.db.models import F
 from allauth.account.signals import user_logged_in
-from datetime import timedelta
+from datetime import timedelta, time
 import json
 from django.utils import timezone
-from datetime import timedelta, time 
+from django.db.models import Window
+from django.db.models.functions import Rank
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User
+from django.db.models.functions import RowNumber
 
 from .models import *
 from .forms import *
@@ -219,32 +223,57 @@ def edit_rewards(request, id):
 
 @login_required
 def home_view(request):
-    if request.user.is_authenticated:
-        try:
-            profile = request.user.profile
-            if not (profile.name and profile.school and profile.major):
-                return redirect('profile')
-            required = True
-        except Profile.DoesNotExist:
+    try:
+        profile = request.user.profile
+        if not (profile.name and profile.school and profile.major):
             return redirect('profile')
-    else:
-        return redirect('login')
+        required = True
+    except Profile.DoesNotExist:
+        return redirect('profile')
 
-    leaderboard_data = Profile.objects.order_by('-points').annotate(
-        rank=F('points')
-    )[:50]
+        # Update the rank for the current user
+    all_profiles = (
+        Profile.objects.annotate(rank=Window(
+            expression=RowNumber(),
+            order_by=[F('points').desc(), F('last_points_update').asc()]
+        ))
+        .order_by('rank')
+    )
 
-    top_3_users = leaderboard_data[:3]
-    top_3_names = [user.name for user in top_3_users]
-    top_3_points = [user.points for user in top_3_users]
+    leaderboard_data = []
+    for user in all_profiles[:50]:
+        # Calculate rank change
+        rank_change = 0 # Change default to 0
+        if user.previous_rank is not None:
+            rank_change = user.previous_rank - user.rank
 
-    news_items = News.objects.all()
-    campaign_items = Campaign.objects.all()
+        # Update the user's previous rank
+        user.rank_change = rank_change
+        user.previous_rank = user.rank
+        user.save(update_fields=['rank_change', 'previous_rank'])
+
+        leaderboard_data.append({
+            'id': user.id,
+            'name': user.name,
+            'points': user.points,
+            'picture': user.picture.url if user.picture else None,
+            'rank': user.rank,
+            'rank_change': rank_change,  # Changed so dealt with default in above lines
+            'is_current_user': user.id == profile.id,
+            #'abs_rank_change': abs(rank_change) if rank_change is not None else 0,  # Calculate absolute rank change
+        })
+
+    # Correctly get the rank for the current user
+    user_rank = None
+    for user in all_profiles:
+        if user.id == profile.id:
+            user_rank = user.rank
+            break
 
     total_users = Profile.objects.count()
-    user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
+    user_in_top_50 = user_rank <= 50  # Check if the user is in the top 50
 
-    user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
+    # User info dictionary
     user_info = {
         'rank': user_rank,
         'name': profile.name,
@@ -252,10 +281,16 @@ def home_view(request):
         'picture': profile.picture.url if profile.picture else None,
     }
 
-    leaderboard_data = Profile.objects.order_by('-points')[:50]
-    user_rank = Profile.objects.filter(points__gt=profile.points).count() + 1
-    user_in_top_50 = user_rank <= 50  # Check if the user is in the top 50
+    # Top 3 users for leaderboard display
+    top_3_users = leaderboard_data[:3]
+    top_3_names = [user['name'] for user in top_3_users]
+    top_3_points = [user['points'] for user in top_3_users]
 
+    # Get news and campaign items for the homepage
+    news_items = News.objects.all()
+    campaign_items = Campaign.objects.all()
+
+    # Determine motivational message based on correct user rank
     if user_rank <= 10:
         motivation_message = "Amazing job! You're in the Top 10. Keep up the good work!"
     elif user_rank <= 20:
@@ -281,9 +316,32 @@ def home_view(request):
         "leaderboard_points": json.dumps(profile.points),
         "user_in_top_50": user_in_top_50,
         "user_info": user_info,
-        "required": required,  
     }
+
     return render(request, 'home.html', context)
+
+@login_required
+def manage_users(request):
+    if not request.user.is_superuser:
+        return redirect('home')  
+
+    users = User.objects.all()
+    context = {
+        'users': users,
+        'required': True  
+    }
+
+    return render(request, 'manage_users.html', context)
+
+@user_passes_test(lambda u: u.is_superuser)  # Only superusers can access this
+def toggle_supervisor(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if user.is_superuser:
+        user.is_superuser = False
+    else:
+        user.is_superuser = True
+    user.save()
+    return redirect('manage_users')  # Redirect to the manage users page
 
 @login_required
 def actions_view(request):

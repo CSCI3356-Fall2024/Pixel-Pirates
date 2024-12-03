@@ -2,8 +2,8 @@
     box-sizing: border-box;
 }
 
-html, body {
-    font-family: "Times New Roman", Times;
+html, body, form {
+    font-family: Georgia;
     margin: 0;
     padding: 0;
     height: 100%; /* Ensures full height for the content */

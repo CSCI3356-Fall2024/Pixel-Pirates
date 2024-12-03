@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="../static/styles/style.css">
+    <title>Manage Users</title>
+</head>
+<body>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Manage Users</h2>
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Username</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{% if user.is_superuser %}Supervisor{% else %}Student{% endif %}</td>
+                        <td>
+                            {% if not user.is_superuser %}
+                            <button class="btn btn-success" data-user-id="{{ user.id }}" onclick="showConfirmModal(event)">Make Supervisor</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <h3>Are you sure you want to make this user a supervisor?</h3>
+        <form id="toggleForm" method="POST" action="{% url 'toggle_supervisor' 0 %}">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" id="userIdField" value="">
+            <div class="modal-buttons">
+                <button type="submit" class="btn btn-danger">Yes</button>
+                <button type="button" class="btn btn-secondary" onclick="hideConfirmModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const confirmModal = document.getElementById("confirmModal");
+        confirmModal.style.display = "none";  
+    });
+    
+    // Show the confirm modal when the button is clicked
+    function showConfirmModal(event) {
+        event.preventDefault();
+        
+        const button = event.currentTarget;
+        const userId = button.getAttribute('data-user-id');
+
+        // Set the user ID in the hidden input field in the modal
+        document.getElementById('userIdField').value = userId;
+
+        // Update the form action to include the correct user ID in the URL
+        const toggleForm = document.getElementById('toggleForm');
+        toggleForm.action = toggleForm.action.replace('0', userId);
+        
+        // Show the modal
+        document.getElementById("confirmModal").style.display = "flex";
+    }
+
+    // Hide the confirm modal
+    function hideConfirmModal() {
+        document.getElementById("confirmModal").style.display = "none";
+    }
+</script>
+{% endblock %}
