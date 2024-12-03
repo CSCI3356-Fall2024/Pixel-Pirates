@@ -188,6 +188,7 @@ def rewards_view(request):
     profile = request.user.profile 
     user = request.user
 
+    history_items = History.objects.filter(user=user)
     now = timezone.now() #in UTC
     # Get titles of rewards redeemed by the user
     redeemed_titles = Redeemed.objects.filter(user=user).values_list('title', flat=True)
@@ -218,12 +219,16 @@ def rewards_view(request):
         if start_datetime <= now <= end_datetime:
             redeemed_items.append(redeem)
 
+    redeemed_items = reversed(redeemed_items)
+    available_rewards = reversed(available_rewards)
+    history_items = reversed(history_items)
 
 
     context = {
         'profile': profile,
         'redeemed_items': redeemed_items,
         'available_rewards': available_rewards,
+        'history_items': history_items,
         'required': True
     }
     return render(request, 'rewards.html', context)
@@ -245,8 +250,9 @@ def redeem_reward(request):
         reward_id = request.POST.get('reward_id')
         reward = get_object_or_404(Rewards, id=reward_id)
 
-        start_day = timezone.now() - timedelta(hours=5)
-        start_day = start_day.date()
+        start = timezone.now() - timedelta(hours=5)
+        start_day = start.date()
+
         end_day = start_day + timedelta(days=30)
 
         profile = request.user.profile
@@ -263,6 +269,16 @@ def redeem_reward(request):
             time_begin=time(0, 0),
             time_end=time(23,59),
             description=reward.description
+        )
+
+        History.objects.create(
+            user=request.user,
+            title=reward.title,
+            date_created=start_day,
+            time_created=start.time(), 
+            points=reward.points,
+            is_redeem=True,
+            location=None,
         )
         return redirect('rewards')
 

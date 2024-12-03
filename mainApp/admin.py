@@ -7,6 +7,7 @@ admin.site.register(Campaign)
 admin.site.register(News)
 admin.site.register(Rewards)
 admin.site.register(Redeemed)
+admin.site.register(History)
 
 # Admin for DailyTask
 class DailyTaskAdmin(admin.ModelAdmin):
