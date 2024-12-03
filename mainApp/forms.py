@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from datetime import datetime
-from .models import Profile, Campaign, News, Rewards
+from .models import Profile, Campaign, News, Rewards, ArticleQuiz
 from .choices import SCHOOL_CHOICES, MAJOR_CHOICES, MINOR_CHOICES
 
 class ProfileForm(forms.ModelForm):
@@ -89,7 +89,7 @@ class RewardsForm(forms.ModelForm):
     class Meta:
         model = Rewards
         fields = ['title', 'date_begin', 
-                  'date_end', 'time_begin', 'time_end', 'description', 'points']
+                  'date_end', 'time_begin', 'time_end', 'description', 'points', 'amount']
         widgets = {
             'date_begin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'date_end': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -109,4 +109,43 @@ class RewardsForm(forms.ModelForm):
 
         return cleaned_data
     
+class ArticleQuizForm(forms.ModelForm):
+    class Meta:
+        model = ArticleQuiz
+        fields = ['title', 'article_url', 'date_begin',
+                  'date_end', 'time_begin', 'time_end', 
+                  'question_1', 'q1_false_answer_1', 'q1_false_answer_2', 'q1_correct_answer',
+                  'question_2', 'q2_false_answer_1', 'q2_false_answer_2', 'q2_correct_answer',
+                  'question_3', 'q3_false_answer_1', 'q3_false_answer_2', 'q3_correct_answer']
+        widgets = {
+            'date_begin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'date_end': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'time_begin': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            'time_end': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+        }
+        title = forms.CharField(required=True)
+        article_url = forms.CharField(required=True)
+        question_1 = forms.CharField(required=True)
+        q1_false_answer_1 = forms.CharField(required=True)
+        q1_false_answer_2 = forms.CharField(required=True)
+        q1_correct_answer = forms.CharField(required=True)
+        question_2 = forms.CharField(required=True)
+        q2_false_answer_1 = forms.CharField(required=True)
+        q2_false_answer_2 = forms.CharField(required=True)
+        q2_correct_answer = forms.CharField(required=True)
+        question_3 = forms.CharField(required=True)
+        q3_false_answer_1 = forms.CharField(required=True)
+        q3_false_answer_2 = forms.CharField(required=True)
+        q3_correct_answer = forms.CharField(required=True)
+        
+    def clean(self):
+        cleaned_data = super().clean()
+        date_begin = cleaned_data.get('date_begin')
+        date_end = cleaned_data.get('date_end')
+
+        # Validate that the end date is not before the start date
+        if date_begin and date_end and date_end < date_begin:
+            raise ValidationError("End date must be on or after the start date.")
+        return cleaned_data
+   
 

@@ -25,3 +25,5 @@ class WeeklyTaskAdmin(admin.ModelAdmin):
 # Registering models with their respective admin
 admin.site.register(DailyTask, DailyTaskAdmin)
 admin.site.register(WeeklyTask, WeeklyTaskAdmin)
+admin.site.register(ArticleQuiz)
+

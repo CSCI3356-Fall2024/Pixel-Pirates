@@ -1,0 +1,143 @@
+{% load static widget_tweaks %}  
+
+<link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/create_form.css' %}">
+<script type="text/javascript" src="{% static 'js/multiselect-dropdown.js' %}"></script>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const startDate = moment(document.getElementById('id_date_begin').value);
+            const endDate = moment(document.getElementById('id_date_end').value);
+
+            if (endDate.isBefore(startDate)) {
+                e.preventDefault();
+                alert('End date must be after the start date.');
+            }
+        });
+    });
+</script>
+
+<form method="post" action="" class="container mt-4" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for field in form %}
+                    {% if field.errors %}
+                        <li><strong>{{ field.label }}:</strong> {{ field.errors|join:", " }}</li>
+                    {% endif %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Form Fields -->
+    <div class="row g-3">
+        <div class="col-md-12">
+            <label for="id_article_url" class="form-label">URL to Article</label>
+            {% render_field form.article_url class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_title" class="form-label">Title of Quiz</label>
+            {% render_field form.title class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <h5>Display From</h5>
+        </div>
+        <div class="col-md-6">
+            <label for="id_date_begin" class="form-label">Date</label>
+            {% render_field form.date_begin class="form-control" %}
+        </div>
+        <div class="col-md-6">
+            <label for="id_time_begin" class="form-label">Time</label>
+            {% render_field form.time_begin class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <h5>Display Until</h5>
+        </div>
+        <div class="col-md-6">
+            <label for="id_date_end" class="form-label">Date</label>
+            {% render_field form.date_end class="form-control" %}
+        </div>
+        <div class="col-md-6">
+            <label for="id_time_end" class="form-label">Time</label>
+            {% render_field form.time_end class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_question_1" class="h5 bold-text">Question 1</label>
+            {% render_field form.question_1 class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_q1_false_answer_1" class="form-label incorrect-text">WRONG Answer</label>
+            {% render_field form.q1_false_answer_1 class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_q1_false_answer_2" class="form-label incorrect-text">WRONG Answer</label>
+            {% render_field form.q1_false_answer_2 class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_q1_correct_answer" class="form-label correct-text">CORRECT Answer</label>
+            {% render_field form.q1_correct_answer class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_question_1" class="h5 bold-text">Question 2</label>
+            {% render_field form.question_2 class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_q2_false_answer_1" class="form-label incorrect-text">WRONG Answer</label>
+            {% render_field form.q2_false_answer_1 class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_q2_false_answer_2" class="form-label incorrect-text">WRONG Answer</label>
+            {% render_field form.q2_false_answer_2 class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_q2_correct_answer" class="form-label correct-text">CORRECT Answer</label>
+            {% render_field form.q2_correct_answer class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_question_1" class="h5 bold-text">Question 3</label>
+            {% render_field form.question_1 class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_q3_false_answer_1" class="form-label incorrect-text">WRONG Answer</label>
+            {% render_field form.q3_false_answer_1 class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_q3_false_answer_2" class="form-label incorrect-text">WRONG Answer</label>
+            {% render_field form.q3_false_answer_2 class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <label for="id_q3_correct_answer" class="form-label correct-text">CORRECT Answer</label>
+            {% render_field form.q3_correct_answer class="form-control" %}
+        </div>
+
+        <div class="col-md-12">
+            <hr>
+        </div>
+
+        <div class="col-md-12 text-end">
+            <button type="submit" class="btn btn-success">Create Article Quiz</button>
+        </div>
+    </div>
+</form>

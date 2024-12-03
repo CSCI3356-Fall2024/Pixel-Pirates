@@ -18,8 +18,9 @@ class Profile(models.Model):
     points = models.IntegerField(default=0)
     total_points = models.IntegerField(default=0)  # All-time accumulated points
     previous_rank = models.IntegerField(null=True, blank=True)
+    current_rank = models.IntegerField(null=True, blank=True)
     last_points_update = models.DateTimeField(default=timezone.now)
-    rank_change = models.IntegerField(default=0)
+    rank_change = models.IntegerField(default=0, null=True)
     streak_status = models.IntegerField(default=0)
 
     def update_points(self, new_points):
@@ -159,6 +160,7 @@ class Rewards(models.Model):
     time_end = models.TimeField()
     description = models.TextField(max_length=500)
     points = models.IntegerField(default=0)
+    amount = models.IntegerField(default=0)
                                  
     def __str__(self):
         return self.title
@@ -173,4 +175,27 @@ class Redeemed(models.Model):
     description = models.TextField(max_length=500)
 
     def __str__(self):
+        return self.title
+
+class ArticleQuiz(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=500)
+    article_url = models.URLField(max_length=500, blank=True, null=True)  # field for external URL to display on landing page
+    date_begin = models.DateField()
+    date_end = models.DateField()
+    time_begin = models.TimeField()
+    time_end = models.TimeField()
+    question_1 = models.CharField(max_length=100, null=True, blank=True)
+    q1_false_answer_1 = models.CharField(max_length=100, null=True, blank=True)
+    q1_false_answer_2 = models.CharField(max_length=100, null=True, blank=True)
+    q1_correct_answer = models.CharField(max_length=100, null=True, blank=True)
+    question_2 = models.CharField(max_length=100, null=True, blank=True)
+    q2_false_answer_1 = models.CharField(max_length=100, null=True, blank=True)
+    q2_false_answer_2 = models.CharField(max_length=100, null=True, blank=True)
+    q2_correct_answer = models.CharField(max_length=100, null=True, blank=True)
+    question_3 = models.CharField(max_length=100, null=True, blank=True)
+    q3_false_answer_1 = models.CharField(max_length=100, null=True, blank=True)
+    q3_false_answer_2 = models.CharField(max_length=100, null=True, blank=True)
+    q3_correct_answer = models.CharField(max_length=100, null=True, blank=True)
+    def __str__(self) -> str:
         return self.title

@@ -36,6 +36,7 @@ button {
     border-radius: 10px;
     padding: 10px 20px;
     margin-bottom: 20px;
+    color: #B8D8BE;
 }
 
 button:hover {
@@ -45,6 +46,22 @@ button:hover {
 hr {
     border-top: 2px solid black;
     border-radius: 5px;
+}
+
+.incorrect-text {
+    color: #9C1A11;
+}
+
+.correct-text {
+    color: #0B851D;
+}
+
+.question-label {
+    font-weight: bold;
+}
+
+.bold-text {
+    font-weight: bold;
 }
 
 /* Mobile adjustments */
