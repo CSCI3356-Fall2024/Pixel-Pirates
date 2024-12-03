@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.db.utils import ProgrammingError, OperationalError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -8,11 +9,16 @@ class MainAppConfig(AppConfig):
     name = 'mainApp'
 
     def ready(self):
+        import mainApp.signals 
         from django_celery_beat.models import IntervalSchedule, PeriodicTask  # Import here
         try:
+            # Avoid running during migrations
+            if 'makemigrations' in self.argv or 'migrate' in self.argv:
+                return
+
             # Schedule daily tasks
             interval, created = IntervalSchedule.objects.get_or_create(
-                every=1,  
+                every=1,
                 period=IntervalSchedule.DAYS,
             )
             if created:
@@ -40,5 +46,13 @@ class MainAppConfig(AppConfig):
             )
             logger.info("Periodic task for weekly tasks created")
 
+        except (ProgrammingError, OperationalError) as e:
+            logger.error(f"Database error while scheduling tasks: {e}")
         except Exception as e:
-            logger.error(f"Error scheduling tasks: {e}")
+            logger.error(f"Unexpected error scheduling tasks: {e}")
+
+    @property
+    def argv(self):
+        """Helper to check command-line arguments."""
+        import sys
+        return sys.argv

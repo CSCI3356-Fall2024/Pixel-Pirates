@@ -82,22 +82,50 @@ class News(models.Model):
         return self.display_title
     
 class DailyTask(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='daily_tasks')
     title = models.CharField(max_length=255)
     points = models.IntegerField(default=0)
-    is_static = models.BooleanField(default=False)
-    completion_criteria = models.JSONField(default=dict)
     completed = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=now)
+    is_static = models.BooleanField(default=True)
+    completion_criteria = models.JSONField(default=dict)
+    date_created = models.DateField(default=now)  
+    time_created = models.DateTimeField(default=now)  # Added field to store both date and time
+
+    class Meta:
+        unique_together = ('user', 'title', 'is_static', 'completion_criteria')
+
+    def complete_task(self):
+        """Mark the task as completed and set the submission time."""
+        if not self.completed:
+            self.completed = True
+            self.time_submitted = now()  # Set current date and time
+            self.save()
+
+    def __str__(self):
+        return f"{self.title} - {'Completed' if self.completed else 'Open'}"
 
 class WeeklyTask(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="weekly_tasks")
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     points = models.IntegerField(default=0)
+    completed = models.BooleanField(default=False)
     start_date = models.DateField()
     end_date = models.DateField()
-    completed = models.BooleanField(default=False,)
+    completion_criteria = models.JSONField(default=dict)
+
+    def check_completion(self):
+        today = timezone.now().date()
+
+        if self.start_date <= today <= self.end_date and self.completion_criteria.get('criteria_met'):
+            self.completed = True
+            self.user.profile.points += self.points  
+            self.user.profile.save()
+            self.save()
+    
+    def __str__(self):
+        return f"{self.title} - {'Completed' if self.completed else 'Open'}"
+    
 
 class ReferralTask(models.Model):
     referrer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='referrals')

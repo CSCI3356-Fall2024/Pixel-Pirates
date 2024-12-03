@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.db.models.signals import post_save
 from .models import Profile, ReferralTask
 from django.contrib.auth.models import User
+from django.utils.timezone import now
 from .task_helpers import *
 
 @receiver(user_signed_up)
@@ -71,32 +72,59 @@ def save_user_profile(sender, instance, created, **kwargs):
 def create_default_tasks_for_new_user(sender, instance, created, **kwargs):
     """Create default tasks for a new user."""
     if created:
-        # Static tasks (e.g., composting, recycling)
-        static_tasks = [
-            {"title": "COMPOSTING", "points": 5},
-            {"title": "RECYCLING", "points": 5},
-            {"title": "GREEN2GO CONTAINER", "points": 15},
-        ]
-        create_daily_tasks(instance, static_tasks, is_static=True)
+        from django.utils.timezone import now
+        from datetime import timedelta
+        import logging
 
-        # Dynamic daily tasks (change daily)
-        today = timezone.now().date()
-        dynamic_tasks = [
-            {"title": "WORD OF THE DAY", "points": 20, "completion_criteria": {"action_date": str(today)}},
-            {"title": "PICTURE IN ACTION", "points": 20, "completion_criteria": {"action_date": str(today)}},
+        logger = logging.getLogger(__name__)
+        logger.info(f"Creating tasks for new user: {instance.username}")
+        today = now().date()
+        
+        # Define tasks
+        daily_tasks = [
+            {"title": "COMPOSTING", "points": 5, "is_static": True},
+            {"title": "RECYCLING", "points": 5, "is_static": True},
+            {"title": "GREEN2GO CONTAINER", "points": 15, "is_static": True},
+            {"title": "WORD OF THE DAY", "points": 20, "is_static": False, "completion_criteria": {"action_date": str(today)}},
+            {"title": "PICTURE IN ACTION", "points": 20, "is_static": False, "completion_criteria": {"action_date": str(today)}},
         ]
-        create_daily_tasks(instance, dynamic_tasks, is_static=False)
-
-        # Weekly task setup using the current week's range
-        start_of_week = today - timedelta(days=today.weekday())
-        end_of_week = start_of_week + timedelta(days=6)
         weekly_tasks = [
             {"title": "ARTICLE QUIZ", "points": 20, "description": "Complete the weekly quiz"},
         ]
         
-        # Create weekly tasks with the current week's start and end dates
-        create_weekly_tasks(instance, weekly_tasks, start_of_week, end_of_week)
-    
+        # Weekly range
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+        
+        # Create daily tasks
+        for task in daily_tasks:
+            DailyTask.objects.get_or_create(
+                user=instance,
+                title=task["title"],
+                is_static=task["is_static"],
+                defaults={
+                    "points": task["points"],
+                    "completed": False,
+                    "date_created": today,
+                    "time_created": now(),
+                    "completion_criteria": task.get("completion_criteria", {}),
+                }
+            )
+        
+        # Create weekly tasks
+        for task in weekly_tasks:
+            WeeklyTask.objects.get_or_create(
+                user=instance,
+                title=task["title"],
+                defaults={
+                    "points": task["points"],
+                    "completed": False,
+                    "description": task.get("description", ""),
+                    "start_date": start_of_week,
+                    "end_date": end_of_week,
+                }
+            )
+  
 @receiver(post_save, sender=User)
 def check_referral_completion(sender, instance, created, **kwarg):
     if created:
