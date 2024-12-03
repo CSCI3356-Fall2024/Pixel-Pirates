@@ -187,12 +187,38 @@ def campaign_view(request):
 def rewards_view(request):
     profile = request.user.profile 
     user = request.user
+
+    now = timezone.now() #in UTC
     # Get titles of rewards redeemed by the user
     redeemed_titles = Redeemed.objects.filter(user=user).values_list('title', flat=True)
     # Filter rewards not redeemed by the user
-    available_rewards = Rewards.objects.exclude(title__in=redeemed_titles)
+    filtered_rewards = Rewards.objects.exclude(title__in=redeemed_titles)
+    available_rewards = []
 
-    redeemed_items = Redeemed.objects.filter(user=user)
+    for reward in filtered_rewards:
+        start_datetime = datetime.combine(reward.date_begin, reward.time_begin)
+        end_datetime = datetime.combine(reward.date_end, reward.time_end)
+
+        start_datetime = timezone.make_aware(start_datetime, timezone.get_current_timezone()) #adjusts to UTC 
+        end_datetime = timezone.make_aware(end_datetime, timezone.get_current_timezone()) #adjusts to UTC 
+
+        if start_datetime <= now <= end_datetime:
+            available_rewards.append(reward)
+
+    filtered_redeem = Redeemed.objects.filter(user=user)
+    redeemed_items = []
+
+    for redeem in filtered_redeem:
+        start_datetime = datetime.combine(redeem.date_begin, redeem.time_begin)
+        end_datetime = datetime.combine(redeem.date_end, redeem.time_end)
+
+        start_datetime = timezone.make_aware(start_datetime, timezone.get_current_timezone())
+        end_datetime = timezone.make_aware(end_datetime, timezone.get_current_timezone())
+
+        if start_datetime <= now <= end_datetime:
+            redeemed_items.append(redeem)
+
+
 
     context = {
         'profile': profile,
@@ -219,7 +245,8 @@ def redeem_reward(request):
         reward_id = request.POST.get('reward_id')
         reward = get_object_or_404(Rewards, id=reward_id)
 
-        start_day = timezone.now().date()
+        start_day = timezone.now() - timedelta(hours=5)
+        start_day = start_day.date()
         end_day = start_day + timedelta(days=30)
 
         profile = request.user.profile
