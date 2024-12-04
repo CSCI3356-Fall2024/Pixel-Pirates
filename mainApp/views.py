@@ -490,7 +490,7 @@ def actions_view(request):
 
     task_word = None
     word_task = dynamic_tasks.filter(title="WORD OF THE DAY").first()
-
+    feedback_message = ""
     # Handle the "WORD OF THE DAY" task
     if word_task:
         if not word_task.word:  # Only assign if not already set
@@ -505,7 +505,7 @@ def actions_view(request):
     if request.method == 'POST' and word_task:
         if wod_form.is_valid():
             answer = wod_form.cleaned_data['response']
-            word_task.completed = answer == task_word
+            word_task.completed = answer.lower() == task_word.lower()
             print(answer)
             print(task_word)
             word_task.save()
@@ -595,9 +595,10 @@ def actions_view(request):
         'next_year': next_year,
         'streak_description': streak_description,
         'required': True,
-        'task_word': task_word
+        'task_word': task_word,
+        'form': wod_form, 
     }
-    return render(request, 'actions.html', {**context, 'form': wod_form})
+    return render(request, 'actions.html', context)
 
 @csrf_exempt
 @login_required

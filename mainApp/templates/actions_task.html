@@ -30,26 +30,20 @@
     </div>
     <p>Details for {{ task.title }}</p>
     <label>
-        <!-- <input 
-            type="checkbox" 
-            name="{{ task.title }}" 
-            {% if task.completed %}checked disabled{% endif %} 
-            onclick="markTaskCompleted('{{ task.id }}', this)"
-        /> -->
         {{ task.title }}
         {% if task.title == "WORD OF THE DAY" %}
-        <div class="word-search-box">
-            <p>{{ task.content }}</p>
-        </div>
-        {% endif %} 
-        <!-- Form for word search -->
-        <form method="post">
-            {% csrf_token %}
-            {% render_field form.response class="form-control" %}
-            <button type="submit">Submit</button>
-        </form>
-        {% if task.completed %}
-            <button class="status" type="button" disabled>Completed</button>
+            <div class="word-search-box">
+                <p>{{ task.content }}</p>
+            </div>
+            <!-- Form for word search -->
+            <form method="post">
+                {% csrf_token %}
+                {% render_field form.response class="form-control" placeholder="enter guess here"%}
+                <button type="submit">Check Word</button>
+            </form>
+            {% if task.completed %}
+                <button class="status" type="button" disabled>Completed</button>
+            {% endif %}
         {% endif %}
     </label>
 </div>
