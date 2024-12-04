@@ -44,6 +44,13 @@
                 <button class="status" type="button" disabled>Completed</button>
             {% endif %}
         {% endif %}
+
+        {% if task.title == "GREEN2GO CONTAINER" %}
+            <div class="qr-code">
+                <p>Scan the QR code below to complete this task:</p>
+                <img src="/static/qr_codes/task_{{ green2go_task.id }}.png">
+            </div>
+        {% endif %}
     </label>
 </div>
 

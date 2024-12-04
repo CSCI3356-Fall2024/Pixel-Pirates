@@ -275,6 +275,18 @@ button.status:disabled:hover {
     align-items: center; 
 }
 
+.qr-code img{
+    margin: auto;
+    display: flex;
+    width: 45ch;
+    padding-top: 10px;   /* Adds padding to the top of each item */
+    padding-bottom: 10px; 
+    border-radius: 10px;
+    box-shadow: 0px 3px rgba(0, 0, 0, 0.2);
+    font-family: monospace;
+    background-color: #DFEDE2;
+}
+
 .form-control {
     height: auto;
     width: auto;
