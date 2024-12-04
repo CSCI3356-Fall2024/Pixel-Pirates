@@ -28,10 +28,9 @@
             <i class="fa-solid fa-x"></i>
         </button>
     </div>
-    <p>Details for {{ task.title }}</p>
     <label>
-        {{ task.title }}
         {% if task.title == "WORD OF THE DAY" %}
+        <p>Try to find the sustainable word of the day!</p>
             <div class="word-search-box">
                 <p>{{ task.content }}</p>
             </div>
