@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from datetime import datetime
-from .models import Profile, Campaign, News, Rewards, ArticleQuiz
+from .models import Profile, Campaign, News, Rewards, ArticleQuiz, DailyTask
 from .choices import SCHOOL_CHOICES, MAJOR_CHOICES, MINOR_CHOICES
 
 class ProfileForm(forms.ModelForm):
@@ -151,4 +151,8 @@ class ArticleQuizForm(forms.ModelForm):
 class WODAnswerForm(forms.Form):
     response = forms.CharField(max_length=255)
 
+class DailyTaskPhotoForm(forms.ModelForm):
+    class Meta:
+        model = DailyTask
+        fields = ['photo']
 

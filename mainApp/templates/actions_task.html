@@ -30,24 +30,31 @@
     </div>
     <p>Details for {{ task.title }}</p>
     <label>
+        {% if task.title in "COMPOSTING,RECYCLING,PICTURE IN ACTION" %}
+        <!-- Photo Upload Form -->
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="photo" required>
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+            <button type="submit">Upload Photo</button>
+        </form>
         <!-- <input 
             type="checkbox" 
             name="{{ task.title }}" 
             {% if task.completed %}checked disabled{% endif %} 
             onclick="markTaskCompleted('{{ task.id }}', this)"
         /> -->
-        {{ task.title }}
-        {% if task.title == "WORD OF THE DAY" %}
+        {% elif task.title == "WORD OF THE DAY" %}
         <div class="word-search-box">
             <p>{{ task.content }}</p>
         </div>
-        {% endif %} 
         <!-- Form for word search -->
-        <form method="post">
-            {% csrf_token %}
-            {% render_field form.response class="form-control" %}
-            <button type="submit">Submit</button>
-        </form>
+            <form method="post">
+                {% csrf_token %}
+                {% render_field form.response class="form-control" %}
+                <button type="submit">Submit</button>
+            </form>
+        {% endif %} 
         {% if task.completed %}
             <button class="status" type="button" disabled>Completed</button>
         {% endif %}

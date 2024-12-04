@@ -93,6 +93,8 @@ class DailyTask(models.Model):
     time_created = models.DateTimeField(default=localtime)  # Added field to store both date and time
     content = models.CharField(max_length=500, null=True, blank=True)
     word = models.CharField(max_length=500, null=True, blank=True)
+    photo = models.ImageField(upload_to='task_photos/', blank=True, null=True)
+
     class Meta:
         unique_together = ('user', 'title', 'is_static', 'completion_criteria', 'date_created')
         # constraints = []
