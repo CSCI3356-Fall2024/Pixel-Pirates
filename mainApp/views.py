@@ -678,6 +678,86 @@ def complete_task(request, task_id):
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
+
+@login_required
+def article_quiz_view(request):
+    print("test 1")
+    quiz = ArticleQuiz.objects.latest('date_begin')
+    form = ArticleQuizAnswerForm(request.POST)
+    # Set the choices for each question in the view
+    question_1_choices = [
+        (quiz.q1_correct_answer, quiz.q1_correct_answer),
+        (quiz.q1_false_answer_1, quiz.q1_false_answer_1),
+        (quiz.q1_false_answer_2, quiz.q1_false_answer_2),
+    ]
+    random.shuffle(question_1_choices)  # Shuffle the choices
+    
+    question_2_choices = [
+        (quiz.q2_correct_answer, quiz.q2_correct_answer),
+        (quiz.q2_false_answer_1, quiz.q2_false_answer_1),
+        (quiz.q2_false_answer_2, quiz.q2_false_answer_2),
+    ]
+    random.shuffle(question_2_choices)  # Shuffle the choices
+    
+    question_3_choices = [
+        (quiz.q3_correct_answer, quiz.q3_correct_answer),
+        (quiz.q3_false_answer_1, quiz.q3_false_answer_1),
+        (quiz.q3_false_answer_2, quiz.q3_false_answer_2),
+    ]
+    random.shuffle(question_3_choices)  # Shuffle the choices
+    
+    form.fields['question_1_answer'].choices = question_1_choices
+    form.fields['question_2_answer'].choices = question_2_choices
+    form.fields['question_3_answer'].choices = question_3_choices
+
+    feedback = {
+        'question_1': '',
+        'question_2': '',
+        'question_3': ''
+    }
+    print("test 2")
+    # Handle form submission
+    if request.method == 'POST' and form.is_valid():
+        score = 0
+
+        # Check each answer and provide feedback
+        if form.cleaned_data['question_1_answer'] == quiz.q1_correct_answer:
+            print("test")
+            print(form.cleaned_data['question_1_answer'])
+            score += 1
+            feedback['question_1'] = 'Correct!'
+        else:
+            feedback['question_1'] = f'Incorrect! Try again!'
+
+        if form.cleaned_data['question_2_answer'] == quiz.q2_correct_answer:
+            score += 1
+            feedback['question_2'] = 'Correct!'
+        else:
+            feedback['question_2'] = f'Incorrect! Try again!'
+
+        if form.cleaned_data['question_3_answer'] == quiz.q3_correct_answer:
+            score += 1
+            feedback['question_3'] = 'Correct!'
+        else:
+            feedback['question_3'] = f'Incorrect! Try again!'
+
+        if score == 3: 
+            task = WeeklyTask.objects.filter(user=request.user, completed=False).first()
+            if task:
+                mark_task_completed(task)
+                task.save()
+        # Render the result page with the score and feedback
+        return render(request, 'article_quiz.html', {
+            'form': form,
+            'quiz': quiz,
+            'score': score,
+            'feedback': feedback,
+            'required': True
+        })
+
+    # Render the quiz page with the form
+    return render(request, 'article_quiz.html', {'form': form, 'quiz': quiz, 'required': True})
+
 # def run_daily_task(request):
 #     """Manually trigger the daily tasks."""
 #     generate_daily_tasks.delay()

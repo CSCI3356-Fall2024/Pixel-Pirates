@@ -7,13 +7,19 @@
     <div class="task-details">
         <div class="points">{{ task.points }} points</div>
         {% if not task.completed %}
-            <button 
-                class="status" 
-                type="button" 
-                onclick="showPopup('{{ task.id }}')"
-            >
-                Open
-            </button>
+            {% if task.title == "ARTICLE QUIZ" %}
+                <form action="{% url 'article_quiz' %}" method="get">
+                    <button class="status" type="submit">Open</button>
+                </form>
+            {% else %}
+                <button 
+                    class="status" 
+                    type="button" 
+                    onclick="showPopup('{{ task.id }}')"
+                >
+                    Open
+                </button>
+            {% endif %}
         {% else %}
             <button class="status" type="button" disabled>Completed</button>
         {% endif %}

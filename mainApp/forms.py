@@ -148,6 +148,12 @@ class ArticleQuizForm(forms.ModelForm):
             raise ValidationError("End date must be on or after the start date.")
         return cleaned_data
 
+class ArticleQuizAnswerForm(forms.Form):
+    fields = ['question_1_answer', 'question_2_answer', 'question_3_answer']
+    question_1_answer = forms.ChoiceField(choices=[], widget=forms.RadioSelect, required=True)
+    question_2_answer = forms.ChoiceField(choices=[], widget=forms.RadioSelect, required=True)
+    question_3_answer = forms.ChoiceField(choices=[], widget=forms.RadioSelect, required=True)
+
 class WODAnswerForm(forms.Form):
     response = forms.CharField(max_length=255)
 

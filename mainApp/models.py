@@ -188,7 +188,6 @@ class Redeemed(models.Model):
         return self.title
 
 class ArticleQuiz(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=500)
     article_url = models.URLField(max_length=500, blank=True, null=True)  # field for external URL to display on landing page
     date_begin = models.DateField()
