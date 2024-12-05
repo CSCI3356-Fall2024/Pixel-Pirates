@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
@@ -14,7 +15,6 @@ from django.http import HttpResponse
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
 from allauth.account.signals import user_logged_in
 from datetime import timedelta, time
-import json
 from django.utils import timezone
 from django.db.models import Window
 from django.db.models.functions import Rank
@@ -31,6 +31,8 @@ from .models import *
 from .forms import *
 from .word_search import *
 
+import json
+import qrcode
 
 @receiver(user_logged_in)
 def handle_login(sender, request, user, **kwargs):
@@ -490,6 +492,7 @@ def actions_view(request):
 
     task_word = None
     word_task = dynamic_tasks.filter(title="WORD OF THE DAY").first()
+    feedback_message = ""
 
     # Handle the "WORD OF THE DAY" task
     if word_task:
@@ -500,10 +503,10 @@ def actions_view(request):
             word_task.save()
         task_word = word_task.word
 
-    # Check "WORD OF THE DAY" answer
+    # Handle forms
     photo_form = DailyTaskPhotoForm(request.POST, request.FILES or None)
     wod_form = WODAnswerForm(request.POST or None)
-    
+
     if request.method == 'POST':
         # Handle "WORD OF THE DAY" answer
         if 'response' in request.POST and word_task:
@@ -529,7 +532,20 @@ def actions_view(request):
                         task.completed = True
                         task.save()
                         return redirect("actions")
-            
+
+    # Handle QR code for Green 2 Go
+    green2go_task = static_tasks.filter(title="GREEN2GO CONTAINER").first()
+
+    if green2go_task and not green2go_task.qr_code_link:
+        # Generate a unique QR code link
+        qr_code_link = f"{request.scheme}://{request.get_host()}/qrscan/complete/{green2go_task.id}/"
+        green2go_task.qr_code_link = qr_code_link
+        green2go_task.save()
+
+        # Generate QR code image
+        qr_code_image = qrcode.make(qr_code_link)
+        qr_code_image.save(f"mainApp/static/qr_codes/task_{green2go_task.id}.png")
+
     # Calculate daily progress
     total_tasks = static_tasks.count() + dynamic_tasks.count()
     completed_tasks = (
@@ -581,6 +597,7 @@ def actions_view(request):
     # Referral task
     referral_task, _ = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
 
+    # Handle "WORD OF THE DAY" in loop
     for task in dynamic_tasks: 
         if task.title == "WORD OF THE DAY" and request.method == 'POST':
             wod_form = WODAnswerForm(request.POST)
@@ -593,8 +610,6 @@ def actions_view(request):
                 else:
                     task.completed = False
                     task.save()
-        else:
-            wod_form = WODAnswerForm(request.POST)
 
     context = {
         'profile': user.profile,
@@ -615,9 +630,11 @@ def actions_view(request):
         'streak_description': streak_description,
         'required': True,
         'task_word': task_word,
-        'photo_form': photo_form
+        'photo_form': photo_form,
+        'form': wod_form,
+        'green2go_task': green2go_task,
     }
-    return render(request, 'actions.html', {**context, 'form': wod_form})
+    return render(request, 'actions.html', context)
 
 @csrf_exempt
 @login_required

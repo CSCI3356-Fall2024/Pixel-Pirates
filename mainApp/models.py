@@ -94,7 +94,8 @@ class DailyTask(models.Model):
     content = models.CharField(max_length=500, null=True, blank=True)
     word = models.CharField(max_length=500, null=True, blank=True)
     photo = models.ImageField(upload_to='task_photos/', blank=True, null=True)
-
+    qr_code_link = models.URLField(blank=True, null=True)  # Link for QR code
+    
     class Meta:
         unique_together = ('user', 'title', 'is_static', 'completion_criteria', 'date_created')
         # constraints = []
