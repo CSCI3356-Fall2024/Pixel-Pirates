@@ -487,7 +487,7 @@ def actions_view(request):
 
     # Retrieve tasks
     static_tasks = DailyTask.objects.filter(user=user, is_static=True)
-    dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
+    dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(localtime().date()))
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
     task_word = None
@@ -512,9 +512,8 @@ def actions_view(request):
         if 'response' in request.POST and word_task:
             if wod_form.is_valid():
                 answer = wod_form.cleaned_data['response']
-                word_task.completed = answer.lower() == task_word.lower()
-                word_task.save()
-                if word_task.completed:
+                if answer.lower() == task_word.lower():
+                    mark_task_completed(word_task)
                     return redirect("actions")
 
         # Handle photo upload for specific tasks
@@ -529,8 +528,7 @@ def actions_view(request):
                 if task and task.title in ["COMPOSTING", "RECYCLING", "PICTURE IN ACTION"]:
                     if photo_form.is_valid():
                         task.photo = photo_form.cleaned_data['photo']
-                        task.completed = True
-                        task.save()
+                        mark_task_completed(task)
                         return redirect("actions")
 
     # Handle QR code for Green 2 Go
@@ -597,20 +595,6 @@ def actions_view(request):
     # Referral task
     referral_task, _ = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
 
-    # Handle "WORD OF THE DAY" in loop
-    for task in dynamic_tasks: 
-        if task.title == "WORD OF THE DAY" and request.method == 'POST':
-            wod_form = WODAnswerForm(request.POST)
-            if wod_form.is_valid(): 
-                answer = wod_form.cleaned_data['response']
-                if answer.lower() == task_word.lower():
-                    task.completed = True
-                    task.save()
-                    return redirect("actions")
-                else:
-                    task.completed = False
-                    task.save()
-
     context = {
         'profile': user.profile,
         'static_tasks': static_tasks,
@@ -635,6 +619,15 @@ def actions_view(request):
         'green2go_task': green2go_task,
     }
     return render(request, 'actions.html', context)
+
+def mark_task_completed(task):
+    """Marks a task as completed and updates the user's points."""
+    task.completed = True
+    task.save()
+    profile = task.user.profile
+    profile.points += task.points
+    profile.save()
+
 
 @csrf_exempt
 @login_required
