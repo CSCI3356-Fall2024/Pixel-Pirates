@@ -493,6 +493,7 @@ def actions_view(request):
     task_word = None
     word_task = dynamic_tasks.filter(title="WORD OF THE DAY").first()
     feedback_message = ""
+
     # Handle the "WORD OF THE DAY" task
     if word_task:
         if not word_task.word:  # Only assign if not already set
@@ -502,21 +503,38 @@ def actions_view(request):
             word_task.save()
         task_word = word_task.word
 
-    # Check "WORD OF THE DAY" answer
+    # Handle forms
+    photo_form = DailyTaskPhotoForm(request.POST, request.FILES or None)
     wod_form = WODAnswerForm(request.POST or None)
-    if request.method == 'POST' and word_task:
-        if wod_form.is_valid():
-            answer = wod_form.cleaned_data['response']
-            word_task.completed = answer.lower() == task_word.lower()
-            print(answer)
-            print(task_word)
-            word_task.save()
-            if word_task.completed:
-                return redirect("actions")
-            
+
+    if request.method == 'POST':
+        # Handle "WORD OF THE DAY" answer
+        if 'response' in request.POST and word_task:
+            if wod_form.is_valid():
+                answer = wod_form.cleaned_data['response']
+                word_task.completed = answer.lower() == task_word.lower()
+                word_task.save()
+                if word_task.completed:
+                    return redirect("actions")
+
+        # Handle photo upload for specific tasks
+        if 'photo' in request.FILES:
+            task_id = request.POST.get('task_id')
+            if task_id:
+                try:
+                    task = DailyTask.objects.get(id=task_id, user=user)
+                except DailyTask.DoesNotExist:
+                    task = None
+
+                if task and task.title in ["COMPOSTING", "RECYCLING", "PICTURE IN ACTION"]:
+                    if photo_form.is_valid():
+                        task.photo = photo_form.cleaned_data['photo']
+                        task.completed = True
+                        task.save()
+                        return redirect("actions")
+
     # Handle QR code for Green 2 Go
     green2go_task = static_tasks.filter(title="GREEN2GO CONTAINER").first()
-    print(green2go_task.id)
 
     if green2go_task and not green2go_task.qr_code_link:
         # Generate a unique QR code link
@@ -527,7 +545,7 @@ def actions_view(request):
         # Generate QR code image
         qr_code_image = qrcode.make(qr_code_link)
         qr_code_image.save(f"mainApp/static/qr_codes/task_{green2go_task.id}.png")
-            
+
     # Calculate daily progress
     total_tasks = static_tasks.count() + dynamic_tasks.count()
     completed_tasks = (
@@ -579,19 +597,19 @@ def actions_view(request):
     # Referral task
     referral_task, _ = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
 
+    # Handle "WORD OF THE DAY" in loop
     for task in dynamic_tasks: 
         if task.title == "WORD OF THE DAY" and request.method == 'POST':
             wod_form = WODAnswerForm(request.POST)
             if wod_form.is_valid(): 
                 answer = wod_form.cleaned_data['response']
-            if answer.lower() == task_word.lower():
-                task.completed = True
-                task.save()
-                return redirect("actions")
-            else:
-                task.completed = False
-    else:
-        wod_form = WODAnswerForm(request.POST)
+                if answer.lower() == task_word.lower():
+                    task.completed = True
+                    task.save()
+                    return redirect("actions")
+                else:
+                    task.completed = False
+                    task.save()
 
     context = {
         'profile': user.profile,
@@ -612,7 +630,8 @@ def actions_view(request):
         'streak_description': streak_description,
         'required': True,
         'task_word': task_word,
-        'form': wod_form, 
+        'photo_form': photo_form,
+        'form': wod_form,
         'green2go_task': green2go_task,
     }
     return render(request, 'actions.html', context)

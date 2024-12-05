@@ -1,4 +1,4 @@
-{% load static widget_tweaks %}  
+{% load static widget_tweaks %}
 
 <div class="task-item {{ task.status }}">
     <div class="task-title">
@@ -29,27 +29,39 @@
         </button>
     </div>
     <label>
-        {% if task.title == "WORD OF THE DAY" %}
+        {% if task.title in "COMPOSTING,RECYCLING,PICTURE IN ACTION" %}
+        <!-- Photo Upload Form -->
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="photo" required>
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+            <button type="submit">Upload Photo</button>
+        </form>
+
+        {% elif task.title == "WORD OF THE DAY" %}
+        <!-- "Word of the Day" Task Section -->
         <p>Try to find the sustainable word of the day!</p>
-            <div class="word-search-box">
-                <p>{{ task.content }}</p>
-            </div>
-            <!-- Form for word search -->
-            <form method="post">
-                {% csrf_token %}
-                {% render_field form.response class="form-control" placeholder="enter guess here"%}
-                <button type="submit">Check Word</button>
-            </form>
-            {% if task.completed %}
-                <button class="status" type="button" disabled>Completed</button>
-            {% endif %}
+        <div class="word-search-box">
+            <p>{{ task.content }}</p>
+        </div>
+        <!-- Form for word search -->
+        <form method="post">
+            {% csrf_token %}
+            {% render_field form.response class="form-control" placeholder="Enter guess here" %}
+            <button type="submit">Check Word</button>
+        </form>
+
+        {% elif task.title == "GREEN2GO CONTAINER" %}
+        <!-- Green2Go Task Section -->
+        <div class="qr-code">
+            <p>Scan the QR code below to complete this task:</p>
+            <img src="/static/qr_codes/task_{{ green2go_task.id }}.png">
+        </div>
+
         {% endif %}
 
-        {% if task.title == "GREEN2GO CONTAINER" %}
-            <div class="qr-code">
-                <p>Scan the QR code below to complete this task:</p>
-                <img src="/static/qr_codes/task_{{ green2go_task.id }}.png">
-            </div>
+        {% if task.completed %}
+            <button class="status" type="button" disabled>Completed</button>
         {% endif %}
     </label>
 </div>

@@ -12,6 +12,7 @@ urlpatterns = [
     path("actions/", views.actions_view, name="actions"),
     path("choose_action/", views.choose_action_view, name = "choose_action"),
     path('tasks/complete/<int:task_id>/', views.complete_task, name='complete_task'),
+    #path('task/<int:task_id>/upload_photo/', views.upload_task_photo, name='upload_task_photo'),
     path("create_news/", views.news_view, name = "create_news"),
     path('create_news/edit/<int:id>/', views.edit_news, name='edit_news'),
     path("rewards/", views.rewards_view, name='rewards'),
