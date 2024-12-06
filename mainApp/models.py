@@ -177,6 +177,7 @@ class Rewards(models.Model):
     
 class Redeemed(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rewards = models.ForeignKey(Rewards, on_delete=models.CASCADE)
     title = models.CharField(max_length=500)
     date_begin = models.DateField()
     date_end = models.DateField()
