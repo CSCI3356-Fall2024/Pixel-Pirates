@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from multiselectfield import MultiSelectField
 from .choices import MAJOR_CHOICES, MINOR_CHOICES, SCHOOL_CHOICES
 from django.utils.timezone import localtime
-from .utils import generate_ref_code
+from pinax.referrals.models import Referral
+from django.urls import reverse
 
 class Profile(models.Model):
     username = models.OneToOneField(User, on_delete=models.CASCADE) #this is just the user itself, not the actual username of the user
@@ -23,9 +24,8 @@ class Profile(models.Model):
     last_points_update = models.DateTimeField(default=timezone.now)
     rank_change = models.IntegerField(default=0, null=True)
     streak_status = models.IntegerField(default=0)
-    code = models.CharField(max_length=12, blank=True)
     recommended_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='ref_by')
-
+    referral = models.OneToOneField(Referral, on_delete=models.SET_NULL, null=True, blank=True)
 
     def update_points(self, new_points):
         self.points = new_points
@@ -33,14 +33,20 @@ class Profile(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
-        if self.code == "":
-            code = generate_ref_code()
-            self.code = code
+        if not self.referral:  # Only assign referral if not already assigned
+            referral = Referral.create(
+                user=self.username,  # Assuming `username` is a OneToOneField to User
+                redirect_to=reverse("home")
+            )
+            self.referral = referral
         if self.pk:  
             original = Profile.objects.get(pk=self.pk)
             if original.points != self.points:
                 self.last_points_update = timezone.now()
         super(Profile, self).save(*args, **kwargs)
+
+    def get_recommended_profiles(self):
+        pass
 
     def __str__(self):
         return f"{self.username.username}'s Profile"

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     'multiselectfield',
+    "pinax.referrals",
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -82,7 +83,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware"
+    "allauth.account.middleware.AccountMiddleware",
+    "pinax.referrals.middleware.SessionJumpingMiddleware",
 ]
 
 ROOT_URLCONF = "Pixel_Pirates.urls"

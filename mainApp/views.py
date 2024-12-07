@@ -98,6 +98,7 @@ def profile_view(request):
         'profile.html',
         {'form': form, 'profile': profile, 'required': required_fields}
     )
+    
 
 def confirmation_view(request):  
     user = request.user
@@ -597,8 +598,12 @@ def actions_view(request):
     # Generate calendar
     calendar_weeks = generate_calendar(year, month, completed_dates)
 
-    # Referral task
-    referral_task, _ = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
+    # Handle referral task creation or retrieval
+    referral_task, _ = ReferralTask.objects.get_or_create(
+        referrer=user, completed=False, defaults={'points': 10}
+    )
+    referral_url = request.build_absolute_uri(f"/?ref={user.profile.referral.code}")
+    print(f"Referral Task: {referral_task}")  # Debugging
 
     context = {
         'profile': user.profile,
@@ -606,6 +611,7 @@ def actions_view(request):
         'dynamic_tasks': dynamic_tasks,
         'weekly_tasks': weekly_tasks,
         'referral_task': referral_task,
+        'referral_url': referral_url,
         'daily_progress_percentage': daily_progress_percentage,
         'calendar_weeks': calendar_weeks,
         'completed_dates': completed_dates,

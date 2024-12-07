@@ -117,6 +117,7 @@ h5 {
     text-align: end;
 }
 
+
 .points {
     display: flex;
     flex-direction: column;
@@ -207,6 +208,20 @@ button.status:disabled:hover {
     color: white;
     padding: 0 20px;
 }
+
+.label-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 80%;
+    gap: 10px;
+}
+
+.label-container p {
+    font-weight: bold;
+    font-size: large;
+}
+
 
 .calendar-navigation {
     display: flex;
@@ -300,7 +315,7 @@ button.status:disabled:hover {
     padding-bottom: 10px;
 }
 
-button[type="submit"] {
+button[type="submit"] button[type="button"]{
     width: auto; 
     height: auto; 
     background-color: #DFEDE2;
@@ -312,7 +327,7 @@ button[type="submit"] {
     padding-bottom: 10px;
 }
 
-button.status[type="submit"] {
+button.status[type="submit"] button[type="button"]{
     background-color: white;
     padding: 0px;
 }

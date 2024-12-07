@@ -12,6 +12,7 @@ from .models import Profile, ReferralTask
 from django.contrib.auth.models import User
 from django.utils.timezone import localtime
 from .task_helpers import *
+from pinax.referrals.models import Referral
 
 @receiver(user_signed_up)
 def create_profile_on_google_signup(request, user, **kwargs):
@@ -52,6 +53,33 @@ def create_profile_on_google_signup(request, user, **kwargs):
                 'name': f"{first_name} {last_name}".strip(),
             }
         )
+
+@receiver(user_signed_up)
+def create_referral_on_signup(sender, request, user, **kwargs):
+    """
+    Create a referral for the user when they sign up through Google OAuth.
+    """
+    # Create a Profile if it doesn't already exist
+    profile, created = Profile.objects.get_or_create(username=user)
+    
+    # Generate a referral and associate it with the user's profile
+    referral = Referral.create(
+        user=user,
+        redirect_to=reverse("home")  # Redirect URL after clicking the referral link
+    )
+    profile.referral = referral
+    profile.save()
+
+@receiver(post_save, sender=Profile)
+def create_referral_on_profile_save(sender, instance, created, **kwargs):
+    """Assign referral to a user when their profile is created."""
+    if created:  # Only create a referral for new profiles
+        referral = Referral.create(
+            user=instance.username,  # Assuming Profile has a `username` field linked to User
+            redirect_to=reverse("home")
+        )
+        instance.referral = referral
+        instance.save()
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, created, **kwargs):

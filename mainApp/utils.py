@@ -1,5 +1,7 @@
 import calendar
 from datetime import date
+from pinax.referrals.models import Referral
+from django.urls import reverse
 import uuid
 
 def generate_calendar(year, month, completed_dates):
@@ -23,6 +25,15 @@ def generate_calendar(year, month, completed_dates):
         calendar_weeks.append(week_data)
     
     return calendar_weeks
+
+def assign_referral_to_user(profile):
+    """Creates and assigns a referral to the profile."""
+    referral = Referral.create(
+        user=profile.username,  # Assuming `username` is linked to User
+        redirect_to=reverse("home")
+    )
+    profile.referral = referral
+    profile.save()
 
 def generate_ref_code():
     code = str(uuid.uuid4()).replace("-", "")[:12]

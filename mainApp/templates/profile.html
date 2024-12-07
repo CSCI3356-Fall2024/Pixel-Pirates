@@ -93,7 +93,13 @@
                             </div>
                             <div class="col-md-6">
                                 <label>Recommend By</label>
-                                <div class="readonly-field input-field">{{ profile.recommeded_by }}</div>
+                                <div class="readonly-field input-field">
+                                    {% if profile.recommended_by %}
+                                        {{ profile.recommended_by }}
+                                    {% else %}
+                                        <span class="placeholder-text">None</span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </form>
