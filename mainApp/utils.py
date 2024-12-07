@@ -1,5 +1,6 @@
 import calendar
 from datetime import date
+import uuid
 
 def generate_calendar(year, month, completed_dates):
     # Get the calendar for the month
@@ -22,3 +23,7 @@ def generate_calendar(year, month, completed_dates):
         calendar_weeks.append(week_data)
     
     return calendar_weeks
+
+def generate_ref_code():
+    code = str(uuid.uuid4()).replace("-", "")[:12]
+    return code
