@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="../static/styles/style.css">
+    <link rel="stylesheet" type="text/css" href="../static/styles/article_quiz.css">
+    <title>Article Quiz</title>
+</head>
+<body>
+    <div class='quiz-container'>
+        <h1 style="font-weight: bold;">{{ quiz.title }}</h1>
+        <a href="{{ quiz.article_url }}" class="link-container" target="_blank">Click here to view article</a>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="question-container">
+                <label for="id_question_1_answer" class="question-title">{{ quiz.question_1 }}</label>
+                <div class="choice-container">
+                    {{ form.question_1_answer.0 }}
+                </div>
+                
+                <div class="choice-container">
+                    {{ form.question_1_answer.1 }}
+                </div>
+            
+                <div class="choice-container">
+                    {{ form.question_1_answer.2 }}
+                </div>
+                {{ feedback.question_1 }}
+            </div>
+        
+            <div class="question-container">
+                <label for="id_question_2_answer" class="question-title">{{ quiz.question_2 }}</label>
+                <div class="choice-container">
+                    {{ form.question_2_answer.0 }}
+                </div>
+                
+                <div class="choice-container">
+                    {{ form.question_2_answer.1 }}
+                </div>
+            
+                <div class="choice-container">
+                    {{ form.question_2_answer.2 }}
+                </div>
+                {{ feedback.question_2 }}
+            </div>
+            <div class="question-container">
+                <label for="id_question_1_answer" class="question-title">{{ quiz.question_3 }}</label>
+                <div class="choice-container">
+                    {{ form.question_3_answer.0 }}
+                </div>
+                
+                <div class="choice-container">
+                    {{ form.question_3_answer.1 }}
+                </div>
+            
+                <div class="choice-container">
+                    {{ form.question_3_answer.2 }}
+                </div>
+                {{ feedback.question_3 }}                
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        {% if score is not none %}
+            <div class="score-container">
+                <h2>Your score: {{ score }} out of 3</h2>
+                {% if score == 3 %}
+                    <a href="{% url 'actions' %}" class="redirect-button">
+                    <button type="button">Return to Actions Page</button>
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+
+{% endblock %}

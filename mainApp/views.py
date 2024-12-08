@@ -190,15 +190,14 @@ def campaign_view(request):
 def rewards_view(request):
     profile = request.user.profile 
     user = request.user
+    now = timezone.now() #in UTC
 
     history_items = History.objects.filter(user=user)
-    now = timezone.now() #in UTC
-    # Get titles of rewards redeemed by the user
-    redeemed_titles = Redeemed.objects.filter(user=user).values_list('title', flat=True)
-    # Filter rewards not redeemed by the user
-    filtered_rewards = Rewards.objects.exclude(title__in=redeemed_titles)
+
+    filtered_rewards = Rewards.objects.exclude(redeemed__user=user)
     available_rewards = []
 
+    #checks if it's in the proper timeframe
     for reward in filtered_rewards:
         start_datetime = datetime.combine(reward.date_begin, reward.time_begin)
         end_datetime = datetime.combine(reward.date_end, reward.time_end)
@@ -212,6 +211,7 @@ def rewards_view(request):
     filtered_redeem = Redeemed.objects.filter(user=user)
     redeemed_items = []
 
+    #checks if it's in the proper timeframe 
     for redeem in filtered_redeem:
         start_datetime = datetime.combine(redeem.date_begin, redeem.time_begin)
         end_datetime = datetime.combine(redeem.date_end, redeem.time_end)
@@ -225,6 +225,10 @@ def rewards_view(request):
     redeemed_items = reversed(redeemed_items)
     available_rewards = reversed(available_rewards)
     history_items = reversed(history_items)
+
+    #disregards timeframe for superuser
+    if user.is_superuser: 
+        available_rewards = filtered_rewards
 
 
     context = {
@@ -266,6 +270,7 @@ def redeem_reward(request):
 
         Redeemed.objects.create(
             user=request.user,
+            rewards=reward,
             title=reward.title,
             date_begin=start_day,
             date_end=end_day,
@@ -488,7 +493,7 @@ def actions_view(request):
 
     # Retrieve tasks
     static_tasks = DailyTask.objects.filter(user=user, is_static=True)
-    dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(today))
+    dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(localtime().date()))
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
     task_word = None
@@ -513,9 +518,8 @@ def actions_view(request):
         if 'response' in request.POST and word_task:
             if wod_form.is_valid():
                 answer = wod_form.cleaned_data['response']
-                word_task.completed = answer.lower() == task_word.lower()
-                word_task.save()
-                if word_task.completed:
+                if answer.lower() == task_word.lower():
+                    mark_task_completed(word_task)
                     return redirect("actions")
 
         # Handle photo upload for specific tasks
@@ -530,8 +534,7 @@ def actions_view(request):
                 if task and task.title in ["COMPOSTING", "RECYCLING", "PICTURE IN ACTION"]:
                     if photo_form.is_valid():
                         task.photo = photo_form.cleaned_data['photo']
-                        task.completed = True
-                        task.save()
+                        mark_task_completed(task)
                         return redirect("actions")
 
     # Handle QR code for Green 2 Go
@@ -598,20 +601,6 @@ def actions_view(request):
     # Referral task
     referral_task, _ = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
 
-    # Handle "WORD OF THE DAY" in loop
-    for task in dynamic_tasks: 
-        if task.title == "WORD OF THE DAY" and request.method == 'POST':
-            wod_form = WODAnswerForm(request.POST)
-            if wod_form.is_valid(): 
-                answer = wod_form.cleaned_data['response']
-                if answer.lower() == task_word.lower():
-                    task.completed = True
-                    task.save()
-                    return redirect("actions")
-                else:
-                    task.completed = False
-                    task.save()
-
     context = {
         'profile': user.profile,
         'static_tasks': static_tasks,
@@ -637,6 +626,29 @@ def actions_view(request):
     }
     return render(request, 'actions.html', context)
 
+def mark_task_completed(task):
+    """Marks a task as completed and updates the user's points."""
+    task.completed = True
+    task.save()
+    profile = task.user.profile
+    profile.points += task.points
+    profile.save()
+
+    start = timezone.now() - timedelta(hours=5)
+    start_day = start.date()
+
+    History.objects.create(
+            user=task.user,
+            title=task.title,
+            date_created=start_day,
+            time_created=start.time(), 
+            points=task.points,
+            is_redeem=False,
+            location=None,
+        )
+
+
+#I don't think it's being used anymore 
 @csrf_exempt
 @login_required
 def complete_task(request, task_id):
@@ -675,19 +687,6 @@ def complete_task(request, task_id):
         user_profile.points += points_to_add
         user_profile.save()
 
-        start = timezone.now() - timedelta(hours=5)
-        start_day = start.date()
-
-        History.objects.create(
-            user=task.user,
-            title=task.title,
-            date_created=start_day,
-            time_created=start.time(), 
-            points=task.points,
-            is_redeem=False,
-            location=None,
-        )
-
         return JsonResponse({"success": True, "points_added": points_to_add}, status=200)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
@@ -701,6 +700,85 @@ def explore_view(request):
         'required': True,
     }
     return render(request, 'explore.html', context)
+
+@login_required
+def article_quiz_view(request):
+    print("test 1")
+    quiz = ArticleQuiz.objects.latest('date_begin')
+    form = ArticleQuizAnswerForm(request.POST)
+    # Set the choices for each question in the view
+    question_1_choices = [
+        (quiz.q1_correct_answer, quiz.q1_correct_answer),
+        (quiz.q1_false_answer_1, quiz.q1_false_answer_1),
+        (quiz.q1_false_answer_2, quiz.q1_false_answer_2),
+    ]
+    random.shuffle(question_1_choices)  # Shuffle the choices
+    
+    question_2_choices = [
+        (quiz.q2_correct_answer, quiz.q2_correct_answer),
+        (quiz.q2_false_answer_1, quiz.q2_false_answer_1),
+        (quiz.q2_false_answer_2, quiz.q2_false_answer_2),
+    ]
+    random.shuffle(question_2_choices)  # Shuffle the choices
+    
+    question_3_choices = [
+        (quiz.q3_correct_answer, quiz.q3_correct_answer),
+        (quiz.q3_false_answer_1, quiz.q3_false_answer_1),
+        (quiz.q3_false_answer_2, quiz.q3_false_answer_2),
+    ]
+    random.shuffle(question_3_choices)  # Shuffle the choices
+    
+    form.fields['question_1_answer'].choices = question_1_choices
+    form.fields['question_2_answer'].choices = question_2_choices
+    form.fields['question_3_answer'].choices = question_3_choices
+
+    feedback = {
+        'question_1': '',
+        'question_2': '',
+        'question_3': ''
+    }
+    print("test 2")
+    # Handle form submission
+    if request.method == 'POST' and form.is_valid():
+        score = 0
+
+        # Check each answer and provide feedback
+        if form.cleaned_data['question_1_answer'] == quiz.q1_correct_answer:
+            print("test")
+            print(form.cleaned_data['question_1_answer'])
+            score += 1
+            feedback['question_1'] = 'Correct!'
+        else:
+            feedback['question_1'] = f'Incorrect! Try again!'
+
+        if form.cleaned_data['question_2_answer'] == quiz.q2_correct_answer:
+            score += 1
+            feedback['question_2'] = 'Correct!'
+        else:
+            feedback['question_2'] = f'Incorrect! Try again!'
+
+        if form.cleaned_data['question_3_answer'] == quiz.q3_correct_answer:
+            score += 1
+            feedback['question_3'] = 'Correct!'
+        else:
+            feedback['question_3'] = f'Incorrect! Try again!'
+
+        if score == 3: 
+            task = WeeklyTask.objects.filter(user=request.user, completed=False).first()
+            if task:
+                mark_task_completed(task)
+                task.save()
+        # Render the result page with the score and feedback
+        return render(request, 'article_quiz.html', {
+            'form': form,
+            'quiz': quiz,
+            'score': score,
+            'feedback': feedback,
+            'required': True
+        })
+
+    # Render the quiz page with the form
+    return render(request, 'article_quiz.html', {'form': form, 'quiz': quiz, 'required': True})
 
 # def run_daily_task(request):
 #     """Manually trigger the daily tasks."""

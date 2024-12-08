@@ -23,6 +23,7 @@ urlpatterns = [
     path("create_campaign/", views.campaign_view, name="create_campaign"), 
     path("create_campaign/edit/<int:id>/", views.edit_campaign, name="edit_campaign"),  
     path('explore/', views.explore_view, name='explore'),
+    path('article-quiz/', views.article_quiz_view, name='article_quiz')
     # path("run-daily-tasks/", views.run_daily_task, name="run_daily_tasks"),
     # path("run-weekly-tasks/", views.run_weekly_task, name="run_weekly_tasks"),
     # path("schedule-tasks/", views.schedule_tasks, name="schedule_tasks"),
