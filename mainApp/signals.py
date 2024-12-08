@@ -60,48 +60,48 @@ def create_profile_on_google_signup(request, user, **kwargs):
 @receiver(user_signed_up)
 def user_signed_up_handler(request, user, **kwargs):
     """
-    Handles user signup, processes referral codes, and creates/upgrades profiles.
+    Handles user signup, processes referral codes, and links referrer to recommended_by.
     """
     temp_username = request.session.pop('temp_username', None)
     referral_code = None
-    referrer_profile = None
+    referrer = None
 
     # Retrieve referral code from ReferralTempStore
     if temp_username:
         try:
-            # Retrieve referral code from ReferralTempStore
             temp_store = ReferralTempStore.objects.get(username=temp_username)
             referral_code = temp_store.referral_code
-            
-            # Save the referral code to the user's profile
-            profile, created = Profile.objects.get_or_create(username=user)
-            profile.referral_code = referral_code
-            profile.save()
-            
-            # Clean up the temporary referral store
-            temp_store.delete()
-            print(f"Referral code retrieved and saved for user {user.username}: {referral_code}")
+            temp_store.delete()  # Clean up the temporary referral store
+            logger.info(f"Referral code retrieved for user {user.username}: {referral_code}")
         except ReferralTempStore.DoesNotExist:
-            print(f"No referral code found for temp user {temp_username}")
-    
+            logger.warning(f"No referral code found for temp user {temp_username}")
+
     # Process referral code if it exists
-        if temp_username:
-            try:
-                # Retrieve referral code from ReferralTempStore
-                temp_store = ReferralTempStore.objects.get(username=temp_username)
-                referral_code = temp_store.referral_code
-                
-                # Save the referral code to the user's profile
-                profile, created = Profile.objects.get_or_create(username=user)
-                profile.referral_code = referral_code
-                profile.save()
-                
-                # Clean up the temporary referral store
-                temp_store.delete()
-                print(f"Referral code retrieved and saved for user {user.username}: {referral_code}")
-            except ReferralTempStore.DoesNotExist:
-                print(f"No referral code found for temp user {temp_username}")
-        
+    if referral_code:
+        try:
+            referrer = Referral.objects.get(code=referral_code).user
+            logger.info(f"Referral code {referral_code} belongs to user: {referrer.username}")
+        except Referral.DoesNotExist:
+            logger.warning(f"Invalid referral code: {referral_code}")
+            referrer = None
+
+    # Create or update the user's profile
+    profile, created = Profile.objects.get_or_create(
+        username=user,
+        defaults={
+            'bc_email': user.email,
+            'name': f"{user.first_name} {user.last_name}".strip(),
+            'recommended_by': referrer,  # Link the referrer to this profile
+        }
+    )
+
+    # If profile already exists, update recommended_by and referral_code
+    if not created:
+        if referrer and not profile.recommended_by:
+            profile.recommended_by = referrer
+        if referral_code and not profile.referral_code:
+            profile.referral_code = referral_code
+        profile.save()
 
     # Generate a referral for the new user
     referral = Referral.create(
@@ -111,7 +111,7 @@ def user_signed_up_handler(request, user, **kwargs):
     profile.referral = referral
     profile.save()
 
-    print(f"Profile created/updated for user: {user.username}")
+    logger.info(f"Profile created/updated for user: {user.username}")
 
 # Create or update profile and tasks after saving a User
 @receiver(post_save, sender=User)

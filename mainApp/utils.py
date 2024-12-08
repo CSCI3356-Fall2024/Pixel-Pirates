@@ -2,6 +2,8 @@ import calendar
 from datetime import date
 from pinax.referrals.models import Referral
 from django.urls import reverse
+from .models import Profile
+from django.core.exceptions import ObjectDoesNotExist
 import uuid
 
 def generate_calendar(year, month, completed_dates):
@@ -38,3 +40,19 @@ def assign_referral_to_user(profile):
 def generate_ref_code():
     code = str(uuid.uuid4()).replace("-", "")[:12]
     return code
+
+def get_user_by_referral_code(referral_code):
+    try:
+        profile = Profile.objects.get(referral_code=referral_code)
+        return profile.username  # Assuming 'username' is a ForeignKey to User
+    except ObjectDoesNotExist:
+        print(f"No user found with referral code: {referral_code}")
+        return None
+
+def get_referring_user(referral_code):
+    try:
+        profile = Profile.objects.get(referral_code=referral_code)
+        return profile.recommended_by  # Assuming 'recommended_by' is a ForeignKey to User
+    except ObjectDoesNotExist:
+        print(f"No referring user found for referral code: {referral_code}")
+        return None

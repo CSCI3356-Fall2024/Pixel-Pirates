@@ -85,25 +85,8 @@ def profile_view(request):
     # Retrieve or create a profile for the logged-in user
     profile, created = Profile.objects.get_or_create(username=request.user)
 
-    # Check and associate the referral code from ReferralTempStore
-    try:
-        temp_store = ReferralTempStore.objects.get(username=request.user.username)
-        referral_code = temp_store.referral_code
-
-        # Save referral code to profile if not already set
-        if not profile.referral_code:
-            profile.referral_code = referral_code
-            profile.save()
-            print(f"Referral code saved in Profile: {referral_code}")
-        else:
-            print(f"Referral code already exists in Profile: {profile.referral_code}")
-
-        # Clean up the temporary store
-        temp_store.delete()
-
-    except ReferralTempStore.DoesNotExist:
-        print(f"No referral code found in ReferralTempStore for user: {request.user.username}")
-
+    referrer = profile.recommended_by
+    
     # Check if required profile fields are complete
     required_fields = all([
         getattr(profile, field) for field in ['name', 'school', 'major', 'graduation_year']
@@ -129,7 +112,7 @@ def profile_view(request):
     return render(
         request,
         'profile.html',
-        {'form': form, 'profile': profile, 'required': required_fields}
+        {'form': form, 'profile': profile, 'referrer': referrer, 'required': required_fields}
     )
 
 def confirmation_view(request):  
