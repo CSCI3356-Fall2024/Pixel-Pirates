@@ -190,7 +190,7 @@ class Redeemed(models.Model):
 
 class ArticleQuiz(models.Model):
     title = models.CharField(max_length=500)
-    article_url = models.URLField(max_length=500, blank=True, null=True)  # field for external URL to display on landing page
+    article_url = models.URLField(max_length=500, blank=True, null=True)  
     date_begin = models.DateField()
     date_end = models.DateField()
     time_begin = models.TimeField()

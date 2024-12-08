@@ -704,8 +704,16 @@ def explore_view(request):
 
 @login_required
 def article_quiz_view(request):
-    print("test 1")
-    quiz = ArticleQuiz.objects.latest('date_begin')
+    try:
+        quiz = ArticleQuiz.objects.latest('date_begin')
+    except ArticleQuiz.DoesNotExist:
+        # Handle the case where no quiz exists
+        return render(request, 'article_quiz.html', {
+            'form': None,  # No form since there's no quiz
+            'quiz': None,
+            'message': "No quiz has been created yet. Please check back later.",
+            'required': True
+        })
     form = ArticleQuizAnswerForm(request.POST)
     # Set the choices for each question in the view
     question_1_choices = [
@@ -738,7 +746,6 @@ def article_quiz_view(request):
         'question_2': '',
         'question_3': ''
     }
-    print("test 2")
     # Handle form submission
     if request.method == 'POST' and form.is_valid():
         score = 0
@@ -788,7 +795,10 @@ def history_view(request):
     now = timezone.now() - timedelta(hours=5) #takes UTC time and turns it to EST 
     
     #finds out the difference by subtracting the earliest task date and subtracting it to now 
-    quiz = (now.date() - ArticleQuiz.objects.earliest('date_begin').date_begin).days
+    try: 
+        quiz = (now.date() - ArticleQuiz.objects.earliest('date_begin').date_begin).days
+    except ArticleQuiz.DoesNotExist:
+        quiz = 0
     #doesn't work because there are no referral objects at all 
     referral = 0 #(now.date() - ReferralTask.objects.earliest('completion_date').completion_date).days
     daily = (now.date() - DailyTask.objects.earliest('date_created').date_created).days
@@ -860,61 +870,3 @@ def history_view(request):
     }
 
     return render(request, 'history.html', context)
-
-
-
-# def run_daily_task(request):
-#     """Manually trigger the daily tasks."""
-#     generate_daily_tasks.delay()
-#     return HttpResponse("Daily tasks started!")
-
-# def run_weekly_task(request):
-#     """Manually trigger the weekly tasks."""
-#     generate_weekly_tasks.delay()
-#     return HttpResponse("Weekly tasks started!")
-
-# def schedule_tasks(request):
-#     """Schedule daily and weekly tasks using django-celery-beat."""
-#     # Daily tasks schedule
-#     interval, _ = IntervalSchedule.objects.get_or_create(
-#         every=1,
-#         period=IntervalSchedule.MINUTES,
-#     )
-
-#     PeriodicTask.objects.get_or_create(
-#         interval=interval,
-#         name="Generate Daily Tasks",
-#         task="mainApp.tasks.generate_daily_tasks",
-#     )
-
-#     # Weekly tasks schedule
-#     weekly_interval, _ = IntervalSchedule.objects.get_or_create(
-#         every=7,
-#         period=IntervalSchedule.DAYS,
-#     )
-
-#     PeriodicTask.objects.get_or_create(
-#         interval=weekly_interval,
-#         name="Generate Weekly Tasks",
-#         task="mainApp.tasks.generate_weekly_tasks",
-#     )
-
-#     return HttpResponse("Daily and Weekly tasks scheduled!")
-
-# def index(request):
-#     my_task.delay()
-#     return HttpResponse("Task Started")
-
-# def schedule_task(request):
-#     interval, _ = IntervalSchedule.objects.get_or_create(
-#         every=1,
-#         period=IntervalSchedule.MINUTES,
-#     )
-
-#     PeriodicTask.objects.get_or_create(
-#         interval=interval,
-#         name="My Tasks",
-#         task="mainApp.tasks.generate_daily_tasks",
-#     )
-
-#     return HttpResponse("Task Scheduled")
