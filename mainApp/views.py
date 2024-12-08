@@ -22,6 +22,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.db.models.functions import RowNumber
 from calendar import monthrange
+from django.shortcuts import render
 from datetime import date
 from django.db.models import Count
 
@@ -663,6 +664,12 @@ def complete_task(request, task_id):
                     task = ReferralTask.objects.filter(referrer=request.user).get(id=task_id)
                 except ReferralTask.DoesNotExist:
                     return JsonResponse({"error": "Task not found"}, status=404)
+        
+        # Handle photo submission
+        if 'photo' in request.FILES:
+            task.photo = request.FILES['photo']
+            # Save the photo to PhotoSubmission model
+            PhotoSubmission.objects.create(user=request.user, task=task, photo=task.photo)
 
         # If the task is already completed, return a response
         if task.completed:
@@ -684,6 +691,15 @@ def complete_task(request, task_id):
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
+@login_required
+def explore_view(request):
+    # Filter DailyTask objects where photos exist
+    photos = DailyTask.objects.filter(photo__isnull=False).order_by('-time_created')
+    context = {
+        'photos': photos,
+        'required': True,
+    }
+    return render(request, 'explore.html', context)
 
 @login_required
 def article_quiz_view(request):
