@@ -25,6 +25,7 @@ from calendar import monthrange
 from django.shortcuts import render
 from datetime import date
 from django.db.models import Count
+from collections import defaultdict
 
 from .tasks import *
 from .utils import *
@@ -779,6 +780,88 @@ def article_quiz_view(request):
 
     # Render the quiz page with the form
     return render(request, 'article_quiz.html', {'form': form, 'quiz': quiz, 'required': True})
+
+#this code will probably be really hard to read, but it's because it's not meant to be read
+#the logic here is meant to connect clunky code together
+@login_required
+def history_view(request): 
+    now = timezone.now() - timedelta(hours=5) #takes UTC time and turns it to EST 
+    
+    #finds out the difference by subtracting the earliest task date and subtracting it to now 
+    quiz = (now.date() - ArticleQuiz.objects.earliest('date_begin').date_begin).days
+    #doesn't work because there are no referral objects at all 
+    referral = 0 #(now.date() - ReferralTask.objects.earliest('completion_date').completion_date).days
+    daily = (now.date() - DailyTask.objects.earliest('date_created').date_created).days
+
+    #finds out the highest difference but limits it to 30 days 
+    window = max(quiz, referral, daily) 
+    if window > 30:
+        window = 30
+
+
+    active = defaultdict(list)
+    
+
+    active_campaigns = History.objects.filter(date_created=now.date())
+    active_campaigns = active_campaigns.filter(is_redeem=False)
+
+#missing referral bc referral isn't completed 
+    for campaign in active_campaigns:
+        if campaign.title == 'PICTURE IN ACTION':
+            active['Picture in Action'].append(campaign)
+        elif campaign.title == 'WORD OF THE DAY':
+            active['Word of the Day'].append(campaign)
+        elif campaign.title == 'GREEN2GO CONTAINER':
+            active['Green2Go'].append(campaign)
+        elif campaign.title == 'RECYCLING':
+            active['Recycling'].append(campaign)
+        elif campaign.title == 'COMPOSTING':
+            active['Composting'].append(campaign)
+        else: #needs to be an else statement bc we can't pinpoint the name of the articlequiz
+            active['Article Quiz'].append(campaign)
+
+    active = dict(active)
+
+    past = {}
+    
+    past_campaigns = History.objects.exclude(date_created=now.date())
+    past_campaigns = past_campaigns.filter(is_redeem=False)
+
+    current_date = now.date() - timedelta(days=1)
+
+    for i in range(window):
+        history_items = past_campaigns.filter(date_created=current_date)
+        past[current_date] = defaultdict(list)
+        for campaign in history_items:
+            if campaign.title == 'PICTURE IN ACTION':
+                past[current_date]['Picture in Action'].append(campaign)
+            elif campaign.title == 'WORD OF THE DAY':
+                past[current_date]['Word of the Day'].append(campaign)
+            elif campaign.title == 'GREEN2GO CONTAINER':
+                past[current_date]['Green2Go'].append(campaign)
+            elif campaign.title == 'RECYCLING':
+                past[current_date]['Recycling'].append(campaign)
+            elif campaign.title == 'COMPOSTING':
+                past[current_date]['Composting'].append(campaign)
+            else: #needs to be an else statement bc we can't pinpoint the name of the articlequiz
+                past[current_date]['Article Quiz'].append(campaign)
+        past[current_date] = dict(past[current_date])
+        current_date -= timedelta(days=1)
+        
+    
+    
+    active_date = now.date()
+    context = {
+        'active': active,
+        'past': past,
+        'custom_range': range(1, window + 1),
+        'active_date': active_date,
+        'required': True
+    }
+
+    return render(request, 'history.html', context)
+
+
 
 # def run_daily_task(request):
 #     """Manually trigger the daily tasks."""

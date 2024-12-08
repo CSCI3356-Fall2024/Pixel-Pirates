@@ -22,6 +22,7 @@ urlpatterns = [
     path('create_reward/edit/<int:id>/', views.edit_rewards, name='edit_rewards'),
     path("create_campaign/", views.campaign_view, name="create_campaign"), 
     path("create_campaign/edit/<int:id>/", views.edit_campaign, name="edit_campaign"),  
+    path('history/', views.history_view, name='history')
     path('explore/', views.explore_view, name='explore'),
     path('article-quiz/', views.article_quiz_view, name='article_quiz')
     # path("run-daily-tasks/", views.run_daily_task, name="run_daily_tasks"),
