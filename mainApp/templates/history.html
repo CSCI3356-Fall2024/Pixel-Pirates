@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<ul>
+    <li>{{ active_date }}</li>
+    {% for key, value in active.items %}
+        <li>{{ key }}</li>
+        <li>{{ value }}</li>
+    {% endfor %}
+</ul>
+
+<!-- Make the vars actually look like variables  -->
+<ul>
+    <!-- {% for key, dictionary in past.items %}
+        {% for title, objects in dictionary.items %}
+            <li>{{ title }}</li>
+            <li>{{ objects }}</li>
+        {% endfor %} 
+
+    {% endfor %} -->
+    {% for key, value in past.items %}
+        <li>{{ key }}</li>
+        {% for name, campaign in value.items %}
+            <li>{{ name }}</li>
+            <li>{{ campaign }}</li>
+        {% endfor %}
+    {% endfor %}
+</ul>
+
+{% endblock %}
