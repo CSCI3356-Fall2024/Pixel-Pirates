@@ -20,7 +20,11 @@
         <div class="mt-4 center-button">
             <a href="{% url 'manage_users' %}" class="btn btn-success">Manage Users</a>
         </div>
+        <div class="mt-4 center-button">
+            <a href="{% url 'explore' %}" class="btn btn-success">Explore Photos</a>
+        </div>
         {% else %} Student </h2>
+        <a href="{% url 'explore' %}" class="btn btn-success">Explore Photos</a>
     
     {% endif %}
 </div>

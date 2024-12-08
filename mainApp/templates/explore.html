@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">Explore Submitted Photos</h1>
+    {% if photos %}
+        <div class="row mt-4">
+            {% for task in photos %}
+                {% if task.photo %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <img src="{{ task.photo.url }}" class="card-img-top" alt="Photo by {{ task.user.username }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ task.user.username }}</h5>
+                                <p class="card-text">Uploaded on {{ task.time_created|date:"F j, Y, g:i a" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center">No photos submitted yet. Be the first to submit a photo!</p>
+    {% endif %}
+</div>
+{% endblock %}
