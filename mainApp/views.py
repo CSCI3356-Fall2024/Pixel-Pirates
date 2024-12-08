@@ -85,6 +85,8 @@ def profile_view(request):
     # Retrieve or create a profile for the logged-in user
     profile, created = Profile.objects.get_or_create(username=request.user)
 
+    now = timezone.now() - timedelta(hours=5)
+
     referrer = profile.recommended_by
     
     # Check if required profile fields are complete
@@ -93,6 +95,25 @@ def profile_view(request):
     ])
     if not required_fields:
         messages.warning(request, "Please complete your profile to access the platform.")
+        
+        histquery = History.objects.filter(user=referrer)
+        histquery = histquery.filter(title='REFERRAL')
+        if profile.recommended_by != None and not histquery.count() > 0:
+            recommended = Profile.objects.get(username=referrer)
+            recommended.points += 10 
+            recommended.save()
+
+            History.objects.create(
+                user=recommended.username,
+                title='REFERRAL',
+                date_created=now.date(),
+                time_created=now.time(), 
+                points=10,
+                is_redeem=False,
+                location=None,
+            )
+
+
 
     # Handle profile form submission
     if request.method == 'POST':
