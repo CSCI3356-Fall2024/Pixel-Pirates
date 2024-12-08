@@ -114,9 +114,38 @@
     <!-- Referral Section -->
     <div class="referral-task">
         <h5>Referral</h5>
-        {% if referral_task %}
-            {% include 'actions_task.html' with task=referral_task %}
-        {% endif %}
+        <div class="task-item referral-task">
+            <div class="task-title">
+                <input 
+                type="text" 
+                id="referral-link-{{ task.id }}" 
+                value="{{ referral_url }}" 
+                style="width: 400px";"
+                readonly
+                />
+                
+            </div>
+            <div class="task-details">
+                <div class="points">{{ referral_task.points }} points</div>
+                <button 
+                    class="status" 
+                    type="button" 
+                    onclick="copyReferralLink('{{ task.id }}')"
+                >
+                    Copy
+                </button>
+            </div>
+        </div>
+        
+        <script>
+            function copyReferralLink(taskId) {
+                const linkInput = document.getElementById(`referral-link-${taskId}`);
+                linkInput.select();
+                document.execCommand("copy");
+                alert("Referral link copied to clipboard!");
+            }
+        </script>
+        
     </div>
 </div>
 {% endblock %}

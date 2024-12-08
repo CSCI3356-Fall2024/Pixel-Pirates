@@ -11,4 +11,5 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),  
     path("accounts/signup/", RedirectView.as_view(url='profile')), 
     path("", include("mainApp.urls")),  
+    path("referrals/", include("pinax.referrals.urls", namespace="pinax_referrals")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

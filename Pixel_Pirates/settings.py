@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     'multiselectfield',
+    "pinax.referrals",
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -82,7 +83,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware"
+    "allauth.account.middleware.AccountMiddleware",
+    "pinax.referrals.middleware.SessionJumpingMiddleware",
 ]
 
 ROOT_URLCONF = "Pixel_Pirates.urls"
@@ -90,7 +92,7 @@ ROOT_URLCONF = "Pixel_Pirates.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR/'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -209,3 +211,7 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 # Enforce login redirect after Google login
 LOGIN_REDIRECT_URL = '/home/'  # Redirect existing users
 LOGOUT_REDIRECT_URL = '/accounts/google/login/'
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 1209600  # Two weeks
+SESSION_SAVE_EVERY_REQUEST = True  # Save session on every request

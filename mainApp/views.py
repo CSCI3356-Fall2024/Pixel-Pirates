@@ -36,6 +36,11 @@ from .word_search import *
 import json
 import qrcode
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 @receiver(user_logged_in)
 def handle_login(sender, request, user, **kwargs):
     """Redirect new users to profile page and existing users to home."""
@@ -49,10 +54,26 @@ def handle_login(sender, request, user, **kwargs):
         request.session['login_redirect'] = '/profile/'
 
 def login_view(request):
-    """Handle post-login redirection."""
-    if request.user.is_authenticated:
-        # Redirect based on session value set during login
-        return redirect(request.session.pop('login_redirect', '/home/'))
+    # Handle referral codes from query parameters
+    referral_code = request.GET.get('ref')
+    if referral_code:
+        if not request.user.is_authenticated:
+            # Save referral code using a temporary identifier
+            temp_username = request.session.get('temp_username', str(uuid.uuid4()))
+            request.session['temp_username'] = temp_username
+            print(f"Temporary username before login: {temp_username}")
+
+            ReferralTempStore.objects.update_or_create(
+                username=temp_username,
+                defaults={'referral_code': referral_code}
+            )
+            print(f"Referral code saved temporarily for temp user {temp_username}: {referral_code}")
+
+    # Redirect to Google login if the user clicks "Continue with Google"
+    if request.method == "POST" and 'continue_with_google' in request.POST:
+        return redirect('/accounts/google/login/')
+
+    # Render the login page
     return render(request, 'login.html')
 
 def logout_view(request):
@@ -60,33 +81,49 @@ def logout_view(request):
     #messages.success(request, "You have been logged out successfully.")
     return redirect('login')
 
+
 @login_required
 def profile_view(request):
     # Retrieve or create a profile for the logged-in user
     profile, created = Profile.objects.get_or_create(username=request.user)
 
-    # If the profile is newly created, initialize required fields to ensure the user can edit it
-    if created:
-        messages.info(request, "Welcome! Please complete your profile.")
-    
-    # Check if the profile has all required fields filled
-    required_fields = bool(
-        profile.name and profile.school and profile.major and profile.graduation_year
-    )
+    now = timezone.now() - timedelta(hours=5)
 
+    referrer = profile.recommended_by
+    
+    # Check if required profile fields are complete
+    required_fields = all([
+        getattr(profile, field) for field in ['name', 'school', 'major', 'graduation_year']
+    ])
+    if not required_fields:
+        messages.warning(request, "Please complete your profile to access the platform.")
+        
+        histquery = History.objects.filter(user=referrer)
+        histquery = histquery.filter(title='REFERRAL')
+        if profile.recommended_by != None and not histquery.count() > 0:
+            recommended = Profile.objects.get(username=referrer)
+            recommended.points += 10 
+            recommended.save()
+
+            History.objects.create(
+                user=recommended.username,
+                title='REFERRAL',
+                date_created=now.date(),
+                time_created=now.time(), 
+                points=10,
+                is_redeem=False,
+                location=None,
+            )
+
+
+
+    # Handle profile form submission
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             try:
                 form.save()
                 messages.success(request, "Profile updated successfully!")
-                
-                # Recheck required fields after saving
-                required_fields = bool(
-                    profile.name and profile.school and profile.major and profile.graduation_year
-                )
-
-                # Redirect to refresh the page and reflect changes
                 return redirect('profile')
             except Exception as e:
                 messages.error(request, f"Error saving profile: {e}")
@@ -98,7 +135,7 @@ def profile_view(request):
     return render(
         request,
         'profile.html',
-        {'form': form, 'profile': profile, 'required': required_fields}
+        {'form': form, 'profile': profile, 'referrer': referrer, 'required': required_fields}
     )
 
 def confirmation_view(request):  
@@ -599,8 +636,12 @@ def actions_view(request):
     # Generate calendar
     calendar_weeks = generate_calendar(year, month, completed_dates)
 
-    # Referral task
-    referral_task, _ = ReferralTask.objects.get_or_create(referrer=user, completed=False, defaults={'points': 10})
+    # Handle referral task creation or retrieval
+    referral_task, _ = ReferralTask.objects.get_or_create(
+        referrer=user, completed=False, defaults={'points': 10}
+    )
+    referral_url = f"{request.scheme}://{request.get_host()}/login/?ref={user.profile.referral.code}"
+    print(f"Referral Task: {referral_task}")  # Debugging
 
     context = {
         'profile': user.profile,
@@ -608,6 +649,7 @@ def actions_view(request):
         'dynamic_tasks': dynamic_tasks,
         'weekly_tasks': weekly_tasks,
         'referral_task': referral_task,
+        'referral_url': referral_url,
         'daily_progress_percentage': daily_progress_percentage,
         'calendar_weeks': calendar_weeks,
         'completed_dates': completed_dates,

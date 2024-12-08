@@ -27,4 +27,5 @@ class WeeklyTaskAdmin(admin.ModelAdmin):
 admin.site.register(DailyTask, DailyTaskAdmin)
 admin.site.register(WeeklyTask, WeeklyTaskAdmin)
 admin.site.register(ArticleQuiz)
+admin.site.register(ReferralTempStore)
 
