@@ -211,3 +211,7 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 # Enforce login redirect after Google login
 LOGIN_REDIRECT_URL = '/home/'  # Redirect existing users
 LOGOUT_REDIRECT_URL = '/accounts/google/login/'
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 1209600  # Two weeks
+SESSION_SAVE_EVERY_REQUEST = True  # Save session on every request

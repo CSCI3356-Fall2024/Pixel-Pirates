@@ -26,6 +26,7 @@ class Profile(models.Model):
     streak_status = models.IntegerField(default=0)
     recommended_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='ref_by')
     referral = models.OneToOneField(Referral, on_delete=models.SET_NULL, null=True, blank=True)
+    referral_code = models.CharField(max_length=100, null=True, blank=True)  # Temporary referral code field
 
     def update_points(self, new_points):
         self.points = new_points
@@ -33,17 +34,19 @@ class Profile(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
-        if not self.referral:  # Only assign referral if not already assigned
-            referral = Referral.create(
-                user=self.username,  # Assuming `username` is a OneToOneField to User
+        # Only create a referral if it hasn't been assigned
+        if not self.referral:
+            self.referral = Referral.create(
+                user=self.username,
                 redirect_to=reverse("home")
             )
-            self.referral = referral
-        if self.pk:  
+        # Check if points have changed
+        if self.pk:
             original = Profile.objects.get(pk=self.pk)
             if original.points != self.points:
                 self.last_points_update = timezone.now()
         super(Profile, self).save(*args, **kwargs)
+
 
     def get_recommended_profiles(self):
         pass
@@ -244,3 +247,7 @@ class History(models.Model):
 
     def __str__(self):
         return self.title
+
+class ReferralTempStore(models.Model):
+    username = models.CharField(max_length=255, unique=True)  # Use username as the unique identifier
+    referral_code = models.CharField(max_length=255)

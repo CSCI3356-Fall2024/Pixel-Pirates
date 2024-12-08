@@ -8,11 +8,14 @@ from allauth.core.exceptions import ImmediateHttpResponse
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models.signals import post_save
-from .models import Profile, ReferralTask
+from .models import Profile, ReferralTask, ReferralTempStore
 from django.contrib.auth.models import User
 from django.utils.timezone import localtime
 from .task_helpers import *
 from pinax.referrals.models import Referral
+
+import logging
+logger = logging.getLogger(__name__)
 
 @receiver(user_signed_up)
 def create_profile_on_google_signup(request, user, **kwargs):
@@ -55,99 +58,103 @@ def create_profile_on_google_signup(request, user, **kwargs):
         )
 
 @receiver(user_signed_up)
-def create_referral_on_signup(sender, request, user, **kwargs):
+def user_signed_up_handler(request, user, **kwargs):
     """
-    Create a referral for the user when they sign up through Google OAuth.
+    Handles user signup, processes referral codes, and creates/upgrades profiles.
     """
-    # Create a Profile if it doesn't already exist
-    profile, created = Profile.objects.get_or_create(username=user)
+    temp_username = request.session.pop('temp_username', None)
+    referral_code = None
+    referrer_profile = None
+
+    # Retrieve referral code from ReferralTempStore
+    if temp_username:
+        try:
+            # Retrieve referral code from ReferralTempStore
+            temp_store = ReferralTempStore.objects.get(username=temp_username)
+            referral_code = temp_store.referral_code
+            
+            # Save the referral code to the user's profile
+            profile, created = Profile.objects.get_or_create(username=user)
+            profile.referral_code = referral_code
+            profile.save()
+            
+            # Clean up the temporary referral store
+            temp_store.delete()
+            print(f"Referral code retrieved and saved for user {user.username}: {referral_code}")
+        except ReferralTempStore.DoesNotExist:
+            print(f"No referral code found for temp user {temp_username}")
     
-    # Generate a referral and associate it with the user's profile
+    # Process referral code if it exists
+        if temp_username:
+            try:
+                # Retrieve referral code from ReferralTempStore
+                temp_store = ReferralTempStore.objects.get(username=temp_username)
+                referral_code = temp_store.referral_code
+                
+                # Save the referral code to the user's profile
+                profile, created = Profile.objects.get_or_create(username=user)
+                profile.referral_code = referral_code
+                profile.save()
+                
+                # Clean up the temporary referral store
+                temp_store.delete()
+                print(f"Referral code retrieved and saved for user {user.username}: {referral_code}")
+            except ReferralTempStore.DoesNotExist:
+                print(f"No referral code found for temp user {temp_username}")
+        
+
+    # Generate a referral for the new user
     referral = Referral.create(
         user=user,
-        redirect_to=reverse("home")  # Redirect URL after clicking the referral link
+        redirect_to=reverse("home")
     )
     profile.referral = referral
     profile.save()
 
-@receiver(post_save, sender=Profile)
-def create_referral_on_profile_save(sender, instance, created, **kwargs):
-    """Assign referral to a user when their profile is created."""
-    if created:  # Only create a referral for new profiles
-        referral = Referral.create(
-            user=instance.username,  # Assuming Profile has a `username` field linked to User
-            redirect_to=reverse("home")
-        )
-        instance.referral = referral
-        instance.save()
+    print(f"Profile created/updated for user: {user.username}")
 
+# Create or update profile and tasks after saving a User
 @receiver(post_save, sender=User)
-def save_user_profile(sender, instance, created, **kwargs):
-    """Ensure profile is created or saved whenever a User instance is saved."""
-    if created:
-        Profile.objects.get_or_create(
-            username=instance,
-            defaults={'bc_email': instance.email}
-        )
-    else:
-        try:
-            instance.profile.save()
-        except Profile.DoesNotExist:
-            # Create the profile if it doesn't exist
-            Profile.objects.create(username=instance, bc_email=instance.email)
+def user_post_save_handler(sender, instance, created, **kwargs):
+    """
+    Ensures profile creation and assigns default tasks for new users.
+    """
+    profile, _ = Profile.objects.get_or_create(
+        username=instance,
+        defaults={'bc_email': instance.email}
+    )
 
-@receiver(post_save, sender=User)
-def create_default_tasks_for_new_user(sender, instance, created, **kwargs):
-    """Create default tasks for a new user."""
     if created:
-        from django.utils.timezone import now
-        from datetime import timedelta
-        import logging
+        logger.info(f"Creating default tasks for user: {instance.username}")
+        today = localtime().date()
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
 
-        logger = logging.getLogger(__name__)
-        logger.info(f"Creating tasks for new user: {instance.username}")
-        local_now = localtime()
-        today = local_now.date()
-        
-        # Define tasks
+        # Define default tasks
         daily_tasks = [
             {"title": "COMPOSTING", "points": 5, "is_static": True},
             {"title": "RECYCLING", "points": 5, "is_static": True},
             {"title": "GREEN2GO CONTAINER", "points": 15, "is_static": True},
-            {"title": "WORD OF THE DAY", "points": 20, "is_static": False, "completion_criteria": {"action_date": str(today)}},
-            {"title": "PICTURE IN ACTION", "points": 20, "is_static": False, "completion_criteria": {"action_date": str(today)}},
+            {"title": "WORD OF THE DAY", "points": 20, "is_static": False},
+            {"title": "PICTURE IN ACTION", "points": 20, "is_static": False},
         ]
         weekly_tasks = [
             {"title": "ARTICLE QUIZ", "points": 20, "description": "Complete the weekly quiz"},
         ]
-        
-        # Weekly range
-        start_of_week = today - timedelta(days=today.weekday())
-        end_of_week = start_of_week + timedelta(days=6)
-        
-        # Create daily tasks without duplicates
+
+        # Create daily tasks
         for task in daily_tasks:
-            task_exists = DailyTask.objects.filter(
+            DailyTask.objects.get_or_create(
                 user=instance,
                 title=task["title"],
-                is_static=task["is_static"],
-                completion_criteria=task.get("completion_criteria", {})
-            ).exists()
+                defaults={
+                    "is_static": task["is_static"],
+                    "points": task["points"],
+                    "completed": False,
+                    "date_created": today,
+                }
+            )
 
-            if not task_exists:
-                DailyTask.objects.create(
-                    user=instance,
-                    title=task["title"],
-                    is_static=task["is_static"],
-                    points=task["points"],
-                    completed=False,
-                    date_created=today,
-                    time_created=local_now,
-                    completion_criteria=task.get("completion_criteria", {}),
-                )
-                logger.info(f"Created task: {task['title']} (Static: {task['is_static']}) for user {instance.username}")
-
-        
         # Create weekly tasks
         for task in weekly_tasks:
             WeeklyTask.objects.get_or_create(
@@ -161,11 +168,4 @@ def create_default_tasks_for_new_user(sender, instance, created, **kwargs):
                     "end_date": end_of_week,
                 }
             )
-  
-@receiver(post_save, sender=User)
-def check_referral_completion(sender, instance, created, **kwarg):
-    if created:
-        # Check if a ReferralTask with this user's email exists
-        referral = ReferralTask.objects.filter(referee_email=instance.email, completed=False).first()
-        if referral:
-            referral.complete_referral()
+
