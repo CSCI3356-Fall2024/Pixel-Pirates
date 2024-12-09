@@ -540,8 +540,6 @@ def actions_view(request):
 
     task_word = None
     word_task = dynamic_tasks.filter(title="WORD OF THE DAY").first()
-    print(dynamic_tasks)
-    print(static_tasks)
     feedback_message = ""
 
     # Handle the "WORD OF THE DAY" task
