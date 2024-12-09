@@ -865,7 +865,7 @@ def history_view(request):
     #finds out the difference by subtracting the earliest task date and subtracting it to now 
     try: 
         window = (now.date() - History.objects.earliest('date_created').date_created).days
-    except ArticleQuiz.DoesNotExist:
+    except History.DoesNotExist:
         window = 0
     
     if window > 30:
@@ -886,19 +886,19 @@ def history_view(request):
     #missing referral bc referral isn't completed 
     for campaign in active_campaigns:
         if campaign.title == 'PICTURE IN ACTION':
-            active['Picture in Action'].append(campaign)
+            active['Picture in Action'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
         elif campaign.title == 'WORD OF THE DAY':
-            active['Word of the Day'].append(campaign)
+            active['Word of the Day'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
         elif campaign.title == 'GREEN2GO CONTAINER':
-            active['Green2Go'].append(campaign)
+            active['Green2Go'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
         elif campaign.title == 'RECYCLING':
-            active['Recycling'].append(campaign)
+            active['Recycling'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
         elif campaign.title == 'COMPOSTING':
-            active['Composting'].append(campaign)
+            active['Composting'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
         elif campaign.title == 'REFERRAL':
-            active['Referral'].append(campaign)
+            active['Referral'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
         else: #needs to be an else statement bc we can't pinpoint the name of the articlequiz
-            active['Article Quiz'].append(campaign)
+            active['Article Quiz'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
 
     past_campaigns = History.objects.exclude(date_created=now.date())
     past_campaigns = past_campaigns.filter(is_redeem=False)
@@ -909,19 +909,19 @@ def history_view(request):
         past[current_date] = defaultdict(list)
         for campaign in history_items:
             if campaign.title == 'PICTURE IN ACTION':
-                past[current_date]['Picture in Action'].append(campaign)
+                past[current_date]['Picture in Action'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
             elif campaign.title == 'WORD OF THE DAY':
-                past[current_date]['Word of the Day'].append(campaign)
+                past[current_date]['Word of the Day'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
             elif campaign.title == 'GREEN2GO CONTAINER':
-                past[current_date]['Green2Go'].append(campaign)
+                past[current_date]['Green2Go'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
             elif campaign.title == 'RECYCLING':
-                past[current_date]['Recycling'].append(campaign)
+                past[current_date]['Recycling'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
             elif campaign.title == 'COMPOSTING':
-                past[current_date]['Composting'].append(campaign)
+                past[current_date]['Composting'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
             elif campaign.title == 'REFERRAL':
-                past[current_date]['Referral'].append(campaign)
+                past[current_date]['Referral'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
             else: #needs to be an else statement bc we can't pinpoint the name of the articlequiz
-                past[current_date]['Article Quiz'].append(campaign)
+                past[current_date]['Article Quiz'].append([str(campaign.user), campaign.time_created.strftime("%I:%M %p")])
         past[current_date] = dict(past[current_date])
         current_date -= timedelta(days=1)
         
