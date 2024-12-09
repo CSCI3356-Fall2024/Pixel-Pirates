@@ -54,6 +54,9 @@ def handle_login(sender, request, user, **kwargs):
         request.session['login_redirect'] = '/profile/'
 
 def login_view(request):
+    if request.user.is_authenticated:
+        # Redirect based on session value set during login
+        return redirect(request.session.pop('login_redirect', '/home/'))
     # Handle referral codes from query parameters
     referral_code = request.GET.get('ref')
     if referral_code:
