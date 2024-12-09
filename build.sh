@@ -3,13 +3,12 @@
 set -o errexit
 
 # Modify this line as needed for your package manager (pip, poetry, etc.)
-pip freeze > requirements.txt
-pip uninstall JWT
-pip uninstall PyJWT
 pip install -r requirements.txt
 
-# Convert static asset files
-python manage.py collectstatic --no-input
-
-# Apply any outstanding database migrations
+# Run database migrations
+python manage.py makemigrations
 python manage.py migrate
+
+# Collect static files
+
+python manage.py collectstatic --no-input
