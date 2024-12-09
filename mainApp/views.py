@@ -113,6 +113,8 @@ def profile_view(request):
                 points=10,
                 is_redeem=False,
                 location=None,
+                article_start=None,
+                article_end=None
             )
 
 
@@ -325,6 +327,8 @@ def redeem_reward(request):
             points=reward.points,
             is_redeem=True,
             location=None,
+            article_start=None,
+            article_end=None
         )
         return redirect('rewards')
 
@@ -680,7 +684,13 @@ def mark_task_completed(task):
     start = timezone.now() - timedelta(hours=5)
     start_day = start.date()
 
-    History.objects.create(
+    if (task.title == 'PICTURE IN ACTION'
+        or task.title == 'WORD OF THE DAY'
+        or task.title == 'GREEN2GO CONTAINER'
+        or task.title == 'RECYCLING'
+        or task.title == 'COMPOSTING'
+        or task.title == 'REFERRAL'):
+        History.objects.create(
             user=task.user,
             title=task.title,
             date_created=start_day,
@@ -688,7 +698,23 @@ def mark_task_completed(task):
             points=task.points,
             is_redeem=False,
             location=None,
+            article_start=None,
+            article_end=None
         )
+    else:
+            
+            History.objects.create(
+            user=task.user,
+            title=task.title,
+            date_created=start_day,
+            time_created=start.time(), 
+            points=task.points,
+            is_redeem=False,
+            location=None,
+            article_start=task.start_date,
+            article_end=task.end_date
+        )
+
 
 
 #I don't think it's being used anymore 
@@ -838,26 +864,26 @@ def history_view(request):
     
     #finds out the difference by subtracting the earliest task date and subtracting it to now 
     try: 
-        quiz = (now.date() - ArticleQuiz.objects.earliest('date_begin').date_begin).days
+        window = (now.date() - History.objects.earliest('date_created').date_created).days
     except ArticleQuiz.DoesNotExist:
-        quiz = 0
-    #doesn't work because there are no referral objects at all 
-    referral = 0 #(now.date() - ReferralTask.objects.earliest('completion_date').completion_date).days
-    daily = (now.date() - DailyTask.objects.earliest('date_created').date_created).days
-
-    #finds out the highest difference but limits it to 30 days 
-    window = max(quiz, referral, daily) 
+        window = 0
+    
     if window > 30:
         window = 30
-
-
-    active = defaultdict(list)
-    
 
     active_campaigns = History.objects.filter(date_created=now.date())
     active_campaigns = active_campaigns.filter(is_redeem=False)
 
-#missing referral bc referral isn't completed 
+    active = {
+        'Picture in Action': [],
+        'Word of the Day': [],
+        'Green2Go': [],
+        'Recycling': [],
+        'Composting': [],
+        'Referral': [],
+        'Article Quiz': []
+    }
+    #missing referral bc referral isn't completed 
     for campaign in active_campaigns:
         if campaign.title == 'PICTURE IN ACTION':
             active['Picture in Action'].append(campaign)
@@ -869,18 +895,15 @@ def history_view(request):
             active['Recycling'].append(campaign)
         elif campaign.title == 'COMPOSTING':
             active['Composting'].append(campaign)
+        elif campaign.title == 'REFERRAL':
+            active['Referral'].append(campaign)
         else: #needs to be an else statement bc we can't pinpoint the name of the articlequiz
             active['Article Quiz'].append(campaign)
 
-    active = dict(active)
-
-    past = {}
-    
     past_campaigns = History.objects.exclude(date_created=now.date())
     past_campaigns = past_campaigns.filter(is_redeem=False)
-
     current_date = now.date() - timedelta(days=1)
-
+    past = {}
     for i in range(window):
         history_items = past_campaigns.filter(date_created=current_date)
         past[current_date] = defaultdict(list)
@@ -895,6 +918,8 @@ def history_view(request):
                 past[current_date]['Recycling'].append(campaign)
             elif campaign.title == 'COMPOSTING':
                 past[current_date]['Composting'].append(campaign)
+            elif campaign.title == 'REFERRAL':
+                past[current_date]['Referral'].append(campaign)
             else: #needs to be an else statement bc we can't pinpoint the name of the articlequiz
                 past[current_date]['Article Quiz'].append(campaign)
         past[current_date] = dict(past[current_date])

@@ -233,6 +233,8 @@ class History(models.Model):
     time_created = models.TimeField()
     points = models.IntegerField(default=0)
     is_redeem = models.BooleanField(default=False)
+    article_start = models.DateField(blank=True, null=True)
+    article_end = models.DateField(blank=True, null=True)
 
     LOCATION_CHOICES = [
         ('Lower', 'Lower'),

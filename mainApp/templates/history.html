@@ -10,15 +10,9 @@
     {% endfor %}
 </ul>
 
-<!-- Make the vars actually look like variables  -->
-<ul>
-    <!-- {% for key, dictionary in past.items %}
-        {% for title, objects in dictionary.items %}
-            <li>{{ title }}</li>
-            <li>{{ objects }}</li>
-        {% endfor %} 
 
-    {% endfor %} -->
+<ul>
+
     {% for key, value in past.items %}
         <li>{{ key }}</li>
         {% for name, campaign in value.items %}
