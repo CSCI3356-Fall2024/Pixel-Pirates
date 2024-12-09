@@ -535,11 +535,13 @@ def actions_view(request):
 
     # Retrieve tasks
     static_tasks = DailyTask.objects.filter(user=user, is_static=True)
-    dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(localtime().date()))
+    dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False)
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
     task_word = None
     word_task = dynamic_tasks.filter(title="WORD OF THE DAY").first()
+    print(dynamic_tasks)
+    print(static_tasks)
     feedback_message = ""
 
     # Handle the "WORD OF THE DAY" task
