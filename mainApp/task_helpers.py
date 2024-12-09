@@ -4,7 +4,8 @@ from datetime import timedelta
 
 def create_daily_tasks(user, task_data, is_static=False):
     """Create daily tasks for a specific user."""
-    today = timezone.now().date()
+    now = timezone.now() - timedelta(hours=5)
+    today = now.date()
     for task in task_data:
         action_date = str(today) if not is_static else ''
         DailyTask.objects.update_or_create(
