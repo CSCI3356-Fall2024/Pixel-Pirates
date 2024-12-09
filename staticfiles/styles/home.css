@@ -1,0 +1,128 @@
+.section-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.motivation-container {
+    border-radius: 50px;
+    background: #DFEDE2;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container {
+    height: 350px;
+    position: relative;
+    margin-top: 20px;
+}
+
+.leaderboard-table-container {
+    max-height: 300px; 
+    overflow-y: auto; 
+    background-color: #FFFFFF;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    color: #3A3A3A;
+}
+
+.leaderboard-table .rank-up {
+    color: green;
+}
+
+.leaderboard-table .rank-down {
+    color: red;
+}
+
+.leaderboard-table .rank-neutral {
+    color: #888888;
+}
+
+.floating-row {
+    display: flex;
+    background-color: #DFEDE2; 
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px; 
+    margin-bottom: 20px;
+    font-size: 16px; 
+    border-radius: 8px;
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover; 
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.no-bullets {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.news-section {
+    background-color: #DFEDE2; 
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .news-section {
+        height: auto;
+        min-height: 200px; 
+    }
+}
+
+.news-box {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #DFEDE2;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    gap: 10px;
+}
+
+.news-box img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.news-item a {
+    color: black;
+    text-decoration: none;
+    font-size: 18px;
+    flex-grow: 1;
+}
+
+.news-item a:hover {
+    text-decoration: underline;
+}
+
+.news-item a:visited {
+    color: #49454F;
+    text-decoration: none;
+}
+
+.edit-icon {
+    color: #333;
+    font-size: 18px;
+    margin-left: auto;
+}

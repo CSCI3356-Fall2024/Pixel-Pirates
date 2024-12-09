@@ -1,0 +1,41 @@
+body {
+    height: 100vh;
+    overflow: hidden;
+    background-color: white;
+}
+
+
+.nav-tabs .nav-link.active {
+    background-color: #E8F4EA;
+    color: #40826D;
+    font-weight: bold;
+    border-color: #40826D;
+}
+
+.nav-tabs .nav-link {
+    color: #73A497;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #E8F4EA;
+}
+
+.tab-content {
+    padding: 20px;
+    border-radius: 0.5rem;
+}
+
+.container h1 {
+    color: #007BFF;
+}
+
+button[type="submit"] {
+    background-color: #007BFF;
+    border-color: #007BFF;
+    color: white;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}

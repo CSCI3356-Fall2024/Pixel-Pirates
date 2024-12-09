@@ -1,0 +1,4 @@
+/* General Modal Styling */
+.modal-header .close {
+    display: none;
+}
