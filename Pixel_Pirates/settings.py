@@ -24,14 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-chpo3krf9dr7^s#fgezkn-5owlsdd6jv2z@6*(lb%md2u$p*xy"
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://mysite-2hj1.onrender.com'
-]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['mysite-2hj1.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 # Application definition
 SITE_ID = 1
 
