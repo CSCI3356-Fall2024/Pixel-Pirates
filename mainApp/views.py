@@ -535,7 +535,7 @@ def actions_view(request):
 
     # Retrieve tasks
     static_tasks = DailyTask.objects.filter(user=user, is_static=True)
-    dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False, completion_criteria__action_date=str(localtime().date()))
+    dynamic_tasks = DailyTask.objects.filter(user=user, is_static=False)
     weekly_tasks = WeeklyTask.objects.filter(user=user, start_date=start_of_week, end_date=end_of_week)
 
     task_word = None
